@@ -1,7 +1,7 @@
 package com.example.ccl3_app.data
 
-import com.example.ccl3_app.db.StackEntity
-import com.example.ccl3_app.db.StackDao
+import com.example.ccl3_app.database.StackEntity
+import com.example.ccl3_app.database.StackDao
 import kotlinx.coroutines.flow.map
 
 class StackRepository(private val stackDao: StackDao) {

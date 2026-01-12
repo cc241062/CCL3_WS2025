@@ -1,3 +1,28 @@
 package com.example.ccl3_app.database
 
-data class RecipeEntity()
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.PrimaryKey
+import androidx.room.Index
+
+@Entity(
+    tableName = "recipes",
+    foreignKeys = [
+        ForeignKey(
+            entity = StackEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["stackId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ],
+    indices = [Index("stackId")]
+)
+data class RecipeEntity(
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
+    val stackId: Int,
+    val title: String,
+    val description: String = "",
+    val ingredients: String,
+    val instructions: String
+)

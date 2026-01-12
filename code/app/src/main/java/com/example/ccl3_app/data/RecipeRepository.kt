@@ -1,7 +1,7 @@
 package com.example.ccl3_app.data
 
-import com.example.ccl3_app.db.RecipeEntity
-import com.example.ccl3_app.db.RecipeDao
+import com.example.ccl3_app.database.RecipeDao
+import com.example.ccl3_app.database.RecipeEntity
 import kotlinx.coroutines.flow.map
 
 class RecipeRepository(private val recipeDao: RecipeDao) {
