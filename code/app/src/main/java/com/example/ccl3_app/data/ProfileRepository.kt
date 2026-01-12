@@ -1,7 +1,7 @@
 package com.example.ccl3_app.data
 
-import com.example.ccl3_app.db.ProfileDao
-import com.example.ccl3_app.db.ProfileEntity
+import com.example.ccl3_app.database.ProfileDao
+import com.example.ccl3_app.database.ProfileEntity
 import kotlinx.coroutines.flow.map
 
 class ProfileRepository(private val profileDao: ProfileDao) {

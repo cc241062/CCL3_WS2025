@@ -1,8 +1,11 @@
 package com.example.ccl3_app.data
 
+import com.example.ccl3_app.database.QuestDao
 import com.example.ccl3_app.database.QuestEntity
 
-class QuestRepository {
+class QuestRepository(
+    private val questDao: QuestDao
+) {
 
     suspend fun completeQuest(quest: QuestEntity) {
         if (quest.level == 1) {
@@ -18,5 +21,4 @@ class QuestRepository {
             throw IllegalStateException("Previous quest must be completed first")
         }
     }
-
 }

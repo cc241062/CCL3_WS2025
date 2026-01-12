@@ -7,6 +7,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.ccl3_app.ui.screens.HomeScreen
+import com.example.ccl3_app.ui.screens.ProfileDetailScreen
+import com.example.ccl3_app.ui.screens.ProfileListScreen
+import com.example.ccl3_app.ui.screens.RecipeDetailScreen
+import com.example.ccl3_app.ui.screens.RecipeFormScreen
 
 /* ---------------------------------------------------
    Routes (kept in same file)
