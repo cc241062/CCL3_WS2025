@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.ccl3_app.db.StackDao
+import com.example.ccl3_app.database.StackDao
 
 @Database(
     entities = [StackEntity::class, RecipeEntity::class, ProfileEntity::class],
