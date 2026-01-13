@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.compose.rememberNavController
 import com.example.ccl3_app.ui.navigation.AppNavHost
+import com.example.ccl3_app.ui.navigation.BottomNavBar
 import com.example.ccl3_app.ui.theme.CCL3_AppTheme
 
 class MainActivity : ComponentActivity() {
@@ -18,10 +20,25 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             CCL3_AppTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    AppNavHost(Modifier.padding(innerPadding))
-                }
+                MainScreen()
             }
         }
+    }
+}
+
+@Composable
+fun MainScreen() {
+    val navController = rememberNavController()
+
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        bottomBar = {
+            BottomNavBar(navController) // optional
+        }
+    ) { innerPadding ->
+        AppNavHost(
+            navController = navController,
+            modifier = Modifier.padding(innerPadding)
+        )
     }
 }

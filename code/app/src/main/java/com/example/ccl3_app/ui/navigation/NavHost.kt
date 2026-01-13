@@ -10,8 +10,17 @@ import androidx.navigation.navArgument
 import com.example.ccl3_app.ui.screens.HomeScreen
 import com.example.ccl3_app.ui.screens.ProfileDetailScreen
 import com.example.ccl3_app.ui.screens.ProfileListScreen
+import com.example.ccl3_app.ui.screens.QuestScreen
 import com.example.ccl3_app.ui.screens.RecipeDetailScreen
 import com.example.ccl3_app.ui.screens.RecipeFormScreen
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.*
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.navigation.compose.currentBackStackEntryAsState
 
 /* ---------------------------------------------------
    Routes (kept in same file)
@@ -19,7 +28,9 @@ import com.example.ccl3_app.ui.screens.RecipeFormScreen
 object Routes {
 
     const val HOME = "home"
+    const val QUEST = "quest"
     const val PROFILES = "profiles"
+
     const val PROFILE_DETAIL = "profile_detail"
     const val RECIPE_DETAIL = "recipe_detail"
     const val RECIPE_FORM = "recipe_form"
@@ -29,13 +40,15 @@ object Routes {
     fun recipeForm(stackId: Int) = "$RECIPE_FORM/$stackId"
 }
 
+
 /* ---------------------------------------------------
    NavHost
 --------------------------------------------------- */
 @Composable
-fun AppNavHost(modifier: Modifier = Modifier) {
-
-    val navController = rememberNavController()
+fun AppNavHost(
+    navController: androidx.navigation.NavHostController,
+    modifier: Modifier = Modifier
+) {
 
     NavHost(
         navController = navController,
@@ -55,6 +68,10 @@ fun AppNavHost(modifier: Modifier = Modifier) {
                     navController.navigate(Routes.recipeForm(stackId))
                 }
             )
+        }
+
+        composable(Routes.QUEST) {
+            QuestScreen()
         }
 
         /* ---------------- Profiles ---------------- */
@@ -122,5 +139,41 @@ fun AppNavHost(modifier: Modifier = Modifier) {
                 }
             )
         }
+
     }
 }
+    data class BottomNavItem(
+            val label: String,
+            val route: String,
+            val icon: ImageVector
+        )
+
+    @Composable
+    fun BottomNavBar(navController: androidx.navigation.NavHostController) {
+
+            val items = listOf(
+                BottomNavItem("Home", Routes.HOME, Icons.Default.Home),
+                BottomNavItem("Quest", Routes.QUEST, Icons.Default.List),
+                BottomNavItem("Profile", Routes.PROFILES, Icons.Default.Person)
+            )
+
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentRoute = navBackStackEntry?.destination?.route
+
+            NavigationBar {
+                items.forEach { item ->
+                    NavigationBarItem(
+                        selected = currentRoute == item.route,
+                        onClick = {
+                            navController.navigate(item.route) {
+                                popUpTo(Routes.HOME) { saveState = true }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        },
+                        icon = { Icon(item.icon, contentDescription = item.label) },
+                        label = { Text(item.label) }
+                    )
+                }
+            }
+        }
