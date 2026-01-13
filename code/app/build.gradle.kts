@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ksp) // ADD THIS - Use the KSP plugin from libs.versions.toml
 }
 
 android {
@@ -49,8 +50,12 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+
+    // Room dependencies - FIXED
     implementation(libs.androidx.room.common.jvm)
     implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler) // ADD THIS - Critical for Room to work!
+
     implementation(libs.androidx.navigation.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

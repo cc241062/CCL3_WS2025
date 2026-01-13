@@ -2,17 +2,23 @@ package com.example.ccl3_app.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.ccl3_app.data.RecipeRepository
+import com.example.ccl3_app.database.OopsDatabase
 import com.example.ccl3_app.ui.screens.HomeScreen
 import com.example.ccl3_app.ui.screens.ProfileDetailScreen
 import com.example.ccl3_app.ui.screens.ProfileListScreen
 import com.example.ccl3_app.ui.screens.QuestScreen
 import com.example.ccl3_app.ui.screens.RecipeDetailScreen
 import com.example.ccl3_app.ui.screens.RecipeFormScreen
+import com.example.ccl3_app.ui.viewmodels.HomeViewModel
+import com.example.ccl3_app.ui.viewmodels.HomeViewModelFactory
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
@@ -49,6 +55,9 @@ fun AppNavHost(
     navController: androidx.navigation.NavHostController,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+    val database = OopsDatabase.getDatabase(context)
+    val recipeRepository = RecipeRepository(database.RecipeDao())
 
     NavHost(
         navController = navController,
@@ -57,7 +66,12 @@ fun AppNavHost(
 
         /* ---------------- Home ---------------- */
         composable(Routes.HOME) {
+            val homeViewModel: HomeViewModel = viewModel(
+                factory = HomeViewModelFactory(recipeRepository)
+            )
+
             HomeScreen(
+                viewModel = homeViewModel,
                 onOpenProfiles = {
                     navController.navigate(Routes.PROFILES)
                 },
@@ -66,6 +80,9 @@ fun AppNavHost(
                 },
                 onAddRecipe = { stackId ->
                     navController.navigate(Routes.recipeForm(stackId))
+                },
+                onNavigateToQuests = {
+                    navController.navigate(Routes.QUEST)
                 }
             )
         }
@@ -142,38 +159,44 @@ fun AppNavHost(
 
     }
 }
-    data class BottomNavItem(
-            val label: String,
-            val route: String,
-            val icon: ImageVector
-        )
 
-    @Composable
-    fun BottomNavBar(navController: androidx.navigation.NavHostController) {
+data class BottomNavItem(
+    val label: String,
+    val route: String,
+    val icon: ImageVector
+)
 
-            val items = listOf(
-                BottomNavItem("Home", Routes.HOME, Icons.Default.Home),
-                BottomNavItem("Quest", Routes.QUEST, Icons.Default.List),
-                BottomNavItem("Profile", Routes.PROFILES, Icons.Default.Person)
+@Composable
+fun BottomNavBar(navController: androidx.navigation.NavHostController) {
+
+    val items = listOf(
+        BottomNavItem("Home", Routes.HOME, Icons.Default.Home),
+        BottomNavItem("Quest", Routes.QUEST, Icons.Default.List),
+        BottomNavItem("Profile", Routes.PROFILES, Icons.Default.Person)
+    )
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    NavigationBar {
+        items.forEach { item ->
+            NavigationBarItem(
+                selected = currentRoute == item.route,
+                onClick = {
+                    navController.navigate(item.route) {
+                        // Pop up to the start destination and save state
+                        popUpTo(navController.graph.startDestinationId) {
+                            saveState = true
+                        }
+                        // Avoid multiple copies of the same destination
+                        launchSingleTop = true
+                        // Restore state when navigating back
+                        restoreState = true
+                    }
+                },
+                icon = { Icon(item.icon, contentDescription = item.label) },
+                label = { Text(item.label) }
             )
-
-            val navBackStackEntry by navController.currentBackStackEntryAsState()
-            val currentRoute = navBackStackEntry?.destination?.route
-
-            NavigationBar {
-                items.forEach { item ->
-                    NavigationBarItem(
-                        selected = currentRoute == item.route,
-                        onClick = {
-                            navController.navigate(item.route) {
-                                popUpTo(Routes.HOME) { saveState = true }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        },
-                        icon = { Icon(item.icon, contentDescription = item.label) },
-                        label = { Text(item.label) }
-                    )
-                }
-            }
         }
+    }
+}
