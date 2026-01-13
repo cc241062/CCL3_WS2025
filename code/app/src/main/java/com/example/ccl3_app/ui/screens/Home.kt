@@ -9,6 +9,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.example.ccl3_app.ui.components.OopsCard
+import com.example.ccl3_app.ui.components.RecipeCard
 import com.example.ccl3_app.ui.theme.DarkTeal
 import com.example.ccl3_app.ui.theme.Orange
 
@@ -56,16 +57,22 @@ fun HomeScreen(
             Text("Have a look!")
         }
 
-            Text("Home Screen")
-            Button(onClick = onOpenProfiles) {
-                Text("Open Profiles")
-            }
-            Button(onClick = { onRecipeClick(1) }) {
-                Text("Go to Recipe Detail (id=1)")
-            }
-            Button(onClick = { onAddRecipe(1) }) {
-                Text("Add Recipe (stackId=1)")
-            }
+        RecipeCard(
+            backGroundColor = Orange
+        ) {
+            Text("Recipe")
+        }
+
+        Text("Home Screen")
+        Button(onClick = onOpenProfiles) {
+            Text("Open Profiles")
+        }
+        Button(onClick = { onRecipeClick(1) }) {
+            Text("Go to Recipe Detail (id=1)")
+        }
+        Button(onClick = { onAddRecipe(1) }) {
+            Text("Add Recipe (stackId=1)")
+        }
 
     }
 }

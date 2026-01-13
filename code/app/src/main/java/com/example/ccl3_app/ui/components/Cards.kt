@@ -5,11 +5,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CardColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.ccl3_app.ui.theme.CardBackground
+
 
 @Composable
 fun OopsCard(
@@ -25,3 +28,17 @@ fun OopsCard(
     )
 }
 
+@Composable
+fun RecipeCard(
+        modifier: Modifier = Modifier,
+        backGroundColor: Color = CardBackground,
+        content: @Composable ColumnScope.() -> Unit,
+) {
+    Column (
+        modifier = modifier
+            .shadow(6.dp, RoundedCornerShape(20.dp))
+            .background(backGroundColor, RoundedCornerShape(20.dp))
+            .padding(16.dp),
+        content = content
+    )
+}
