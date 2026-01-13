@@ -23,6 +23,6 @@ data class RecipeEntity(
     val stackId: Int,
     val title: String,
     val description: String = "",
-    val ingredients: String,
-    val instructions: String
+    val ingredients: List<String>,
+    val instructions: List<String>
 )

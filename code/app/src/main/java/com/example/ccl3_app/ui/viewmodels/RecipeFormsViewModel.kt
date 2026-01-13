@@ -13,17 +13,19 @@ class RecipeFormsViewModel(
     fun addRecipe(
         stackId: Int,
         title: String,
-        image: String,
+        //image: String,
+        description: String,
         ingredients: List<String>,
-        steps: List<String>
+        instructions: List<String>
     ) {
         viewModelScope.launch {
             recipeRepository.addRecipe(
                 stackId,
                 title,
-                image,
+                //image,
+                description,
                 ingredients,
-                steps
+                instructions
             )
         }
     }

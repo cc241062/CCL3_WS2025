@@ -4,8 +4,9 @@ data class Recipe(
     val id: Int = 0,
     val stackId: Int,
     val title: String,
-    val image: String,
+    //val image: String,
+    val description: String,
     val ingredients: List<String>,
-    val stepByStepInstructions: List<String>
+    val instructions: List<String>
 )
 
