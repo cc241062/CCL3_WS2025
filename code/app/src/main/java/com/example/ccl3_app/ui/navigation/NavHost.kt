@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.ccl3_app.data.RecipeRepository
+import com.example.ccl3_app.data.QuestRepository
 import com.example.ccl3_app.database.OopsDatabase
 import com.example.ccl3_app.ui.screens.HomeScreen
 import com.example.ccl3_app.ui.screens.ProfileDetailScreen
@@ -19,6 +20,8 @@ import com.example.ccl3_app.ui.screens.RecipeDetailScreen
 import com.example.ccl3_app.ui.screens.RecipeFormScreen
 import com.example.ccl3_app.ui.viewmodels.HomeViewModel
 import com.example.ccl3_app.ui.viewmodels.HomeViewModelFactory
+import com.example.ccl3_app.ui.viewmodels.QuestViewModel
+import com.example.ccl3_app.ui.viewmodels.QuestViewModelFactory
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
@@ -58,6 +61,7 @@ fun AppNavHost(
     val context = LocalContext.current
     val database = OopsDatabase.getDatabase(context)
     val recipeRepository = RecipeRepository(database.RecipeDao())
+    val questRepository = QuestRepository(database.QuestDao())
 
     NavHost(
         navController = navController,
@@ -87,8 +91,12 @@ fun AppNavHost(
             )
         }
 
+        /* ---------------- Quest ---------------- */
         composable(Routes.QUEST) {
-            QuestScreen()
+            val questViewModel: QuestViewModel = viewModel(
+                factory = QuestViewModelFactory(questRepository)
+            )
+            QuestScreen(viewModel = questViewModel)
         }
 
         /* ---------------- Profiles ---------------- */

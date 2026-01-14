@@ -8,18 +8,17 @@ import androidx.room.TypeConverters
 import com.example.ccl3_app.database.StackDao
 
 @Database(
-    entities = [StackEntity::class, RecipeEntity::class, ProfileEntity::class],
-    version = 2,
+    entities = [StackEntity::class, RecipeEntity::class, ProfileEntity::class, QuestEntity::class],
+    version = 3,  // Increment this!
     exportSchema = false
 )
-
 @TypeConverters(Converters::class)
 abstract class OopsDatabase : RoomDatabase() {
 
     abstract fun StackDao(): StackDao
     abstract fun RecipeDao(): RecipeDao
     abstract fun ProfileDao(): ProfileDao
-
+    abstract fun QuestDao(): QuestDao  // Add this!
 
     companion object {
         @Volatile
