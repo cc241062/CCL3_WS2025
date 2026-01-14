@@ -21,6 +21,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ccl3_app.data.Recipe
 import com.example.ccl3_app.ui.theme.*
 import com.example.ccl3_app.ui.viewmodels.HomeViewModel
+import com.example.ccl3_app.ui.components.RecipeCard
+import com.example.ccl3_app.ui.components.NewQuestsCard
+import com.example.ccl3_app.ui.components.WelcomeCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -126,7 +129,7 @@ fun HomeScreen(
             .background(Color.White)
     ) {
         // Header
-        Box(
+        /*Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Teal)
@@ -138,12 +141,17 @@ fun HomeScreen(
                 fontWeight = FontWeight.Bold,
                 color = Color.White
             )
-        }
+        }*/
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        val scrollState = rememberScrollState()
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .padding(16.dp)
+                .verticalScroll(scrollState),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Welcome Card
@@ -166,217 +174,6 @@ fun HomeScreen(
                 EmptyRecipeCard(
                     onAddRecipe = { onAddRecipe(1) }
                 )
-            }
-        }
-    }
-}
-
-@Composable
-fun WelcomeCard() {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = LightTeal.copy(alpha = 0.3f)
-        )
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column {
-                Text(
-                    text = "Hiii, welcome back.\nAre you hungry?",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Teal,
-                    lineHeight = 24.sp
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "Lets cook!",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Orange
-                )
-            }
-
-            Text(
-                text = "🥄",
-                fontSize = 48.sp
-            )
-        }
-    }
-}
-
-@Composable
-fun NewQuestsCard(onClick: () -> Unit = {}) {
-    Card(
-        onClick = onClick,
-        modifier = Modifier
-            .fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Orange.copy(alpha = 0.2f)
-        )
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column {
-                Text(
-                    text = "New Quests available",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color.Black
-                )
-                Text(
-                    text = "Have a look!",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Orange
-                )
-            }
-
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = "Quests",
-                tint = Color.Gray,
-                modifier = Modifier.size(36.dp)
-            )
-        }
-    }
-}
-
-@Composable
-fun RecipeCard(
-    recipe: Recipe,
-    onRecipeClick: () -> Unit = {},
-    onPreviousClick: () -> Unit = {},
-    onNextClick: () -> Unit = {}
-) {
-    Card(
-        onClick = onRecipeClick,
-        modifier = Modifier
-            .fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = PostItYellow
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 4.dp
-        )
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            // Recipe Image
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(180.dp),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.DarkGray),
-                    contentAlignment = Alignment.Center
-                ) {
-                    // TODO: Replace with actual image
-                    // Image(
-                    //     painter = painterResource(id = recipe.imageResId),
-                    //     contentDescription = recipe.name,
-                    //     contentScale = ContentScale.Crop,
-                    //     modifier = Modifier.fillMaxSize()
-                    // )
-                    Text(
-                        text = "🍳",
-                        fontSize = 72.sp
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Recipe Title
-            Text(
-                text = recipe.title,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black
-            )
-
-            // Ingredient count (since no duration field)
-            Text(
-                text = "${recipe.ingredients.size} ingredients",
-                fontSize = 14.sp,
-                color = Color.Gray
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Description
-            Text(
-                text = recipe.description,
-                fontSize = 14.sp,
-                color = Color.Black.copy(alpha = 0.7f),
-                lineHeight = 20.sp,
-                maxLines = 3
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Navigation Buttons
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(
-                    onClick = onPreviousClick,
-                    modifier = Modifier.size(48.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "Previous",
-                        tint = Color.Black
-                    )
-                }
-
-                FloatingActionButton(
-                    onClick = onRecipeClick,
-                    containerColor = Orange,
-                    contentColor = Color.White,
-                    modifier = Modifier.size(56.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "View Recipe",
-                        modifier = Modifier.size(32.dp)
-                    )
-                }
-
-                IconButton(
-                    onClick = onNextClick,
-                    modifier = Modifier.size(48.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowForward,
-                        contentDescription = "Next",
-                        tint = Color.Black
-                    )
-                }
             }
         }
     }
