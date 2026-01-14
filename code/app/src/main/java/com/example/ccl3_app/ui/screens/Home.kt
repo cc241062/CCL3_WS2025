@@ -126,7 +126,7 @@ fun HomeScreen(
             .background(Color.White)
     ) {
         // Header
-        Box(
+        /*Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Teal)
@@ -138,12 +138,15 @@ fun HomeScreen(
                 fontWeight = FontWeight.Bold,
                 color = Color.White
             )
-        }
+        }*/
+
+        val scrollState = rememberScrollState()
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .padding(16.dp)
+                .verticalScroll(scrollState),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Welcome Card
