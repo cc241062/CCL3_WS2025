@@ -2,26 +2,18 @@ package com.example.ccl3_app.data
 
 import com.example.ccl3_app.database.ProfileDao
 import com.example.ccl3_app.database.ProfileEntity
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class ProfileRepository(private val profileDao: ProfileDao) {
 
-    // get all profiles ???????????????????????????????????????????????????????????????????????????????????????????
-    fun getAllProfiles() =
-        profileDao.getAllProfiles().map { profileList ->
-            profileList.map { entity ->
-                Profile(
-                    id = entity.id,
-                    name = entity.name,
-                    username = entity.username,
-                    email = entity.email,
-                    password = entity.password,
-                    profileImage = entity.profileImage
-                )
-            }
-        }
+    fun getAllProfiles(): Flow<List<Profile>> =
+        profileDao.getAllProfiles().map { list -> list.map { it.toDomain() } }
 
-    // create profile
+    // NEW: observe one profile for compose screens
+    fun getProfileById(profileId: Int): Flow<Profile?> =
+        profileDao.getProfileById(profileId).map { it?.toDomain() }
+
     suspend fun addProfile(
         name: String,
         username: String,
@@ -41,44 +33,34 @@ class ProfileRepository(private val profileDao: ProfileDao) {
         )
     }
 
-    // update profile
     suspend fun updateProfile(profile: Profile) {
-        profileDao.updateProfile(
-            ProfileEntity(
-                id = profile.id,
-                name = profile.name,
-                username = profile.username,
-                email = profile.email,
-                password = profile.password,
-                profileImage = profile.profileImage
-            )
-        )
+        profileDao.updateProfile(profile.toEntity())
     }
 
-    // get single profile
+    // keep if you still want one-shot fetch
     suspend fun findProfileById(profileId: Int): Profile {
-        val entity = profileDao.findProfileById(profileId)
-        return Profile(
-            id = entity.id,
-            name = entity.name,
-            username = entity.username,
-            email = entity.email,
-            password = entity.password,
-            profileImage = entity.profileImage
-        )
+        return profileDao.findProfileById(profileId).toDomain()
     }
 
-    // delete profile
     suspend fun deleteProfile(profile: Profile) {
-        profileDao.deleteProfile(
-            ProfileEntity(
-                id = profile.id,
-                name = profile.name,
-                username = profile.username,
-                email = profile.email,
-                password = profile.password,
-                profileImage = profile.profileImage
-            )
-        )
+        profileDao.deleteProfile(profile.toEntity())
     }
 }
+
+private fun ProfileEntity.toDomain() = Profile(
+    id = id,
+    name = name,
+    username = username,
+    email = email,
+    password = password,
+    profileImage = profileImage
+)
+
+private fun Profile.toEntity() = ProfileEntity(
+    id = id,
+    name = name,
+    username = username,
+    email = email,
+    password = password,
+    profileImage = profileImage
+)

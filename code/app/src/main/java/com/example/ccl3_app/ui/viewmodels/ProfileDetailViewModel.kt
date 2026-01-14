@@ -26,4 +26,10 @@ class ProfileDetailViewModel(
             profileRepository.updateProfile(profile)
         }
     }
+    fun deleteProfile(profile: Profile) {
+        viewModelScope.launch {
+            profileRepository.deleteProfile(profile)
+        }
+    }
+
 }

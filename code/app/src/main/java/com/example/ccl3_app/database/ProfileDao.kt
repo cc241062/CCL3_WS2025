@@ -23,6 +23,9 @@ interface ProfileDao {
     @Query("SELECT * FROM profiles WHERE id = :id")
     suspend fun findProfileById(id: Int): ProfileEntity
 
+    @Query("SELECT * FROM profiles WHERE id = :id LIMIT 1")
+    fun getProfileById(id: Int): Flow<ProfileEntity?>
+
     @Query("SELECT * FROM profiles")
     fun getAllProfiles(): Flow<List<ProfileEntity>>
 }

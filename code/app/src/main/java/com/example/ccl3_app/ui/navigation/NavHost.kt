@@ -13,7 +13,7 @@ import com.example.ccl3_app.data.RecipeRepository
 import com.example.ccl3_app.database.OopsDatabase
 import com.example.ccl3_app.ui.screens.HomeScreen
 import com.example.ccl3_app.ui.screens.ProfileDetailScreen
-import com.example.ccl3_app.ui.screens.ProfileListScreen
+import com.example.ccl3_app.ui.screens.ProfileScreen
 import com.example.ccl3_app.ui.screens.QuestScreen
 import com.example.ccl3_app.ui.screens.RecipeDetailScreen
 import com.example.ccl3_app.ui.screens.RecipeFormScreen
@@ -35,7 +35,7 @@ object Routes {
 
     const val HOME = "home"
     const val QUEST = "quest"
-    const val PROFILES = "profiles"
+    const val PROFILE = "profile"
 
     const val PROFILE_DETAIL = "profile_detail"
     const val RECIPE_DETAIL = "recipe_detail"
@@ -73,7 +73,7 @@ fun AppNavHost(
             HomeScreen(
                 viewModel = homeViewModel,
                 onOpenProfiles = {
-                    navController.navigate(Routes.PROFILES)
+                    navController.navigate(Routes.PROFILE)
                 },
                 onRecipeClick = { recipeId ->
                     navController.navigate(Routes.recipeDetail(recipeId))
@@ -92,13 +92,17 @@ fun AppNavHost(
         }
 
         /* ---------------- Profiles ---------------- */
-        composable(Routes.PROFILES) {
-            ProfileListScreen(
-                onProfileClick = { profileId ->
-                    navController.navigate(Routes.profileDetail(profileId))
+        composable(Routes.PROFILE) {
+            ProfileScreen(
+                profileId = 1, // for now: logged-in user
+                onSettingsClick = {
+                    navController.navigate(Routes.profileDetail(1))
                 },
-                onBack = {
-                    navController.popBackStack()
+                onStackClick = { stackId ->
+                    // TODO navigate to stack
+                },
+                onAddStack = {
+                    // TODO add stack
                 }
             )
         }
@@ -172,7 +176,7 @@ fun BottomNavBar(navController: androidx.navigation.NavHostController) {
     val items = listOf(
         BottomNavItem("Home", Routes.HOME, Icons.Default.Home),
         BottomNavItem("Quest", Routes.QUEST, Icons.Default.List),
-        BottomNavItem("Profile", Routes.PROFILES, Icons.Default.Person)
+        BottomNavItem("Profile", Routes.PROFILE, Icons.Default.Person)
     )
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
