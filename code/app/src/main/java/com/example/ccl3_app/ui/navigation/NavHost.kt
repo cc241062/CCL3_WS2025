@@ -94,35 +94,22 @@ fun AppNavHost(
         /* ---------------- Profiles ---------------- */
         composable(Routes.PROFILE) {
             ProfileScreen(
-                profileId = 1, // for now: logged-in user
                 onSettingsClick = {
-                    navController.navigate(Routes.profileDetail(1))
+                    navController.navigate(Routes.PROFILE_DETAIL)
                 },
-                onStackClick = { stackId ->
-                    // TODO navigate to stack
-                },
-                onAddStack = {
-                    // TODO add stack
-                }
+                onStackClick = { /* TODO */ },
+                onAddStack = { /* TODO */ }
             )
+
         }
 
         /* ---------------- Profile Detail ---------------- */
-        composable(
-            route = "${Routes.PROFILE_DETAIL}/{id}",
-            arguments = listOf(
-                navArgument("id") { type = NavType.IntType }
-            )
-        ) { backStackEntry ->
-            val profileId = backStackEntry.arguments!!.getInt("id")
-
+        composable(Routes.PROFILE_DETAIL) {
             ProfileDetailScreen(
-                profileId = profileId,
-                onBack = {
-                    navController.popBackStack()
-                }
+                onBack = { navController.popBackStack() }
             )
         }
+
 
         /* ---------------- Recipe Detail ---------------- */
         composable(

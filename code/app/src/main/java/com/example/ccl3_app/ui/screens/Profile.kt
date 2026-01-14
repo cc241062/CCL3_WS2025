@@ -40,8 +40,7 @@ data class StackUi(
 
 @Composable
 fun ProfileScreen(
-    profileId: Int = 1,
-    onSettingsClick: () -> Unit = {},
+    onSettingsClick: () -> Unit,
     onStackClick: (Int) -> Unit = {},
     onAddStack: () -> Unit = {}
 ) {
@@ -57,8 +56,8 @@ fun ProfileScreen(
 
 
     // set which profile to observe
-    LaunchedEffect(profileId) {
-        profileViewModel.setSelectedProfile(profileId)
+    LaunchedEffect(Unit) {
+        profileViewModel.ensureDefault()
     }
 
     val profile by profileViewModel.currentProfile.collectAsState()
@@ -102,7 +101,7 @@ fun ProfileScreen(
                     color = Color.Black
                 )
 
-                IconButton(onClick = onSettingsClick) {
+                IconButton(onClick = onSettingsClick ) {
                     Icon(
                         imageVector = Icons.Default.Settings,
                         contentDescription = "Settings",

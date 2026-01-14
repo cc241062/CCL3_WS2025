@@ -11,8 +11,6 @@ class ProfileViewModel(
     private val profileRepository: ProfileRepository
 ) : ViewModel() {
 
-    // Existing list
-    val profiles: Flow<List<Profile>> = profileRepository.getAllProfiles()
 
     // Which profile is currently being shown (for now default to 1)
     private val selectedProfileId = MutableStateFlow(1)
@@ -50,6 +48,11 @@ class ProfileViewModel(
     fun deleteProfile(profile: Profile) {
         viewModelScope.launch {
             profileRepository.deleteProfile(profile)
+        }
+    }
+    fun ensureDefault() {
+        viewModelScope.launch {
+            profileRepository.ensureDefaultProfile()
         }
     }
 }

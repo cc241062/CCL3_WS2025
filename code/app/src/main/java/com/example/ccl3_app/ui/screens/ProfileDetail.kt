@@ -30,7 +30,6 @@ import com.example.ccl3_app.ui.viewmodels.ProfileDetailViewModelFactory
 
 @Composable
 fun ProfileDetailScreen(
-    profileId: Int,
     onBack: () -> Unit = {}
 ) {
     val context = LocalContext.current
@@ -41,9 +40,7 @@ fun ProfileDetailScreen(
         factory = ProfileDetailViewModelFactory(repo)
     )
 
-    LaunchedEffect(profileId) {
-        vm.loadProfile(profileId)
-    }
+    LaunchedEffect(Unit) { vm.loadProfile() }
 
     val profile by vm.profile.collectAsState()
 

@@ -15,21 +15,29 @@ class ProfileDetailViewModel(
     private val _profile = MutableStateFlow<Profile?>(null)
     val profile: StateFlow<Profile?> = _profile
 
-    fun loadProfile(profileId: Int) {
+    fun loadProfile() {
         viewModelScope.launch {
-            _profile.value = profileRepository.findProfileById(profileId)
+            profileRepository.ensureDefaultProfile()
+            _profile.value = profileRepository.getSingleProfile()
         }
     }
 
     fun updateProfile(profile: Profile) {
         viewModelScope.launch {
             profileRepository.updateProfile(profile)
+            _profile.value = profileRepository.getSingleProfile()
         }
     }
+
     fun deleteProfile(profile: Profile) {
         viewModelScope.launch {
             profileRepository.deleteProfile(profile)
+            _profile.value = null
         }
     }
 
 }
+
+
+
+

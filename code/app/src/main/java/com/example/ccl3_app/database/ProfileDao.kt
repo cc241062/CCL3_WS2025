@@ -20,12 +20,16 @@ interface ProfileDao {
     @Delete
     suspend fun deleteProfile(profile: ProfileEntity)
 
-    @Query("SELECT * FROM profiles WHERE id = :id")
-    suspend fun findProfileById(id: Int): ProfileEntity
-
     @Query("SELECT * FROM profiles WHERE id = :id LIMIT 1")
     fun getProfileById(id: Int): Flow<ProfileEntity?>
 
-    @Query("SELECT * FROM profiles")
-    fun getAllProfiles(): Flow<List<ProfileEntity>>
+    @Query("SELECT COUNT(*) FROM profiles")
+    suspend fun countProfiles(): Int
+
+    @Query("SELECT * FROM profiles ORDER BY id ASC LIMIT 1")
+    suspend fun getSingleProfile(): ProfileEntity?
+    @Query("SELECT * FROM profiles ORDER BY id ASC LIMIT 1")
+    fun observeSingleProfile(): Flow<ProfileEntity?>
+
+
 }

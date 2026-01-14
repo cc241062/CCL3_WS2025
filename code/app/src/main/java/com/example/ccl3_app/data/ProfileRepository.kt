@@ -7,12 +7,30 @@ import kotlinx.coroutines.flow.map
 
 class ProfileRepository(private val profileDao: ProfileDao) {
 
-    fun getAllProfiles(): Flow<List<Profile>> =
-        profileDao.getAllProfiles().map { list -> list.map { it.toDomain() } }
 
-    // NEW: observe one profile for compose screens
     fun getProfileById(profileId: Int): Flow<Profile?> =
         profileDao.getProfileById(profileId).map { it?.toDomain() }
+
+    // ✅ SINGLE USER APP: observe the only profile
+    fun observeSingleProfile(): Flow<Profile?> =
+        profileDao.observeSingleProfile().map { it?.toDomain() }
+
+    // ✅ Create the default profile once (only if database is empty)
+    suspend fun ensureDefaultProfile() {
+        if (profileDao.countProfiles() == 0) {
+            addProfile(
+                name = "Flippy Wendler",
+                username = "Flippy_flips69",
+                email = "Flippy@ustp-students.at",
+                password = "password123",
+                profileImage = ""
+            )
+        }
+    }
+
+    // ✅ One-shot fetch for detail screen
+    suspend fun getSingleProfile(): Profile? =
+        profileDao.getSingleProfile()?.toDomain()
 
     suspend fun addProfile(
         name: String,
@@ -37,16 +55,12 @@ class ProfileRepository(private val profileDao: ProfileDao) {
         profileDao.updateProfile(profile.toEntity())
     }
 
-    // keep if you still want one-shot fetch
-    suspend fun findProfileById(profileId: Int): Profile {
-        return profileDao.findProfileById(profileId).toDomain()
-    }
-
     suspend fun deleteProfile(profile: Profile) {
         profileDao.deleteProfile(profile.toEntity())
     }
 }
 
+// ---- MAPPERS ----
 private fun ProfileEntity.toDomain() = Profile(
     id = id,
     name = name,
