@@ -49,6 +49,8 @@ fun ProfileDetailScreen(
     var username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var showCannotDeleteDialog by remember { mutableStateOf(false) }
+
 
     LaunchedEffect(profile) {
         profile?.let {
@@ -79,6 +81,20 @@ fun ProfileDetailScreen(
                 color = Color.Black
             )
         }
+
+        if (showCannotDeleteDialog) {
+            AlertDialog(
+                onDismissRequest = { showCannotDeleteDialog = false },
+                title = { Text("Not possible") },
+                text = { Text("You can not delete the test user.") },
+                confirmButton = {
+                    TextButton(onClick = { showCannotDeleteDialog = false }) {
+                        Text("OK")
+                    }
+                }
+            )
+        }
+
 
         Column(
             modifier = Modifier
@@ -157,24 +173,10 @@ fun ProfileDetailScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 OutlinedButton(
-                    onClick = {
-                        profile?.let { vm.deleteProfile(it) }
-                        onBack()
-                    },
-                    shape = RoundedCornerShape(26.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = Color(0xFFB3261E) // red-ish
-                    ),
-                    border = ButtonDefaults.outlinedButtonBorder.copy(
-                        width = 1.dp
-                    ),
-                    modifier = Modifier.height(48.dp)
+                    onClick = { showCannotDeleteDialog = true },
+                    // keep the rest of your styling the same...
                 ) {
-                    Text(
-                        text = "Delete account",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
+                    Text("Delete account")
                 }
 
                 Button(

@@ -57,10 +57,11 @@ fun ProfileScreen(
 
     // set which profile to observe
     LaunchedEffect(Unit) {
-        profileViewModel.ensureDefault()
+        repo.ensureDefaultProfile()
     }
 
-    val profile by profileViewModel.currentProfile.collectAsState()
+    val profile by repo.observeSingleProfile().collectAsState(initial = null)
+
     val query by profileViewModel.searchQuery.collectAsState()
 
     // For now, static stacks list (replace with your real stack data later)

@@ -11,11 +11,11 @@ class ProfileRepository(private val profileDao: ProfileDao) {
     fun getProfileById(profileId: Int): Flow<Profile?> =
         profileDao.getProfileById(profileId).map { it?.toDomain() }
 
-    // ✅ SINGLE USER APP: observe the only profile
+
     fun observeSingleProfile(): Flow<Profile?> =
         profileDao.observeSingleProfile().map { it?.toDomain() }
 
-    // ✅ Create the default profile once (only if database is empty)
+
     suspend fun ensureDefaultProfile() {
         if (profileDao.countProfiles() == 0) {
             addProfile(
