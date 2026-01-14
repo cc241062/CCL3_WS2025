@@ -12,6 +12,8 @@ composeBom = "2024.09.00"
 roomCommonJvm = "2.8.4"
 roomKtx = "2.8.4"
 navigationCompose = "2.9.6"
+ui = "1.10.0"
+uiGraphics = "1.10.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -32,6 +34,8 @@ androidx-room-common-jvm = { group = "androidx.room", name = "room-common-jvm", 
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomKtx" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "roomKtx" }  # ADD THIS
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+androidx-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "ui" }
+androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics", version.ref = "uiGraphics" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

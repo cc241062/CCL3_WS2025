@@ -54,6 +54,8 @@ dependencies {
     // Room dependencies - FIXED
     implementation(libs.androidx.room.common.jvm)
     implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.ui.graphics)
     ksp(libs.androidx.room.compiler) // ADD THIS - Critical for Room to work!
 
     implementation(libs.androidx.navigation.compose)
