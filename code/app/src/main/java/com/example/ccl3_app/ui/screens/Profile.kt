@@ -25,12 +25,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ccl3_app.data.ProfileRepository
+import com.example.ccl3_app.data.Stack
+import com.example.ccl3_app.data.StackRepository
 import com.example.ccl3_app.database.OopsDatabase
 import com.example.ccl3_app.ui.theme.Orange
 import com.example.ccl3_app.ui.theme.Teal
 import com.example.ccl3_app.ui.theme.PostItYellow
 import com.example.ccl3_app.ui.viewmodels.ProfileViewModel
 import com.example.ccl3_app.ui.viewmodels.ProfileViewModelFactory
+import com.example.ccl3_app.ui.viewmodels.StackViewModel
 
 data class StackUi(
     val id: Int,
@@ -54,6 +57,16 @@ fun ProfileScreen(
         factory = ProfileViewModelFactory(repo)
     )
 
+    val stackRepository = StackRepository(database.StackDao())
+
+    val stackViewModel: StackViewModel = viewModel(
+        factory = object : androidx.lifecycle.ViewModelProvider.Factory {
+            override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+                return StackViewModel(stackRepository) as T
+            }
+        }
+    )
+
 
     // set which profile to observe
     LaunchedEffect(Unit) {
@@ -65,15 +78,12 @@ fun ProfileScreen(
     val query by profileViewModel.searchQuery.collectAsState()
 
     // For now, static stacks list (replace with your real stack data later)
-    val stacks = remember {
-        listOf(
-            StackUi(1, "All recipes", "🍳")
-        )
-    }
+    val stacks by stackViewModel.stacks.collectAsState(initial = emptyList())
+
 
     val filteredStacks = remember(query, stacks) {
         if (query.isBlank()) stacks
-        else stacks.filter { it.title.contains(query, ignoreCase = true) }
+        else stacks.filter { it.name.contains(query, ignoreCase = true) }
     }
 
     Column(
@@ -160,7 +170,7 @@ fun ProfileScreen(
                 )
 
                 FloatingActionButton(
-                    onClick = onAddStack,
+                    onClick = { stackViewModel.addStack() },
                     containerColor = Orange,
                     contentColor = Color.White,
                     shape = CircleShape,
@@ -182,11 +192,10 @@ fun ProfileScreen(
                 verticalArrangement = Arrangement.spacedBy(14.dp),
                 modifier = Modifier.fillMaxSize()
             ) {
-                items(filteredStacks) { stack ->
+                items(stacks) { stack ->
                     StackCard(
-                        title = stack.title,
-                        emoji = stack.emoji,
-                        modifier = Modifier.fillMaxWidth(),
+                        title = stack.name,
+                        emoji = "🍳", // placeholder for now
                         onClick = { onStackClick(stack.id) }
                     )
                 }

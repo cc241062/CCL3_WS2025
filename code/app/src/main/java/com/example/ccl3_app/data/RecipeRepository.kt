@@ -24,6 +24,7 @@ class RecipeRepository(private val recipeDao: RecipeDao) {
 
     // create recipe
     suspend fun addRecipe(
+        //id: Int,
         stackId: Int,
         title: String,
         //image: String,
@@ -33,7 +34,7 @@ class RecipeRepository(private val recipeDao: RecipeDao) {
     ) {
         recipeDao.addRecipe(
             RecipeEntity(
-                id = 0,
+                //id = 0,
                 stackId = stackId,
                 title = title,
                 //image = image,

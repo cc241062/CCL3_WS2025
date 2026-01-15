@@ -31,7 +31,7 @@ class RecipeFormsViewModel(
         }
     }
 
-    fun saveRecipe(stackId: Int = 1) {
+    fun saveRecipe(stackId: Int) {
         viewModelScope.launch {
             if (recipeId == null) {
                 repository.addRecipe(
