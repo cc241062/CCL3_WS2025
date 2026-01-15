@@ -1,5 +1,8 @@
 package com.example.ccl3_app.ui.viewmodels
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ccl3_app.data.Recipe
@@ -7,32 +10,50 @@ import com.example.ccl3_app.data.RecipeRepository
 import kotlinx.coroutines.launch
 
 class RecipeFormsViewModel(
-    private val recipeRepository: RecipeRepository
+    private val repository: RecipeRepository
 ) : ViewModel() {
 
-    fun addRecipe(
-        stackId: Int,
-        title: String,
-        //image: String,
-        description: String,
-        ingredients: List<String>,
-        instructions: List<String>
-    ) {
+    var title by mutableStateOf("")
+    var description by mutableStateOf("")
+    var ingredients by mutableStateOf("")
+    var instructions by mutableStateOf("")
+
+    private var recipeId: Int? = null
+
+    fun loadRecipe(id: Int) {
+        recipeId = id
         viewModelScope.launch {
-            recipeRepository.addRecipe(
-                stackId,
-                title,
-                //image,
-                description,
-                ingredients,
-                instructions
-            )
+            val recipe = repository.findRecipeById(id)
+            title = recipe.title
+            description = recipe.description
+            ingredients = recipe.ingredients.joinToString("\n")
+            instructions = recipe.instructions.joinToString("\n")
         }
     }
 
-    fun updateRecipe(recipe: Recipe) {
+    fun saveRecipe(stackId: Int = 1) {
         viewModelScope.launch {
-            recipeRepository.updateRecipe(recipe)
+            if (recipeId == null) {
+                repository.addRecipe(
+                    stackId = stackId,
+                    title = title,
+                    description = description,
+                    ingredients = ingredients.lines(),
+                    instructions = instructions.lines()
+                )
+            } else {
+                repository.updateRecipe(
+                    Recipe(
+                        id = recipeId!!,
+                        stackId = stackId,
+                        title = title,
+                        description = description,
+                        ingredients = ingredients.lines(),
+                        instructions = instructions.lines()
+                    )
+                )
+            }
         }
     }
 }
+

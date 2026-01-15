@@ -49,10 +49,10 @@ fun MainScreen() {
         bottomBar = {
             BottomNavBar(navController) // optional
         }
-    ) { innerPadding ->
+    ) { paddingValues ->
         AppNavHost(
             navController = navController,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(paddingValues)
         )
     }
 }

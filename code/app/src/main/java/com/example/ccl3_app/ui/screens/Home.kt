@@ -19,13 +19,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ccl3_app.ui.theme.*
 import com.example.ccl3_app.ui.viewmodels.HomeViewModel
 import com.example.ccl3_app.ui.components.RecipeCard
-import com.example.ccl3_app.ui.components.NewQuestsCard
-import com.example.ccl3_app.ui.components.WelcomeCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EmptyRecipeCard(
-    onAddRecipe: () -> Unit = {}
+    onAddRecipe: (Int) -> Unit = {}
 ) {
     Card(
         modifier = Modifier
@@ -72,20 +70,9 @@ fun EmptyRecipeCard(
                 color = Color.Black
             )
 
-            // Description
-            Text(
-                text = "Start your cooking journey by creating your first recipe!",
-                fontSize = 14.sp,
-                color = Color.Black.copy(alpha = 0.7f),
-                lineHeight = 20.sp,
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
             // Add Recipe Button
             Button(
-                onClick = onAddRecipe,
+                onClick = { onAddRecipe(0) },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Orange
                 ),
@@ -104,6 +91,104 @@ fun EmptyRecipeCard(
                     fontWeight = FontWeight.SemiBold
                 )
             }
+            // Description
+            Text(
+                text = "Start your cooking journey by creating your first recipe!",
+                fontSize = 14.sp,
+                color = Color.Black.copy(alpha = 0.7f),
+                lineHeight = 20.sp,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+        }
+    }
+}
+
+@Composable
+fun WelcomeCard() {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = LightTeal.copy(alpha = 0.3f)
+        ),
+
+        ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column {
+                Text(
+                    text = "Hiii, welcome back.\nAre you hungry?",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Teal,
+                    lineHeight = 24.sp
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Lets cook!",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Orange
+                )
+            }
+
+            Text(
+                text = "🥄",
+                fontSize = 48.sp
+            )
+        }
+    }
+}
+
+@Composable
+fun NewQuestsCard(onClick: () -> Unit = {}) {
+    Card(
+        onClick = onClick,
+        modifier = Modifier
+            .fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Orange.copy(alpha = 0.2f)
+        ),
+
+        ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column {
+                Text(
+                    text = "New Quests available",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.Black
+                )
+                Text(
+                    text = "Have a look!",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Orange
+                )
+            }
+
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = "Quests",
+                tint = Color.Gray,
+                modifier = Modifier.size(36.dp)
+            )
         }
     }
 }

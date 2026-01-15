@@ -12,13 +12,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -27,7 +27,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -58,12 +57,13 @@ fun OopsCard(
 @Composable
 fun RecipeCard(
     recipe: Recipe,
-    onRecipeClick: () -> Unit = {},
+    onRecipeClick: (Int) -> Unit = {},
     onPreviousClick: () -> Unit = {},
-    onNextClick: () -> Unit = {}
+    onNextClick: () -> Unit = {},
+    onAddRecipe: () -> Unit = {}
 ) {
     Card(
-        onClick = onRecipeClick,
+        onClick = { onRecipeClick(recipe.id) },
         modifier = Modifier
             .fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
@@ -74,6 +74,19 @@ fun RecipeCard(
             defaultElevation = 4.dp
         )
     ) {
+        Box {
+
+            // ➕ ADD BUTTON
+            IconButton(
+                onClick = onAddRecipe,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(12.dp)
+                    .size(36.dp)
+                    .background(Orange, CircleShape)
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Add", tint = Color.White)
+            }
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -154,7 +167,7 @@ fun RecipeCard(
                 }
 
                 FloatingActionButton(
-                    onClick = onRecipeClick,
+                    onClick = { onRecipeClick(recipe.id) },
                     containerColor = Orange,
                     contentColor = Color.White,
                     modifier = Modifier.size(56.dp)
@@ -266,4 +279,4 @@ fun WelcomeCard() {
             )
         }
     }
-}
+}}

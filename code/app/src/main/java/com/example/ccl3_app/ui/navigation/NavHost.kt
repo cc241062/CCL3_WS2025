@@ -7,7 +7,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.ccl3_app.data.RecipeRepository
 import com.example.ccl3_app.data.QuestRepository
@@ -35,7 +34,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
    Routes (kept in same file)
 --------------------------------------------------- */
 object Routes {
-
     const val HOME = "home"
     const val QUEST = "quest"
     const val PROFILE = "profile"
@@ -46,7 +44,9 @@ object Routes {
 
     fun profileDetail(id: Int) = "$PROFILE_DETAIL/$id"
     fun recipeDetail(id: Int) = "$RECIPE_DETAIL/$id"
-    fun recipeForm(stackId: Int) = "$RECIPE_FORM/$stackId"
+    fun recipeForm(stackId: Int = 0, recipeId: Int? = null) =
+        if (recipeId != null) "$RECIPE_FORM/$stackId/$recipeId"
+        else "$RECIPE_FORM/$stackId/-1"
 }
 
 
@@ -132,21 +132,31 @@ fun AppNavHost(
                 recipeId = recipeId,
                 onBack = {
                     navController.popBackStack()
+                },
+                onEdit = { id ->
+                    navController.navigate(Routes.recipeForm(/*stackId = id,*/ recipeId = id))
                 }
             )
         }
 
         /* ---------------- Recipe Form (Add/Edit) ---------------- */
         composable(
-            route = "${Routes.RECIPE_FORM}/{stackId}",
+            route = "${Routes.RECIPE_FORM}/{stackId}/{recipeId}",  // ← Changed this
             arguments = listOf(
-                navArgument("stackId") { type = NavType.IntType }
+                navArgument("stackId") { type = NavType.IntType },
+                navArgument("recipeId") {
+                    type = NavType.IntType
+                    //nullable = true
+                    defaultValue = -1  // ← Use -1 instead of null
+                }
             )
         ) { backStackEntry ->
             val stackId = backStackEntry.arguments!!.getInt("stackId")
+            val recipeId = backStackEntry.arguments?.getInt("recipeId")
 
             RecipeFormScreen(
                 stackId = stackId,
+                recipeId = if (recipeId == -1) null else recipeId,  // ← Check for -1
                 onDone = {
                     navController.popBackStack()
                 },

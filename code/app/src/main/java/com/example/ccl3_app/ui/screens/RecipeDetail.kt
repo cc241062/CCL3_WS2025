@@ -33,6 +33,7 @@ import com.example.ccl3_app.ui.viewmodels.ViewModelProvider
 fun RecipeDetailScreen(
     recipeId: Int,
     onBack: () -> Unit = {},
+    onEdit: (Int) -> Unit = {},  // ← ADD THIS LINE
     viewModel: RecipeDetailViewModel = viewModel(factory = ViewModelProvider.Factory)
 ) {
     val recipe by viewModel.recipe.collectAsState()
@@ -60,7 +61,7 @@ fun RecipeDetailScreen(
             )
 
             Row {
-                IconButton(onClick = { }) {
+                IconButton(onClick = { onEdit(recipeId) }) {  // ← CHANGE THIS LINE
                     Icon(Icons.Default.Edit, contentDescription = "Edit")
                 }
                 IconButton(onClick = { recipe?.let { viewModel.deleteRecipe(it) } }) {
@@ -68,6 +69,8 @@ fun RecipeDetailScreen(
                 }
             }
         }
+
+        // ... rest of your code stays the same
 
         Spacer(modifier = Modifier.height(16.dp))
 
