@@ -1,5 +1,11 @@
 package com.example.ccl3_app.ui.navigation
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -21,14 +27,19 @@ import com.example.ccl3_app.ui.viewmodels.HomeViewModel
 import com.example.ccl3_app.ui.viewmodels.HomeViewModelFactory
 import com.example.ccl3_app.ui.viewmodels.QuestViewModel
 import com.example.ccl3_app.ui.viewmodels.QuestViewModelFactory
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.ccl3_app.R
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.Color
+import androidx.navigation.NavHostController
+
+
+
 
 /* ---------------------------------------------------
    Routes (kept in same file)
@@ -172,40 +183,84 @@ fun AppNavHost(
 data class BottomNavItem(
     val label: String,
     val route: String,
-    val icon: ImageVector
+    val icon: Int
 )
 
 @Composable
-fun BottomNavBar(navController: androidx.navigation.NavHostController) {
+fun BottomNavBar(navController: NavHostController) {
 
     val items = listOf(
-        BottomNavItem("Home", Routes.HOME, Icons.Default.Home),
-        BottomNavItem("Quest", Routes.QUEST, Icons.Default.List),
-        BottomNavItem("Profile", Routes.PROFILE, Icons.Default.Person)
+        BottomNavItem("Home", Routes.HOME, R.drawable.home),
+        BottomNavItem("Quest", Routes.QUEST, R.drawable.quest),
+        BottomNavItem("Profile", Routes.PROFILE, R.drawable.profile)
     )
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    NavigationBar {
-        items.forEach { item ->
-            NavigationBarItem(
-                selected = currentRoute == item.route,
-                onClick = {
-                    navController.navigate(item.route) {
-                        // Pop up to the start destination and save state
-                        popUpTo(navController.graph.startDestinationId) {
-                            saveState = true
+    Column {
+
+        // Thin grey line on top
+        HorizontalDivider(
+            thickness = 1.dp,
+            color = Color.LightGray
+        )
+
+        NavigationBar(
+            containerColor = Color.White,
+            tonalElevation = 0.dp,
+            modifier = Modifier.height(64.dp)
+        ) {
+            items.forEach { item ->
+
+                val selected = currentRoute == item.route
+
+                NavigationBarItem(
+                    selected = selected,
+                    onClick = {
+                        navController.navigate(item.route) {
+                            popUpTo(navController.graph.startDestinationId) { saveState = true }
+                            launchSingleTop = true
+                            restoreState = true
                         }
-                        // Avoid multiple copies of the same destination
-                        launchSingleTop = true
-                        // Restore state when navigating back
-                        restoreState = true
-                    }
-                },
-                icon = { Icon(item.icon, contentDescription = item.label) },
-                label = { Text(item.label) }
-            )
+                    },
+                    label = null,
+                    alwaysShowLabel = false,
+
+                    // 🔹 Our custom highlight + icon
+                    icon = {
+                        val boxModifier =
+                            if (selected) {
+                                Modifier
+                                    .padding(top = 4.dp)
+                                    .background(
+                                        color = Color(0xFFF3F3F3), // very light grey
+                                        shape = RoundedCornerShape(18.dp)
+                                    )
+                                    .padding(10.dp)
+                            } else {
+                                Modifier.padding(top = 4.dp)
+                            }
+
+                        Box(modifier = boxModifier) {
+                            Image(
+                                painter = painterResource(id = item.icon),
+                                contentDescription = item.label,
+                                modifier = Modifier.size(36.dp) // 🔸 larger icon
+                            )
+                        }
+                    },
+
+                    // 🔹 Turn OFF Material's default indicator & tint
+                    colors = NavigationBarItemDefaults.colors(
+                        indicatorColor = Color.Transparent,
+                        selectedIconColor = Color.Unspecified,
+                        unselectedIconColor = Color.Unspecified,
+                        selectedTextColor = Color.Unspecified,
+                        unselectedTextColor = Color.Unspecified
+                    )
+                )
+            }
         }
     }
 }
