@@ -22,19 +22,9 @@ class QuestViewModel(
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     init {
-        loadQuests()
-    }
-
-    // Load all quests from database
-    private fun loadQuests() {
         viewModelScope.launch {
-            _isLoading.value = true
-            try {
-                questRepository.getAllQuests().collect { questList ->
-                    _quests.value = questList.sortedBy { it.level }
-                }
-            } finally {
-                _isLoading.value = false
+            questRepository.getAllQuests().collect { questList ->
+                _quests.value = questList.sortedBy { it.level }
             }
         }
     }

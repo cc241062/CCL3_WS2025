@@ -30,25 +30,22 @@ abstract class OopsDatabase : RoomDatabase() {
 
         fun getDatabase(context: Context): OopsDatabase {
             return Instance ?: synchronized(this) {
-                Room.databaseBuilder(
+                val instance = Room.databaseBuilder(
                     context,
                     OopsDatabase::class.java,
                     "oops_database"
                 )
                     .fallbackToDestructiveMigration()
-                    .addCallback(object : RoomDatabase.Callback() {
-                        override fun onCreate(db: SupportSQLiteDatabase) {
-                            super.onCreate(db)
-                            // Prepopulate the database with quests
-                            Instance?.let { database ->
-                                CoroutineScope(Dispatchers.IO).launch {
-                                    prepopulateQuests(database.QuestDao())
-                                }
-                            }
-                        }
-                    })
                     .build()
-                    .also { Instance = it }
+
+                Instance = instance
+
+                // 🔹 Prepopulate quests ONCE in background
+                CoroutineScope(Dispatchers.IO).launch {
+                    prepopulateQuests(instance.QuestDao())
+                }
+
+                instance
             }
         }
 
@@ -56,8 +53,20 @@ abstract class OopsDatabase : RoomDatabase() {
             val quests = listOf(
                 QuestEntity(0, "Boil Water", "Learn the basics of boiling water safely", false, 1),
                 QuestEntity(0, "Make Toast", "Toast bread to golden perfection", false, 2),
-                QuestEntity(0, "Scramble Eggs", "Master the art of fluffy scrambled eggs", false, 3),
-                QuestEntity(0, "Fry an Egg", "Learn how to fry a perfect sunny-side up egg!", false, 4),
+                QuestEntity(
+                    0,
+                    "Scramble Eggs",
+                    "Master the art of fluffy scrambled eggs",
+                    false,
+                    3
+                ),
+                QuestEntity(
+                    0,
+                    "Fry an Egg",
+                    "Learn how to fry a perfect sunny-side up egg!",
+                    false,
+                    4
+                ),
                 QuestEntity(0, "Make Tea", "Brew a perfect cup of tea", false, 5),
                 QuestEntity(0, "Cook Pasta", "Boil pasta al dente", false, 6),
                 QuestEntity(0, "Make a Sandwich", "Create a delicious sandwich", false, 7),
