@@ -20,7 +20,7 @@ import androidx.room.Index
 data class RecipeEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val stackId: Int,
+    val stackId: Int = 1,
     val title: String,
     val description: String = "",
     val ingredients: List<String>,

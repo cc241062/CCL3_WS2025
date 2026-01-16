@@ -115,6 +115,7 @@ class RecipeRepository(private val recipeDao: RecipeDao) {
                 stackId = recipe.stackId,
                 title = recipe.title,
                 //image = recipe.image,
+                description = recipe.description,
                 ingredients = recipe.ingredients,
                 instructions = recipe.instructions
             )

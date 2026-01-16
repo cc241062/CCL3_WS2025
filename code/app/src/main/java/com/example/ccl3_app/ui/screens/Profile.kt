@@ -3,6 +3,7 @@ package com.example.ccl3_app.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -12,6 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import com.example.ccl3_app.ui.navigation.Routes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
@@ -50,7 +52,8 @@ fun ProfileScreen(
     onSettingsClick: () -> Unit,
     onStackClick: (Int) -> Unit = {},
     onAddStack: () -> Unit = {},
-    onRecipeClick: (Int) -> Unit = {}
+    onRecipeClick: (Int) -> Unit = {},
+    onEditStack: (Int) -> Unit = {}
 ) {
 
     val context = LocalContext.current
@@ -205,8 +208,9 @@ fun ProfileScreen(
                     StackCard(
                         title = stack.name,
                         emoji = "🍳",
-                        recipeCount = recipes.size,  // ← Pass recipe count
-                        onClick = { onStackClick(stack.id) }
+                        recipeCount = recipes.size,
+                        onClick = { onStackClick(stack.id) },
+                        onLongClick = { onEditStack(stack.id) }
                     )
                 }
 
@@ -275,17 +279,21 @@ private fun StackCard(
     emoji: String,
     recipeCount: Int = 0,  // ← Add this
     modifier: Modifier = Modifier,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
+    onLongClick: () -> Unit = {}
 ) {
     Surface(
         modifier = modifier
             .height(180.dp)
-            .clickable(onClick = onClick),
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongClick),
         shape = RoundedCornerShape(18.dp),
         tonalElevation = 2.dp,
         shadowElevation = 4.dp,
         color = PostItYellow.copy(alpha = 0.55f)
     ) {
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
