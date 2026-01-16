@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.example.ccl3_app.data.Recipe
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -31,4 +32,7 @@ interface RecipeDao {
 
     @Query("SELECT COUNT(*) FROM recipes WHERE stackId = :stackId")
     fun getRecipeCount(stackId: Int): Flow<Int>
+
+    @Query("SELECT * FROM recipes WHERE stackId IS NULL")
+    fun getRecipesWithoutStack(): Flow<List<RecipeEntity>>
 }

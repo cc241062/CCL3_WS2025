@@ -2,9 +2,42 @@ package com.example.ccl3_app.data
 
 import com.example.ccl3_app.database.RecipeDao
 import com.example.ccl3_app.database.RecipeEntity
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class RecipeRepository(private val recipeDao: RecipeDao) {
+
+    //get recipes in a specific stack
+    fun getRecipesByStack(stackId: Int): Flow<List<Recipe>> {
+        return recipeDao.getRecipesForStack(stackId).map { entityList ->
+            entityList.map { entity ->
+                Recipe(
+                    id = entity.id,
+                    stackId = entity.stackId,
+                    title = entity.title,
+                    description = entity.description,
+                    ingredients = entity.ingredients,
+                    instructions = entity.instructions
+                )
+            }
+        }
+    }
+
+    //get recipes without stacks
+    fun getRecipesWithoutStack(): Flow<List<Recipe>> {
+        return recipeDao.getRecipesWithoutStack().map { entityList ->
+            entityList.map { entity ->
+                Recipe(
+                    id = entity.id,
+                    stackId = entity.stackId,
+                    title = entity.title,
+                    description = entity.description,
+                    ingredients = entity.ingredients,
+                    instructions = entity.instructions
+                )
+            }
+        }
+    }
 
     // get recipes for a stack
     fun getRecipesForStack(stackId: Int) =

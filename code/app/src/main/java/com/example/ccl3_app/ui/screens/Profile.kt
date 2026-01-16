@@ -4,11 +4,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
@@ -25,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ccl3_app.data.ProfileRepository
+import com.example.ccl3_app.data.RecipeRepository
 import com.example.ccl3_app.data.Stack
 import com.example.ccl3_app.data.StackRepository
 import com.example.ccl3_app.database.OopsDatabase
@@ -45,7 +49,8 @@ data class StackUi(
 fun ProfileScreen(
     onSettingsClick: () -> Unit,
     onStackClick: (Int) -> Unit = {},
-    onAddStack: () -> Unit = {}
+    onAddStack: () -> Unit = {},
+    onRecipeClick: (Int) -> Unit = {}
 ) {
 
     val context = LocalContext.current
@@ -58,14 +63,16 @@ fun ProfileScreen(
     )
 
     val stackRepository = StackRepository(database.StackDao())
+    val recipeRepository = RecipeRepository(database.RecipeDao())
 
     val stackViewModel: StackViewModel = viewModel(
         factory = object : androidx.lifecycle.ViewModelProvider.Factory {
             override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
-                return StackViewModel(stackRepository) as T
+                return StackViewModel(stackRepository, recipeRepository) as T
             }
         }
     )
+
 
 
     // set which profile to observe
@@ -169,7 +176,7 @@ fun ProfileScreen(
                     color = Color.Black
                 )
 
-                FloatingActionButton(
+                /*FloatingActionButton(
                     onClick = { stackViewModel.addStack() },
                     containerColor = Orange,
                     contentColor = Color.White,
@@ -181,7 +188,7 @@ fun ProfileScreen(
                         contentDescription = "Add stack",
                         modifier = Modifier.size(22.dp)
                     )
-                }
+                }*/
             }
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -193,9 +200,12 @@ fun ProfileScreen(
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(stacks) { stack ->
+                    val recipes by stackViewModel.getRecipesForStack(stack.id).collectAsState(initial = emptyList())
+
                     StackCard(
                         title = stack.name,
-                        emoji = "🍳", // placeholder for now
+                        emoji = "🍳",
+                        recipeCount = recipes.size,  // ← Pass recipe count
                         onClick = { onStackClick(stack.id) }
                     )
                 }
@@ -203,7 +213,7 @@ fun ProfileScreen(
                 item {
                     AddStackCard(
                         modifier = Modifier.fillMaxWidth(),
-                        onClick = onAddStack
+                        onClick = { stackViewModel.addStack() }
                     )
                 }
             }
@@ -263,6 +273,7 @@ private fun SearchBar(
 private fun StackCard(
     title: String,
     emoji: String,
+    recipeCount: Int = 0,  // ← Add this
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {}
 ) {
@@ -292,12 +303,29 @@ private fun StackCard(
                 Text(text = emoji, fontSize = 44.sp)
             }
 
-            Text(
-                text = title,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = title,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+
+                // ← Add recipe count badge
+                Text(
+                    text = "$recipeCount",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Orange,
+                    modifier = Modifier
+                        .background(Orange.copy(alpha = 0.2f), RoundedCornerShape(8.dp))
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                )
+            }
         }
     }
 }
