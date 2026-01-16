@@ -56,6 +56,7 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.compose.runtime)
     ksp(libs.androidx.room.compiler) // ADD THIS - Critical for Room to work!
 
     implementation(libs.androidx.navigation.compose)

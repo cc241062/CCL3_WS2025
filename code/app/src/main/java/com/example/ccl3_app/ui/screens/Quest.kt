@@ -1,5 +1,6 @@
 package com.example.ccl3_app.ui.screens
 
+import FryEggQuestScreen
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -48,6 +49,7 @@ fun QuestScreen(
     val quests by viewModel.quests.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     var selectedQuest by remember { mutableStateOf<Quest?>(null) }
+    var showFryEggScreen by remember { mutableStateOf(false) }
 
     val completedCount = quests.count { it.isDone }
     val totalQuests = quests.size
@@ -224,12 +226,37 @@ fun QuestScreen(
             quest = quest,
             onDismiss = { selectedQuest = null },
             onStart = {
-                viewModel.completeQuest(quest)
-                selectedQuest = null
+                // ✅ only open the steps screen for Fry an Egg for now
+                if (quest.title == "Fry an Egg") {
+                    showFryEggScreen = true
+                } else {
+                    // keep your old behavior for other quests (optional)
+                    viewModel.completeQuest(quest)
+                }
             },
             fontFamily = juaFont
         )
     }
+
+    if (showFryEggScreen) {
+        // find the Fry an Egg quest in the current list
+        val fryQuest = quests.firstOrNull { it.title == "Fry an Egg" }
+
+        FryEggQuestScreen(
+            fontFamily = juaFont,
+            onClose = {
+                // user pressed X → just close, don't complete
+                showFryEggScreen = false
+            },
+            onFinished = {
+                // user tapped Finish on last step → complete quest 1 and close
+                showFryEggScreen = false
+                fryQuest?.let { viewModel.completeQuest(it) }
+            }
+        )
+    }
+
+
 }
 
 
@@ -397,7 +424,6 @@ fun DownTriangleMarker(
         drawPath(path = path, color = color)
     }
 }
-
 @Composable
 fun QuestDetailDialog(
     quest: Quest,
@@ -412,66 +438,38 @@ fun QuestDetailDialog(
             .clickable(onClick = onDismiss),
         contentAlignment = Alignment.Center
     ) {
-        // Wrap card + circle together so we can float the circle above
+        // Wrap triangle + card together
         Box(
-            modifier = Modifier
-                .fillMaxWidth(0.8f),
+            modifier = Modifier.fillMaxWidth(0.8f),
             contentAlignment = Alignment.TopCenter
         ) {
-            // Top circle sitting above the card
-            Box(
+
+            Canvas(
                 modifier = Modifier
-                    .size(64.dp)
-                    .offset(y = (-32).dp),
-                contentAlignment = Alignment.BottomCenter
+                    .size(45.dp)
+                    .offset(y = (-10).dp)
             ) {
-                // Shadow under the circle
-                Box(
-                    modifier = Modifier
-                        .size(64.dp)
-                        .offset(y = 4.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFF7A3A18))
-                )
-
-                // Main orange circle
-                Box(
-                    modifier = Modifier
-                        .size(64.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFFE37434))
-                )
-
-                // Little notch / triangle touching the card
-                androidx.compose.foundation.Canvas(
-                    modifier = Modifier
-                        .size(22.dp)
-                        .offset(y = 10.dp)
-                ) {
-                    val w = size.width
-                    val h = size.height
-                    val path = androidx.compose.ui.graphics.Path().apply {
-                        moveTo(w / 2f, 0f)      // top
-                        lineTo(0f, h)           // bottom left
-                        lineTo(w, h)            // bottom right
-                        close()
-                    }
-                    drawPath(path, color = Color(0xFFE37434))
+                val w = size.width
+                val h = size.height
+                val path = Path().apply {
+                    moveTo(w / 2f, h)
+                    lineTo(0f, 0f)
+                    lineTo(w, 0f)
+                    close()
                 }
+                drawPath(path, color = Color(0xFFAA5423))
             }
 
             // MAIN BROWN CARD
             Card(
                 modifier = Modifier
-                    .padding(top = 32.dp)
-                    .clickable(enabled = false) {}, // block clicks inside
+                    .padding(top = 12.dp)
+                    .clickable(enabled = false) {},
                 shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFF9B5A2D) // warm brown
+                    containerColor = Color(0xFF9B5A2D)
                 ),
-                elevation = CardDefaults.cardElevation(
-                    defaultElevation = 8.dp
-                )
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {
                 Column(
                     modifier = Modifier
@@ -480,8 +478,6 @@ fun QuestDetailDialog(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-
-                    // Title
                     Text(
                         text = "Level ${quest.level}: ${quest.title}",
                         fontSize = 20.sp,
@@ -492,7 +488,6 @@ fun QuestDetailDialog(
                         modifier = Modifier.fillMaxWidth()
                     )
 
-                    // Description
                     Text(
                         text = quest.description,
                         fontSize = 16.sp,
@@ -505,26 +500,26 @@ fun QuestDetailDialog(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // START BUTTON with little shadow
                     Box(
-                        modifier = Modifier
-                            .fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth(),
                         contentAlignment = Alignment.Center
                     ) {
-                        // Fake shadow behind the button
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth(0.6f)
                                 .height(48.dp)
                                 .offset(y = 4.dp)
                                 .clip(RoundedCornerShape(24.dp))
-                                .background(Color(0xFF0A3941)) // dark teal shadow
+                                .background(Color(0xFF0A3941))
                         )
 
                         Button(
-                            onClick = onStart,
+                            onClick = {
+                                onStart()
+                                onDismiss() // ✅ close dialog after pressing Start
+                            },
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFF4B9DA9) // teal
+                                containerColor = Color(0xFF4B9DA9)
                             ),
                             shape = RoundedCornerShape(24.dp),
                             modifier = Modifier
