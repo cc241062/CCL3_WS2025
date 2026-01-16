@@ -3,21 +3,21 @@ package com.example.ccl3_app.ui.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.ccl3_app.data.StackRepository
+import com.example.ccl3_app.database.OopsDatabase
 import com.example.ccl3_app.ui.theme.Orange
 import com.example.ccl3_app.ui.viewmodels.RecipeFormsViewModel
 import com.example.ccl3_app.ui.viewmodels.ViewModelProvider
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipeFormScreen(
     stackId: Int?,
@@ -27,9 +27,25 @@ fun RecipeFormScreen(
     viewModel: RecipeFormsViewModel =
         viewModel(factory = ViewModelProvider.Factory)
 ) {
+    val context = LocalContext.current
+    val database = OopsDatabase.getDatabase(context)
+    val stackRepository = StackRepository(database.StackDao())
+
+    // Load all available stacks
+    val allStacks by stackRepository.stacks.collectAsState(initial = emptyList())
+
+    // Selected stack state
+    var selectedStackId by remember { mutableStateOf(stackId ?: allStacks.firstOrNull()?.id) }
+    var expanded by remember { mutableStateOf(false) }
 
     LaunchedEffect(recipeId) {
         recipeId?.let { viewModel.loadRecipe(it) }
+    }
+
+    LaunchedEffect(allStacks) {
+        if (selectedStackId == null && allStacks.isNotEmpty()) {
+            selectedStackId = allStacks.first().id
+        }
     }
 
     val scrollState = rememberScrollState()
@@ -48,6 +64,39 @@ fun RecipeFormScreen(
             fontWeight = FontWeight.Bold
         )
 
+        // Stack Selector Dropdown
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded }
+        ) {
+            OutlinedTextField(
+                value = allStacks.find { it.id == selectedStackId }?.name ?: "Select Stack",
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Stack") },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .menuAnchor()
+            )
+
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                allStacks.forEach { stack ->
+                    DropdownMenuItem(
+                        text = { Text(stack.name) },
+                        onClick = {
+                            selectedStackId = stack.id
+                            expanded = false
+                        }
+                    )
+                }
+            }
+        }
+
         OutlinedTextField(
             value = viewModel.title,
             onValueChange = { viewModel.title = it },
@@ -59,7 +108,8 @@ fun RecipeFormScreen(
             value = viewModel.description,
             onValueChange = { viewModel.description = it },
             label = { Text("Description") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            minLines = 3
         )
 
         OutlinedTextField(
@@ -80,23 +130,16 @@ fun RecipeFormScreen(
 
         Button(
             onClick = {
-                viewModel.saveRecipe()
+                viewModel.saveRecipe(selectedStackId?: 1)
                 onDone()
             },
             modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = Orange)
+            colors = ButtonDefaults.buttonColors(containerColor = Orange),
+            enabled = selectedStackId != null
         ) {
             Text("Save Recipe")
         }
 
         Spacer(modifier = Modifier.height(32.dp))
-
-        OutlinedTextField(
-            value = viewModel.instructions,
-            onValueChange = { viewModel.instructions = it },
-            label = { Text("Test Test Test") },
-            modifier = Modifier.fillMaxWidth(),
-            minLines = 4
-        )
     }
 }

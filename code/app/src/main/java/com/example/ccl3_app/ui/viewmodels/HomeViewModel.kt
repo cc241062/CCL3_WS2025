@@ -30,7 +30,7 @@ class HomeViewModel(
     }
 
     // Load featured recipes for the home carousel
-    private fun loadFeaturedRecipes() {
+   private fun loadFeaturedRecipes() {
         viewModelScope.launch {
             _isLoading.value = true
             try {

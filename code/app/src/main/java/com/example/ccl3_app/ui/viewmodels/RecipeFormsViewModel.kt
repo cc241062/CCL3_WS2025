@@ -10,50 +10,60 @@ import com.example.ccl3_app.data.RecipeRepository
 import kotlinx.coroutines.launch
 
 class RecipeFormsViewModel(
-    private val repository: RecipeRepository
+    private val recipeRepository: RecipeRepository
 ) : ViewModel() {
+
+    private var recipeId: Int? = null
 
     var title by mutableStateOf("")
     var description by mutableStateOf("")
     var ingredients by mutableStateOf("")
     var instructions by mutableStateOf("")
 
-    private var recipeId: Int? = null
-
-    fun loadRecipe(id: Int) {
+    suspend fun loadRecipe(id: Int) {
         recipeId = id
-        viewModelScope.launch {
-            val recipe = repository.findRecipeById(id)
-            title = recipe.title
-            description = recipe.description
-            ingredients = recipe.ingredients.joinToString("\n")
-            instructions = recipe.instructions.joinToString("\n")
-        }
+        val recipe = recipeRepository.findRecipeById(id)
+        title = recipe.title
+        description = recipe.description
+        ingredients = recipe.ingredients.joinToString("\n")
+        instructions = recipe.instructions.joinToString("\n")
     }
 
-    fun saveRecipe(stackId: Int = 1) {
+    fun saveRecipe(stackId: Int) {
         viewModelScope.launch {
+            val ingredientsList = ingredients.split("\n").filter { it.isNotBlank() }
+            val instructionsList = instructions.split("\n").filter { it.isNotBlank() }
+
             if (recipeId == null) {
-                repository.addRecipe(
+                // Create new recipe
+                recipeRepository.addRecipe(
                     stackId = stackId,
                     title = title,
                     description = description,
-                    ingredients = ingredients.lines(),
-                    instructions = instructions.lines()
+                    ingredients = ingredientsList,
+                    instructions = instructionsList
                 )
             } else {
-                repository.updateRecipe(
+                // Update existing recipe
+                recipeRepository.updateRecipe(
                     Recipe(
                         id = recipeId!!,
                         stackId = stackId,
                         title = title,
                         description = description,
-                        ingredients = ingredients.lines(),
-                        instructions = instructions.lines()
+                        ingredients = ingredientsList,
+                        instructions = instructionsList
                     )
                 )
             }
         }
     }
-}
 
+    fun clearForm() {
+        recipeId = null
+        title = ""
+        description = ""
+        ingredients = ""
+        instructions = ""
+    }
+}

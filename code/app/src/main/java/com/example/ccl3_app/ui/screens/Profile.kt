@@ -3,12 +3,17 @@ package com.example.ccl3_app.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import com.example.ccl3_app.ui.navigation.Routes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
@@ -25,12 +30,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ccl3_app.data.ProfileRepository
+import com.example.ccl3_app.data.RecipeRepository
+import com.example.ccl3_app.data.Stack
+import com.example.ccl3_app.data.StackRepository
 import com.example.ccl3_app.database.OopsDatabase
 import com.example.ccl3_app.ui.theme.Orange
 import com.example.ccl3_app.ui.theme.Teal
 import com.example.ccl3_app.ui.theme.PostItYellow
 import com.example.ccl3_app.ui.viewmodels.ProfileViewModel
 import com.example.ccl3_app.ui.viewmodels.ProfileViewModelFactory
+import com.example.ccl3_app.ui.viewmodels.StackViewModel
 
 data class StackUi(
     val id: Int,
@@ -42,7 +51,9 @@ data class StackUi(
 fun ProfileScreen(
     onSettingsClick: () -> Unit,
     onStackClick: (Int) -> Unit = {},
-    onAddStack: () -> Unit = {}
+    onAddStack: () -> Unit = {},
+    onRecipeClick: (Int) -> Unit = {},
+    onEditStack: (Int) -> Unit = {}
 ) {
 
     val context = LocalContext.current
@@ -53,6 +64,18 @@ fun ProfileScreen(
     val profileViewModel: ProfileViewModel = viewModel(
         factory = ProfileViewModelFactory(repo)
     )
+
+    val stackRepository = StackRepository(database.StackDao())
+    val recipeRepository = RecipeRepository(database.RecipeDao())
+
+    val stackViewModel: StackViewModel = viewModel(
+        factory = object : androidx.lifecycle.ViewModelProvider.Factory {
+            override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+                return StackViewModel(stackRepository, recipeRepository) as T
+            }
+        }
+    )
+
 
 
     // set which profile to observe
@@ -65,15 +88,12 @@ fun ProfileScreen(
     val query by profileViewModel.searchQuery.collectAsState()
 
     // For now, static stacks list (replace with your real stack data later)
-    val stacks = remember {
-        listOf(
-            StackUi(1, "All recipes", "🍳")
-        )
-    }
+    val stacks by stackViewModel.stacks.collectAsState(initial = emptyList())
+
 
     val filteredStacks = remember(query, stacks) {
         if (query.isBlank()) stacks
-        else stacks.filter { it.title.contains(query, ignoreCase = true) }
+        else stacks.filter { it.name.contains(query, ignoreCase = true) }
     }
 
     Column(
@@ -159,8 +179,8 @@ fun ProfileScreen(
                     color = Color.Black
                 )
 
-                FloatingActionButton(
-                    onClick = onAddStack,
+                /*FloatingActionButton(
+                    onClick = { stackViewModel.addStack() },
                     containerColor = Orange,
                     contentColor = Color.White,
                     shape = CircleShape,
@@ -171,7 +191,7 @@ fun ProfileScreen(
                         contentDescription = "Add stack",
                         modifier = Modifier.size(22.dp)
                     )
-                }
+                }*/
             }
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -182,19 +202,22 @@ fun ProfileScreen(
                 verticalArrangement = Arrangement.spacedBy(14.dp),
                 modifier = Modifier.fillMaxSize()
             ) {
-                items(filteredStacks) { stack ->
+                items(stacks) { stack ->
+                    val recipes by stackViewModel.getRecipesForStack(stack.id).collectAsState(initial = emptyList())
+
                     StackCard(
-                        title = stack.title,
-                        emoji = stack.emoji,
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = { onStackClick(stack.id) }
+                        title = stack.name,
+                        emoji = "🍳",
+                        recipeCount = recipes.size,
+                        onClick = { onStackClick(stack.id) },
+                        onLongClick = { onEditStack(stack.id) }
                     )
                 }
 
                 item {
                     AddStackCard(
                         modifier = Modifier.fillMaxWidth(),
-                        onClick = onAddStack
+                        onClick = { stackViewModel.addStack() }
                     )
                 }
             }
@@ -254,18 +277,23 @@ private fun SearchBar(
 private fun StackCard(
     title: String,
     emoji: String,
+    recipeCount: Int = 0,  // ← Add this
     modifier: Modifier = Modifier,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
+    onLongClick: () -> Unit = {}
 ) {
     Surface(
         modifier = modifier
             .height(180.dp)
-            .clickable(onClick = onClick),
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongClick),
         shape = RoundedCornerShape(18.dp),
         tonalElevation = 2.dp,
         shadowElevation = 4.dp,
         color = PostItYellow.copy(alpha = 0.55f)
     ) {
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -283,12 +311,29 @@ private fun StackCard(
                 Text(text = emoji, fontSize = 44.sp)
             }
 
-            Text(
-                text = title,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = title,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+
+                // ← Add recipe count badge
+                Text(
+                    text = "$recipeCount",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Orange,
+                    modifier = Modifier
+                        .background(Orange.copy(alpha = 0.2f), RoundedCornerShape(8.dp))
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                )
+            }
         }
     }
 }

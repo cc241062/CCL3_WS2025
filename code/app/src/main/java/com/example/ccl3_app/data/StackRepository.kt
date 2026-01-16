@@ -17,6 +17,17 @@ class StackRepository(private val stackDao: StackDao) {
         }
     }
 
+    fun getAllStacks() = stackDao.getAllStacks().map { stackList ->
+        stackList.map { entity ->
+            Stack(
+                id = entity.id,
+                name = entity.name,
+                description = entity.description,
+                color = entity.color
+            )
+        }
+    }
+
     suspend fun addStack(name: String, description: String, color: String) {
         stackDao.addStack(
             StackEntity(

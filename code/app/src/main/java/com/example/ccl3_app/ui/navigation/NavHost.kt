@@ -40,6 +40,8 @@ import androidx.navigation.NavHostController
 
 
 
+import com.example.ccl3_app.ui.screens.StackDetailScreen
+import com.example.ccl3_app.ui.screens.StackFormScreen
 
 /* ---------------------------------------------------
    Routes (kept in same file)
@@ -53,11 +55,20 @@ object Routes {
     const val RECIPE_DETAIL = "recipe_detail"
     const val RECIPE_FORM = "recipe_form"
 
+    const val STACK_DETAIL = "stack_detail"
+    const val STACK_FORM = "stack_form"
+
+
     fun profileDetail(id: Int) = "$PROFILE_DETAIL/$id"
     fun recipeDetail(id: Int) = "$RECIPE_DETAIL/$id"
     fun recipeForm(stackId: Int = 0, recipeId: Int? = null) =
         if (recipeId != null) "$RECIPE_FORM/$stackId/$recipeId"
         else "$RECIPE_FORM/$stackId/-1"
+    fun stackDetail(stackId: Int) = "$STACK_DETAIL/$stackId"
+
+    fun stackForm(stackId: Int? = null) =
+        if (stackId != null) "$STACK_FORM/$stackId"
+        else "$STACK_FORM/-1"
 }
 
 
@@ -116,7 +127,9 @@ fun AppNavHost(
                 onSettingsClick = {
                     navController.navigate(Routes.PROFILE_DETAIL)
                 },
-                onStackClick = { /* TODO */ },
+                onStackClick = { stackId ->  // ← Handle navigation here
+                    navController.navigate(Routes.stackDetail(stackId))
+                },
                 onAddStack = { /* TODO */ }
             )
 
@@ -168,6 +181,55 @@ fun AppNavHost(
             RecipeFormScreen(
                 stackId = stackId,
                 recipeId = if (recipeId == -1) null else recipeId,  // ← Check for -1
+                onDone = {
+                    navController.popBackStack()
+                },
+                onBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        /* ---------------- Stack Detail ---------------- */
+        composable(
+            route = "${Routes.STACK_DETAIL}/{stackId}",
+            arguments = listOf(
+                navArgument("stackId") { type = NavType.IntType }
+            )
+        ) { backStackEntry ->
+            val stackId = backStackEntry.arguments!!.getInt("stackId")
+
+            StackDetailScreen(
+                stackId = stackId,
+                onBack = {
+                    navController.popBackStack()
+                },
+                onRecipeClick = { recipeId ->
+                    navController.navigate(Routes.recipeDetail(recipeId))
+                },
+                onAddRecipe = { stackId ->
+                    navController.navigate(Routes.recipeForm(stackId = stackId))
+                },
+                onEditStack = { stackId ->  // ← Add this
+                    navController.navigate(Routes.stackForm(stackId))
+                }
+            )
+        }
+
+        /* ---------------- Stack Form (Add/Edit) ---------------- */
+        composable(
+            route = "${Routes.STACK_FORM}/{stackId}",
+            arguments = listOf(
+                navArgument("stackId") {
+                    type = NavType.IntType
+                    defaultValue = -1
+                }
+            )
+        ) { backStackEntry ->
+            val stackId = backStackEntry.arguments?.getInt("stackId")
+
+            StackFormScreen(
+                stackId = if (stackId == -1) null else stackId,
                 onDone = {
                     navController.popBackStack()
                 },
