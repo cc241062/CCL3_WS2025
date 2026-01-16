@@ -195,7 +195,7 @@ fun RecipeCard(
 }
 
 @Composable
-fun NewQuestsCard(onClick: () -> Unit = {}) {
+fun QuestsCard(onClick: () -> Unit = {}) {
     Card(
         onClick = onClick,
         modifier = Modifier

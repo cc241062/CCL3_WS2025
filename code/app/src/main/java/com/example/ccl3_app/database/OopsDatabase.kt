@@ -39,9 +39,12 @@ abstract class OopsDatabase : RoomDatabase() {
 
                 Instance = instance
 
-                // 🔹 Prepopulate quests ONCE in background
                 CoroutineScope(Dispatchers.IO).launch {
-                    prepopulateQuests(instance.QuestDao())
+                    val questDao = instance.QuestDao()
+                    val count = questDao.getQuestCount()
+                    if (count == 0) {
+                        prepopulateQuests(questDao)
+                    }
                 }
 
                 instance

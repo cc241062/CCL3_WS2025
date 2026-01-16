@@ -23,4 +23,7 @@ interface QuestDao {
 
     @Query("SELECT COUNT(*) FROM quests WHERE isDone = 1")
     fun getCompletedQuestCount(): Flow<Int>
+
+    @Query("SELECT COUNT(*) FROM quests")
+    suspend fun getQuestCount(): Int
 }
