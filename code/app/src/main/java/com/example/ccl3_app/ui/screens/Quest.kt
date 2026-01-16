@@ -48,11 +48,11 @@ fun QuestScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Teal)
-                .padding(vertical = 24.dp, horizontal = 20.dp)
+                .background(QuestHeader)
+                .padding(vertical = 28.dp, horizontal = 20.dp)
         ) {
             Text(
-                text = "Seasonal Quests",
+                text = "January Quests",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White
