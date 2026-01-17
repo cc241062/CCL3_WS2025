@@ -19,14 +19,19 @@ class RecipeFormsViewModel(
     var description by mutableStateOf("")
     var ingredients by mutableStateOf("")
     var instructions by mutableStateOf("")
+    var stackId by mutableStateOf(1)
 
-    suspend fun loadRecipe(id: Int) {
+    /*suspend*/ fun loadRecipe(id: Int) {
         recipeId = id
-        val recipe = recipeRepository.findRecipeById(id)
-        title = recipe.title
-        description = recipe.description
-        ingredients = recipe.ingredients.joinToString("\n")
-        instructions = recipe.instructions.joinToString("\n")
+        viewModelScope.launch {
+            val recipe = recipeRepository.findRecipeById(id)
+            title = recipe.title
+            description = recipe.description
+            ingredients = recipe.ingredients.joinToString("\n")
+            instructions = recipe.instructions.joinToString("\n")
+            stackId = recipe.stackId
+        }
+
     }
 
     fun saveRecipe(stackId: Int) {

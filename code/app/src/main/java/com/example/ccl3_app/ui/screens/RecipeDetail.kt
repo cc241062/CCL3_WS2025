@@ -8,13 +8,8 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -28,19 +23,22 @@ import com.example.ccl3_app.ui.theme.Teal
 import com.example.ccl3_app.ui.theme.LightTeal
 import com.example.ccl3_app.ui.viewmodels.ViewModelProvider
 
-
 @Composable
 fun RecipeDetailScreen(
     recipeId: Int,
     onBack: () -> Unit = {},
-    onEdit: (Int) -> Unit = {},  // ← ADD THIS LINE
+    onEdit: (Int) -> Unit = {},
     viewModel: RecipeDetailViewModel = viewModel(factory = ViewModelProvider.Factory)
 ) {
     val recipe by viewModel.recipe.collectAsState()
+    var currentCardIndex by remember { mutableStateOf(0) } // 0 = ingredients, 1+ = instruction steps
 
     LaunchedEffect(recipeId) {
         viewModel.loadRecipe(recipeId)
     }
+
+    // Total cards = 1 (ingredients) + number of instructions
+    val totalCards = 1 + (recipe?.instructions?.size ?: 0)
 
     Column(
         modifier = Modifier
@@ -57,22 +55,38 @@ fun RecipeDetailScreen(
             Text(
                 text = recipe?.title ?: "Recipe name",
                 fontSize = 22.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1f)
             )
 
             Row {
-                IconButton(onClick = { onEdit(recipeId) }) {  // ← CHANGE THIS LINE
+                IconButton(onClick = { onEdit(recipeId) }) {
                     Icon(Icons.Default.Edit, contentDescription = "Edit")
                 }
-                IconButton(onClick = { recipe?.let { viewModel.deleteRecipe(it) } }) {
+                IconButton(onClick = {
+                    recipe?.let {
+                        viewModel.deleteRecipe(it)
+                        onBack()
+                    }
+                }) {
                     Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color.Red)
                 }
             }
         }
 
-        // ... rest of your code stays the same
+        Spacer(modifier = Modifier.height(8.dp))
 
-        Spacer(modifier = Modifier.height(16.dp))
+        // Description
+        if (!recipe?.description.isNullOrBlank()) {
+            Text(
+                text = recipe?.description ?: "",
+                fontSize = 14.sp,
+                color = Color.Gray,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
 
@@ -93,10 +107,18 @@ fun RecipeDetailScreen(
                     .padding(16.dp)
             ) {
 
-                Text("Ingredients:", fontWeight = FontWeight.Bold, color = Teal)
+                // Section Title
+                Text(
+                    text = if (currentCardIndex == 0) "Ingredients:"
+                    else "Step $currentCardIndex:",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    color = Teal
+                )
 
                 Spacer(Modifier.height(12.dp))
 
+                // Content Box
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -104,20 +126,69 @@ fun RecipeDetailScreen(
                         .background(Color.White.copy(alpha = 0.6f), RoundedCornerShape(12.dp))
                         .padding(12.dp)
                 ) {
-                    Text(recipe?.description ?: "Description…")
+                    if (currentCardIndex == 0) {
+                        // Ingredients Card
+                        Column {
+                            recipe?.ingredients?.forEach { ingredient ->
+                                Text(
+                                    text = "• $ingredient",
+                                    fontSize = 16.sp,
+                                    modifier = Modifier.padding(vertical = 4.dp)
+                                )
+                            }
+                            if (recipe?.ingredients.isNullOrEmpty()) {
+                                Text("No ingredients listed", color = Color.Gray)
+                            }
+                        }
+                    } else {
+                        // Instruction Step Card
+                        val instructionIndex = currentCardIndex - 1
+                        recipe?.instructions?.getOrNull(instructionIndex)?.let { instruction ->
+                            Text(
+                                text = instruction,
+                                fontSize = 16.sp,
+                                lineHeight = 24.sp
+                            )
+                        }
+                    }
                 }
 
                 Spacer(Modifier.height(16.dp))
 
+                // Navigation Buttons
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton(onClick = { }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Previous")
+                    IconButton(
+                        onClick = { if (currentCardIndex > 0) currentCardIndex-- },
+                        enabled = currentCardIndex > 0
+                    ) {
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = "Previous",
+                            tint = if (currentCardIndex > 0) Color.Black else Color.Gray
+                        )
                     }
-                    IconButton(onClick = { }) {
-                        Icon(Icons.Default.ArrowForward, contentDescription = "Next")
+
+                    // Progress indicator
+                    Text(
+                        text = "${currentCardIndex + 1} / $totalCards",
+                        fontSize = 14.sp,
+                        color = Teal,
+                        fontWeight = FontWeight.SemiBold
+                    )
+
+                    IconButton(
+                        onClick = { if (currentCardIndex < totalCards - 1) currentCardIndex++ },
+                        enabled = currentCardIndex < totalCards - 1
+                    ) {
+                        Icon(
+                            Icons.Default.ArrowForward,
+                            contentDescription = "Next",
+                            tint = if (currentCardIndex < totalCards - 1) Color.Black else Color.Gray
+                        )
                     }
                 }
             }
