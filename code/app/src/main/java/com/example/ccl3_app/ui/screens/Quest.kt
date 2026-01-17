@@ -1,5 +1,6 @@
 package com.example.ccl3_app.ui.screens
 
+import FryEggQuestScreen
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -24,17 +25,31 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ccl3_app.data.Quest
 import com.example.ccl3_app.ui.theme.*
 import com.example.ccl3_app.ui.viewmodels.QuestViewModel
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.Dp
+import com.example.ccl3_app.R
+import androidx.compose.foundation.Canvas
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.PathEffect
+
+
 
 @Composable
 fun QuestScreen(
     viewModel: QuestViewModel = viewModel()
 ) {
+    val juaFont = FontFamily(Font(R.font.jua_regular))
+
     val quests by viewModel.quests.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     var selectedQuest by remember { mutableStateOf<Quest?>(null) }
+    var showFryEggScreen by remember { mutableStateOf(false) }
 
     val completedCount = quests.count { it.isDone }
     val totalQuests = quests.size
@@ -48,13 +63,14 @@ fun QuestScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Teal)
-                .padding(vertical = 24.dp, horizontal = 20.dp)
+                .background(QuestHeader)
+                .padding(vertical = 28.dp, horizontal = 20.dp)
         ) {
             Text(
-                text = "Seasonal Quests",
-                fontSize = 24.sp,
+                text = "January Quests",
+                fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
+                fontFamily = juaFont,
                 color = Color.White
             )
         }
@@ -67,7 +83,6 @@ fun QuestScreen(
                 CircularProgressIndicator(color = Orange)
             }
         } else if (quests.isEmpty()) {
-            // Empty state
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -79,61 +94,85 @@ fun QuestScreen(
                 )
             }
         } else {
-            // Progress Card
-            Card(
+
+
+            // Progress Card with shadow behind
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = LightTeal.copy(alpha = 0.3f)
-                )
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
-                Column(
+                // BACK SHADOW CARD
+                Card(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp)
-                ) {
-                    Text(
-                        text = "Quests completed",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Color.Black
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
+                        .matchParentSize()
+                        .offset(y = 6.dp),                    // slight drop shadow effect
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color(0xFF1C393D)    // same dark teal as other shadows
+                    ),
+                    elevation = CardDefaults.cardElevation(0.dp)
+                ) {}
 
-                    // Progress Bar
-                    Box(
+                // FRONT PROGRESS CARD (your original one)
+                Card(
+                    modifier = Modifier,
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = LightTeal
+                    )
+                ) {
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(32.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(Teal)
+                            .padding(20.dp)
                     ) {
-                        if (totalQuests > 0) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxHeight()
-                                    .fillMaxWidth(completedCount.toFloat() / totalQuests)
-                                    .background(Orange)
-                            )
-                        }
+                        Text(
+                            text = "Quests completed:",
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            fontFamily = juaFont,
+                            color = Color(0xFF0A3941)
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
 
-                        // Progress text
+                        // Progress Bar
                         Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(32.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(Teal)
                         ) {
-                            Text(
-                                text = "$completedCount/$totalQuests",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White
-                            )
+                            if (totalQuests > 0) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxHeight()
+                                        .fillMaxWidth(completedCount.toFloat() / totalQuests)
+                                        .background(Color(0xFFE37434)) // your orange
+                                )
+                            }
+
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "$completedCount/$totalQuests",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    fontFamily = juaFont,
+                                    color = Color.White
+                                )
+                            }
                         }
                     }
                 }
             }
+
+
+
+
 
             // Quest Path
             Box(
@@ -144,26 +183,38 @@ fun QuestScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 32.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(24.dp)
+                        .padding(vertical = 32.dp, horizontal = 16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     quests.forEachIndexed { index, quest ->
-                        val isCurrentQuest = !quest.isDone &&
-                                (index == 0 || quests.getOrNull(index - 1)?.isDone == true)
+                        val offsetX = if (index % 2 == 0) (-50).dp else 50.dp
+                        val prevOffsetX = if (index == 0) null else {
+                            if ((index - 1) % 2 == 0) (-50).dp else 50.dp
+                        }
+
+                        // ✅ draw connector only if there is a previous node
+                        if (prevOffsetX != null) {
+                            OrganicQuestPathConnector(
+                                fromOffsetX = prevOffsetX,
+                                toOffsetX = offsetX,
+                                index = index,
+                                isDone = quests[index - 1].isDone  // ✅ segment becomes solid when the previous quest is done
+                            )
+                        }
+
 
                         QuestNode(
                             quest = quest,
-                            isCurrentQuest = isCurrentQuest,
+                            isCurrentQuest = !quest.isDone &&
+                                    (index == 0 || quests.getOrNull(index - 1)?.isDone == true),
                             onClick = {
-                                if (isCurrentQuest) {
-                                    selectedQuest = quest
-                                }
+                                if (!quest.isDone) selectedQuest = quest
                             },
-                            // Alternate left/right positioning
-                            offsetX = if (index % 2 == 0) (-40).dp else 40.dp
+                            offsetX = offsetX,
+                            fontFamily = juaFont
                         )
                     }
+
                 }
             }
         }
@@ -175,26 +226,108 @@ fun QuestScreen(
             quest = quest,
             onDismiss = { selectedQuest = null },
             onStart = {
-                viewModel.completeQuest(quest)
-                selectedQuest = null
+                // ✅ only open the steps screen for Fry an Egg for now
+                if (quest.title == "Fry an Egg") {
+                    showFryEggScreen = true
+                } else {
+                    // keep your old behavior for other quests (optional)
+                    viewModel.completeQuest(quest)
+                }
+            },
+            fontFamily = juaFont
+        )
+    }
+
+    if (showFryEggScreen) {
+        // find the Fry an Egg quest in the current list
+        val fryQuest = quests.firstOrNull { it.title == "Fry an Egg" }
+
+        FryEggQuestScreen(
+            fontFamily = juaFont,
+            onClose = {
+                // user pressed X → just close, don't complete
+                showFryEggScreen = false
+            },
+            onFinished = {
+                // user tapped Finish on last step → complete quest 1 and close
+                showFryEggScreen = false
+                fryQuest?.let { viewModel.completeQuest(it) }
             }
         )
     }
+
+
 }
+
+
+@Composable
+fun OrganicQuestPathConnector(
+    fromOffsetX: Dp,
+    toOffsetX: Dp,
+    index: Int,
+    isDone: Boolean
+) {
+    Canvas(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(70.dp)
+    ) {
+        val w = size.width
+        val h = size.height
+
+        val fromX = w / 2f + fromOffsetX.toPx()
+        val toX = w / 2f + toOffsetX.toPx()
+
+        // organic wobble
+        val wobble = (if (index % 2 == 0) 1 else -1) * 22.dp.toPx()
+        val midY = h / 2f
+
+        val c1 = Offset(fromX + wobble, midY * 0.3f)
+        val c2 = Offset(toX - wobble, midY * 1.7f)
+
+        val path = Path().apply {
+            moveTo(fromX, 0f)
+            cubicTo(
+                c1.x, c1.y,
+                c2.x, c2.y,
+                toX, h
+            )
+        }
+
+        val stroke = Stroke(
+            width = 12.dp.toPx(),                 // thinner line
+            cap = StrokeCap.Round,
+            pathEffect = if (isDone) null else PathEffect.dashPathEffect(
+                floatArrayOf(
+                    4.dp.toPx(),                  // short dash
+                    25.dp.toPx()                  // space
+                ),
+                0f
+            )
+        )
+
+        drawPath(
+            path = path,
+            color = if (isDone) Color(0xFFE37434) else Color(0xFFE5E5E5),
+            style = stroke
+        )
+    }
+}
+
 
 @Composable
 fun QuestNode(
     quest: Quest,
     isCurrentQuest: Boolean,
     onClick: () -> Unit,
-    offsetX: Dp = 0.dp
+    offsetX: androidx.compose.ui.unit.Dp,
+    fontFamily: FontFamily
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
 
-    // Pulsing animation for current quest
     val pulseScale by infiniteTransition.animateFloat(
         initialValue = 1f,
-        targetValue = 1.3f,
+        targetValue = 1.15f,
         animationSpec = infiniteRepeatable(
             animation = tween(1000, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
@@ -204,65 +337,99 @@ fun QuestNode(
 
     Box(
         modifier = Modifier
-            .offset(x = offsetX)
-            .size(80.dp),
+            .fillMaxWidth()
+            .height(90.dp),
         contentAlignment = Alignment.Center
     ) {
-        // Pulsing ring for current quest
-        if (isCurrentQuest) {
-            Box(
-                modifier = Modifier
-                    .size(80.dp)
-                    .scale(pulseScale)
-                    .border(
-                        width = 3.dp,
-                        color = Orange.copy(alpha = 0.5f),
-                        shape = CircleShape
-                    )
-            )
-        }
-
-        // Quest circle
         Box(
-            modifier = Modifier
-                .size(70.dp)
-                .clip(CircleShape)
-                .background(
-                    when {
-                        quest.isDone -> Orange
-                        isCurrentQuest -> Orange
-                        else -> Color.LightGray
-                    }
-                )
-                .clickable(enabled = isCurrentQuest) { onClick() },
+            modifier = Modifier.offset(x = offsetX),
             contentAlignment = Alignment.Center
         ) {
-            // Yellow indicator for current quest
-            if (isCurrentQuest && !quest.isDone) {
+            // Pulsing ring for current quest
+            if (isCurrentQuest) {
                 Box(
                     modifier = Modifier
-                        .size(25.dp)
-                        .offset(y = (-15).dp)
-                        .clip(
-                            RoundedCornerShape(
-                                topStart = 4.dp,
-                                topEnd = 4.dp,
-                                bottomStart = 0.dp,
-                                bottomEnd = 0.dp
-                            )
+                        .size(90.dp)
+                        .scale(pulseScale)
+                        .border(
+                            width = 3.dp,
+                            color = Orange.copy(alpha = 0.4f),
+                            shape = CircleShape
                         )
-                        .background(PostItYellow)
                 )
+            }
+
+            // Colors based on state
+            val circleColor = if (quest.isDone || isCurrentQuest) Color(0xFFE37434) else Color(0xFFD0D0D0)
+            val shadowColor = if (quest.isDone || isCurrentQuest) Color(0xFF9B5A2D) else Color(0xFFB0B0B0)
+
+            // Shadow disc
+            Box(
+                modifier = Modifier
+                    .size(70.dp)
+                    .offset(y = 5.dp)
+                    .clip(CircleShape)
+                    .background(shadowColor)
+            )
+
+            // Main quest circle
+            Box(
+                modifier = Modifier
+                    .size(70.dp)
+                    .clip(CircleShape)
+                    .background(circleColor)
+                    .clickable(enabled = isCurrentQuest && !quest.isDone) { onClick() },
+                contentAlignment = Alignment.Center
+            ) {
+                // Display level number for completed and current quests
+                if (quest.isDone || isCurrentQuest) {
+                    Text(
+                        text = "${quest.level}",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = fontFamily,
+                        color = Color.White
+                    )
+                }
+            }
+
+                // Triangle marker pointing DOWN at current quest
+                if (isCurrentQuest && !quest.isDone) {
+                    DownTriangleMarker(
+                        modifier = Modifier
+                            .width(44.dp)
+                            .height(30.dp)
+                            .offset(y = (-32).dp),
+                        color = Color(0xFFFEE22B)
+                    )
             }
         }
     }
 }
 
 @Composable
+fun DownTriangleMarker(
+    modifier: Modifier = Modifier,
+    color: Color
+) {
+    androidx.compose.foundation.Canvas(modifier = modifier) {
+        val w = size.width
+        val h = size.height
+        val path = androidx.compose.ui.graphics.Path().apply {
+            moveTo(w / 2f, h)    // bottom point (pointing down)
+            lineTo(0f, 0f)       // top left
+            lineTo(w, 0f)        // top right
+            close()
+        }
+        drawPath(path = path, color = color)
+    }
+}
+@Composable
 fun QuestDetailDialog(
     quest: Quest,
     onDismiss: () -> Unit,
-    onStart: () -> Unit
+    onStart: () -> Unit,
+    fontFamily: FontFamily
 ) {
     Box(
         modifier = Modifier
@@ -271,89 +438,103 @@ fun QuestDetailDialog(
             .clickable(onClick = onDismiss),
         contentAlignment = Alignment.Center
     ) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth(0.85f)
-                .padding(16.dp)
-                .clickable(onClick = {}), // Prevent dismissing when clicking card
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = PostItYellow
-            ),
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = 8.dp
-            )
+        // Wrap triangle + card together
+        Box(
+            modifier = Modifier.fillMaxWidth(0.8f),
+            contentAlignment = Alignment.TopCenter
         ) {
-            Column(
+
+            Canvas(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                    .size(45.dp)
+                    .offset(y = (-10).dp)
             ) {
-                // Quest circle at top
-                Box(
-                    modifier = Modifier
-                        .size(80.dp)
-                        .clip(CircleShape)
-                        .background(Orange),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(30.dp)
-                            .offset(y = (-20).dp)
-                            .clip(
-                                RoundedCornerShape(
-                                    topStart = 4.dp,
-                                    topEnd = 4.dp,
-                                    bottomStart = 0.dp,
-                                    bottomEnd = 0.dp
-                                )
-                            )
-                            .background(PostItYellow)
-                    )
+                val w = size.width
+                val h = size.height
+                val path = Path().apply {
+                    moveTo(w / 2f, h)
+                    lineTo(0f, 0f)
+                    lineTo(w, 0f)
+                    close()
                 }
+                drawPath(path, color = Color(0xFFAA5423))
+            }
 
-                Spacer(modifier = Modifier.height(8.dp))
-
-                // Title
-                Text(
-                    text = "Level ${quest.level}: ${quest.title}",
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black,
-                    textAlign = TextAlign.Center
-                )
-
-                // Description
-                Text(
-                    text = quest.description,
-                    fontSize = 16.sp,
-                    color = Color.Black.copy(alpha = 0.8f),
-                    textAlign = TextAlign.Center,
-                    lineHeight = 22.sp
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                // Start Button
-                Button(
-                    onClick = onStart,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Teal
-                    ),
-                    shape = RoundedCornerShape(12.dp),
+            // MAIN BROWN CARD
+            Card(
+                modifier = Modifier
+                    .padding(top = 12.dp)
+                    .clickable(enabled = false) {},
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color(0xFF9B5A2D)
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+            ) {
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(56.dp)
+                        .padding(horizontal = 24.dp, vertical = 24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(
-                        text = "Start",
-                        fontSize = 18.sp,
+                        text = "Level ${quest.level}: ${quest.title}",
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        fontFamily = fontFamily,
+                        color = Color.White,
+                        textAlign = TextAlign.Start,
+                        modifier = Modifier.fillMaxWidth()
                     )
+
+                    Text(
+                        text = quest.description,
+                        fontSize = 16.sp,
+                        fontFamily = fontFamily,
+                        color = Color.White.copy(alpha = 0.9f),
+                        textAlign = TextAlign.Start,
+                        lineHeight = 22.sp,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth(0.6f)
+                                .height(48.dp)
+                                .offset(y = 4.dp)
+                                .clip(RoundedCornerShape(24.dp))
+                                .background(Color(0xFF0A3941))
+                        )
+
+                        Button(
+                            onClick = {
+                                onStart()
+                                onDismiss() // ✅ close dialog after pressing Start
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF4B9DA9)
+                            ),
+                            shape = RoundedCornerShape(24.dp),
+                            modifier = Modifier
+                                .fillMaxWidth(0.6f)
+                                .height(48.dp)
+                        ) {
+                            Text(
+                                text = "Start",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = fontFamily,
+                                color = Color.White
+                            )
+                        }
+                    }
                 }
             }
         }

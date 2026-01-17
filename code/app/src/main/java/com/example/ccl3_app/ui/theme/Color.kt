@@ -17,6 +17,7 @@ val Teal = Color(0xFF156B77)
 
 val LightTeal = Color(0xFF91C6BC)
 
+
 val PostItYellow = Color(0xFFF6F3C2)
 
 val Mint = Color(0xFF9ED2C6)
@@ -28,3 +29,5 @@ val LightOrange = Color(0xFFFFE0C2)
 
 val Background = Color(0xFFF8F8F8)
 val CardBackground = Color.White
+
+val QuestHeader = Color(0xFF4B9DA9)
