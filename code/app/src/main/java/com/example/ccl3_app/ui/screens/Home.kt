@@ -295,7 +295,7 @@ fun RecipeCardStack(
                 .offset(x = 6.dp, y = 6.dp),
             shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.cardColors(
-                containerColor = LightTeal.copy(alpha = 0.5f)
+                containerColor = Color(0xFFC8F4EC)
             )
         ) {}
 
