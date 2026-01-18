@@ -35,11 +35,18 @@ fun RecipeFormScreen(
     val allStacks by stackRepository.stacks.collectAsState(initial = emptyList())
 
     // Selected stack state
-    var selectedStackId by remember { mutableStateOf(stackId ?: allStacks.firstOrNull()?.id) }
+    var selectedStackId by remember { mutableStateOf(stackId ?: 1) }
     var expanded by remember { mutableStateOf(false) }
 
     LaunchedEffect(recipeId) {
         recipeId?.let { viewModel.loadRecipe(it) }
+    }
+
+    // Update selectedStackId when recipe loads
+    LaunchedEffect(viewModel.stackId) {
+        if (recipeId != null) {
+            selectedStackId = viewModel.stackId
+        }
     }
 
     LaunchedEffect(allStacks) {

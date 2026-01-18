@@ -26,6 +26,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.platform.LocalContext
+import com.example.ccl3_app.database.OopsDatabase
+import com.example.ccl3_app.data.StackRepository
 import com.example.ccl3_app.R
 import com.example.ccl3_app.data.Recipe
 import com.example.ccl3_app.ui.theme.*
@@ -89,7 +92,7 @@ fun HomeScreen(
                     verticalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
                     Text(
-                        text = "Find you match:",
+                        text = "Find your match:",
                         fontSize = 32.sp,
                         fontWeight = FontWeight.Bold,
                         fontFamily = JuaFont,

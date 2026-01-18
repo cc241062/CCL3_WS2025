@@ -202,7 +202,7 @@ fun ProfileScreen(
                 verticalArrangement = Arrangement.spacedBy(14.dp),
                 modifier = Modifier.fillMaxSize()
             ) {
-                items(stacks) { stack ->
+                items(filteredStacks) { stack ->
                     val recipes by stackViewModel.getRecipesForStack(stack.id).collectAsState(initial = emptyList())
 
                     StackCard(
