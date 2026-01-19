@@ -36,7 +36,7 @@ class HomeViewModel(
             try {
                 // Get recipes for a specific stack (e.g., beginner recipes)
                 // You can change stackId based on your needs
-                recipeRepository.getRecipesForStack(1).collect { recipes ->
+                recipeRepository.getAllRecipes().collect { recipes ->
                     _featuredRecipes.value = recipes
                     if (recipes.isNotEmpty() && _currentRecipeIndex.value >= recipes.size) {
                         _currentRecipeIndex.value = 0

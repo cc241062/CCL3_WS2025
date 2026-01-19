@@ -60,13 +60,13 @@ fun ProfileScreen(
 
     val database = OopsDatabase.getDatabase(context)
     val repo = ProfileRepository(database.ProfileDao())
+    val stackRepository = StackRepository(database.StackDao())
+    val recipeRepository = RecipeRepository(database.RecipeDao())
 
     val profileViewModel: ProfileViewModel = viewModel(
         factory = ProfileViewModelFactory(repo)
     )
 
-    val stackRepository = StackRepository(database.StackDao())
-    val recipeRepository = RecipeRepository(database.RecipeDao())
 
     val stackViewModel: StackViewModel = viewModel(
         factory = object : androidx.lifecycle.ViewModelProvider.Factory {
@@ -75,7 +75,6 @@ fun ProfileScreen(
             }
         }
     )
-
 
 
     // set which profile to observe
@@ -178,20 +177,6 @@ fun ProfileScreen(
                     fontWeight = FontWeight.Bold,
                     color = Color.Black
                 )
-
-                /*FloatingActionButton(
-                    onClick = { stackViewModel.addStack() },
-                    containerColor = Orange,
-                    contentColor = Color.White,
-                    shape = CircleShape,
-                    modifier = Modifier.size(44.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Add stack",
-                        modifier = Modifier.size(22.dp)
-                    )
-                }*/
             }
 
             Spacer(modifier = Modifier.height(12.dp))
