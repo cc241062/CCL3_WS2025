@@ -1,52 +1,276 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Your App Name</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 40px;
-      max-width: 900px;
-    }
-    h1, h2 {
-      color: #333;
-    }
-    img {
-      max-width: 100%;
-      border: 1px solid #ccc;
-      margin-top: 10px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Oops! I can cook – Documentation</title>
+    <style>
+        :root {
+          --accent: #E37434;
+        }
+
+        body {
+          font-family: Arial, sans-serif;
+          margin: 40px;
+          max-width: 900px;
+          line-height: 1.6;
+          color: #333;
+        }
+
+        h1, h2, h3, h4 {
+          color: var(--accent);
+          margin-top: 1.6em;
+        }
+
+        h1 {
+          border-bottom: 3px solid var(--accent);
+          padding-bottom: 0.3em;
+        }
+
+        a {
+          color: var(--accent);
+          text-decoration: none;
+        }
+
+        a:hover {
+          text-decoration: underline;
+        }
+
+        .tagline {
+          font-style: italic;
+          color: #555;
+          margin-bottom: 1.5em;
+        }
+
+        .badge {
+          display: inline-block;
+          padding: 4px 10px;
+          border-radius: 999px;
+          background: rgba(227, 116, 52, 0.08);
+          color: var(--accent);
+          font-size: 0.8rem;
+          font-weight: bold;
+          letter-spacing: 0.03em;
+          text-transform: uppercase;
+          margin-bottom: 0.5em;
+        }
+
+        .section-card {
+          border: 1px solid #eee;
+          border-left: 4px solid var(--accent);
+          padding: 16px 20px;
+          border-radius: 8px;
+          margin: 18px 0;
+          background: #fffaf7;
+        }
+
+        ul {
+          padding-left: 20px;
+        }
+
+        .pill-list {
+          list-style: none;
+          padding-left: 0;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+        }
+
+        .pill-list li {
+          border-radius: 999px;
+          padding: 4px 10px;
+          border: 1px solid rgba(0,0,0,0.06);
+          background: #fff;
+          font-size: 0.85rem;
+        }
+
+        .subtle {
+          font-size: 0.9rem;
+          color: #666;
+        }
+
+        img {
+          max-width: 100%;
+          border: 1px solid #ccc;
+          margin-top: 10px;
+        }
+
+        code {
+          background: #f4f4f4;
+          padding: 2px 4px;
+          border-radius: 4px;
+          font-size: 0.9em;
+        }
+    </style>
 </head>
 <body>
 
-  <h1>Oops! I can cook</h1>
-  <p><strong>Short description:</strong> Oops! I can cook is a learning app for beginner chefs. Users can create and edit their own profiles, learn pre-made recipes in a monthly “Quest mode” and add their own recipes and search for them.</p>
-
-  <h2>Team Members</h2>
-  <ul>
-    <li>Antonia Hruschka</li>
-    <li>Katharina Lipp</li>
-  </ul>
-
-  <h2>App Concept</h2>
-
-  <h3>Use Case</h3>
-  <p>Oops! I can cook is designed to teach beginners how to cook from scratch, build confidence in the kitchen, and stay motivated to prepare home-cooked meals instead of relying on takeout, all through step-by-step lessons, personal recipe creation, and fun monthly cooking quests!</p>
-
-  <h3>Target User</h3>
-  <p>Oops! I can cook is for inexperienced home cooks, who want to start eating healthier and learn to cook for themselves.
+<h1>Oops! I can cook</h1>
+<p class="tagline">
+    A learning app that helps beginner cooks grow confident in the kitchen through step-by-step recipes,
+    personal creations, and fun monthly quests.
 </p>
 
-  <h3>User Flow / Hi-Fi Prototype</h3>
-  <p>
-    Explain how users move through the app from screen to screen.
-    Add screenshots or a Figma export below.
-  </p>
+<div class="section-card">
+    <span class="badge">Overview</span>
+    <p><strong>Short description:</strong> Oops! I can cook is a learning app for beginner chefs. Users can create and edit their own profiles, learn pre-made recipes in a monthly “Quest mode”, add their own recipes, and search for them.</p>
 
-  <!-- Example image -->
-  <a href="https://www.figma.com/proto/f5kmf9qPA9E0VyJapWmWkS/CCL3?node-id=10-197&t=05rv1OQNk3YqdZyz-1">Figma Prototype</a>
+    <h2>Team Members</h2>
+    <ul>
+        <li>Antonia Hruschka</li>
+        <li>Katharina Lipp</li>
+    </ul>
+
+    <h2>App Concept</h2>
+
+    <h3>Use Case</h3>
+    <p>
+        Oops! I can cook is designed to teach beginners how to cook from scratch, build confidence in the kitchen,
+        and stay motivated to prepare home-cooked meals instead of relying on takeout — all through step-by-step lessons,
+        personal recipe creation, and fun monthly cooking quests.
+    </p>
+
+    <h3>Target User</h3>
+    <p>
+        Oops! I can cook is for inexperienced home cooks who want to start eating healthier and learn to cook for themselves.
+    </p>
+
+    <h3>User Flow / Hi-Fi Prototype</h3>
+    <p>
+        Users can:
+    </p>
+    <ul>
+        <li>Create and edit a personal profile.</li>
+        <li>Browse pre-made recipes and follow them step by step.</li>
+        <li>Enter “Quest mode” to complete a themed monthly cooking challenge.</li>
+        <li>Add their own recipes and search them later.</li>
+    </ul>
+    <p>
+        You can explore the interactive prototype here:<br>
+        <a href="https://www.figma.com/proto/f5kmf9qPA9E0VyJapWmWkS/CCL3?node-id=10-197&t=05rv1OQNk3YqdZyz-1" target="_blank">
+            Figma Prototype – Oops! I can cook
+        </a>
+    </p>
+</div>
+
+<!-- 1) Description and results of heuristic evaluation -->
+
+<h2>Heuristic Evaluation </h2>
+
+<div class="section-card">
+    <p>
+        The evaluation suggests that the app’s core structure is sound, but several small to medium usability
+        problems accumulate and could noticeably slow down or confuse users—especially beginners, who are
+        the target audience. Navigation clarity, consistency, and visibility of system status are the most
+        prominent themes across the identified issues.
+    </p>
+
+    <p>
+        Addressing the high-severity items, such as navigation clarity, missing UI elements, and unclear
+        dropdown behavior, will significantly improve the overall user experience. Enhancing the Quest
+        screen’s visual clarity and motivational cues will further support the app’s goal of keeping users
+        engaged and encouraging repeated use.
+    </p>
+</div>
+
+
+<<h2>Hypotheses & Testable Questions</h2>
+
+<div class="section-card">
+    <h3>Main Hypothesis</h3>
+    <p>
+        <strong>H1:</strong> Visual cues in the interface significantly impact how users interact with the app,
+        influencing navigation efficiency, content recognition, and overall enjoyment.
+    </p>
+
+    <h3>Testable Questions</h3>
+
+    <h4>Navigation</h4>
+    <p>
+        <em>Do first-time users navigate to main features more successfully with or without onboarding instructions?</em>
+    </p>
+    <ul>
+        <li><strong>Independent Variable (IV):</strong> Presence of onboarding instructions</li>
+        <li><strong>Dependent Variable (DV):</strong> Time needed to reach each main feature</li>
+    </ul>
+
+    <h4>Visual Design – Recipe Cards</h4>
+    <p>
+        <em>Does using colored recipe cards improve users’ ability to distinguish recipes compared to
+            neutral-colored cards?</em>
+    </p>
+    <ul>
+        <li><strong>Independent Variable (IV):</strong> Recipe card color (colored vs. neutral)</li>
+        <li>
+            <strong>Dependent Variable (DV):</strong> Users’ ability to distinguish recipes
+            (measured by accuracy and error rate)
+        </li>
+    </ul>
+
+    <h4>Gamification – Quest Screen</h4>
+    <p>
+        <em>
+            Does a gamified quest screen design increase users’ perceived enjoyment when using the feature?
+        </em>
+    </p>
+    <ul>
+        <li><strong>Independent Variable (IV):</strong> Presence of gamified elements on the quest screen</li>
+        <li><strong>Dependent Variable (DV):</strong> Users’ perceived enjoyment</li>
+    </ul>
+</div>
+
+<h2>Data to Be Collected</h2>
+
+<div class="section-card">
+    <h3>Qualitative Data</h3>
+    <ul>
+        <li>Users’ subjective perceptions of visual design and navigation cues.</li>
+        <li>Identification of pain points, confusion, and frustrations related to the interface.</li>
+        <li>User expectations and emotional responses during task completion.</li>
+    </ul>
+
+    <h3>Quantitative Data</h3>
+    <ul>
+        <li>Task completion times for navigation and feature discovery.</li>
+        <li>Error rates during tasks (wrong clicks, backtracking, failed attempts).</li>
+        <li>
+            Perceived usability scores measured through standardized questionnaires
+            (e.g., SUS and SEQ).
+        </li>
+    </ul>
+
+    <p class="subtle">
+        This data will be used to compare different interface designs and determine which visual cues
+        lead to more efficient, understandable, and enjoyable user interactions.
+    </p>
+</div>
+
+<h2>Methods & Data Collection</h2>
+
+<div class="section-card">
+    <h3>Study Design</h3>
+    <ul>
+        <li>Between-subjects design to compare different visual and interaction conditions.</li>
+    </ul>
+
+    <h3>Evaluation Methods</h3>
+    <ul>
+        <li>Moderated usability testing with a think-aloud protocol.</li>
+        <li>Direct observation of user behavior during task completion.</li>
+        <li>Screen recording or video recording when screen capture is not available.</li>
+        <li>Short interviews to explore user expectations and frustrations.</li>
+    </ul>
+
+    <h3>Questionnaires & Tools</h3>
+    <ul>
+        <li>
+            <strong>SEQ (Single Ease Question):</strong> Administered after each task to measure perceived task difficulty.
+        </li>
+        <li>
+            <strong>SUS (System Usability Scale):</strong> Administered after all tasks to assess overall usability.
+        </li>
+    </ul>
+</div>
+
 
 </body>
 </html>
