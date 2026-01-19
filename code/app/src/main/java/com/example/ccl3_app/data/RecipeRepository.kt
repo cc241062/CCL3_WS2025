@@ -39,6 +39,21 @@ class RecipeRepository(private val recipeDao: RecipeDao) {
         }
     }
 
+    fun getAllRecipes(): Flow<List<Recipe>> {
+        return recipeDao.getAllRecipes().map { entityList ->
+            entityList.map { entity ->
+                Recipe(
+                    id = entity.id,
+                    stackId = entity.stackId,
+                    title = entity.title,
+                    description = entity.description,
+                    ingredients = entity.ingredients,
+                    instructions = entity.instructions
+                )
+            }
+        }
+    }
+
     // get recipes for a stack
     fun getRecipesForStack(stackId: Int) =
         recipeDao.getRecipesForStack(stackId).map { recipeList ->

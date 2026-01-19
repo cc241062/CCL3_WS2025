@@ -178,20 +178,6 @@ fun ProfileScreen(
                     fontWeight = FontWeight.Bold,
                     color = Color.Black
                 )
-
-                /*FloatingActionButton(
-                    onClick = { stackViewModel.addStack() },
-                    containerColor = Orange,
-                    contentColor = Color.White,
-                    shape = CircleShape,
-                    modifier = Modifier.size(44.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Add stack",
-                        modifier = Modifier.size(22.dp)
-                    )
-                }*/
             }
 
             Spacer(modifier = Modifier.height(12.dp))

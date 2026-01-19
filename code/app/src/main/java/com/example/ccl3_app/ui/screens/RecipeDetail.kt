@@ -52,6 +52,16 @@ fun RecipeDetailScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
+            IconButton(
+                onClick = onBack,
+            ) {
+                Icon(
+                    Icons.Default.ArrowBack,
+                    contentDescription = "Back",
+                    tint = Color.Black
+                )
+            }
+
             Text(
                 text = recipe?.title ?: "Recipe name",
                 fontSize = 22.sp,
