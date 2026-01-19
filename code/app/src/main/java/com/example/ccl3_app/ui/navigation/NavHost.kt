@@ -37,7 +37,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
-
+import com.example.ccl3_app.data.StackRepository
 
 
 import com.example.ccl3_app.ui.screens.StackDetailScreen
@@ -84,6 +84,7 @@ fun AppNavHost(
     val database = OopsDatabase.getDatabase(context)
     val recipeRepository = RecipeRepository(database.RecipeDao())
     val questRepository = QuestRepository(database.QuestDao())
+    val stackRepository = StackRepository(database.StackDao())
 
     NavHost(
         navController = navController,
@@ -93,7 +94,7 @@ fun AppNavHost(
         /* ---------------- Home ---------------- */
         composable(Routes.HOME) {
             val homeViewModel: HomeViewModel = viewModel(
-                factory = HomeViewModelFactory(recipeRepository)
+                factory = HomeViewModelFactory(recipeRepository,stackRepository)
             )
 
             HomeScreen(

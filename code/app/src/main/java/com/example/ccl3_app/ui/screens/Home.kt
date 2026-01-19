@@ -43,7 +43,7 @@ val JuaFont = FontFamily(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel = viewModel(),
+    viewModel: HomeViewModel = viewModel(), // assuming factory is wired wherever this is called
     onOpenProfiles: () -> Unit = {},
     onRecipeClick: (Int) -> Unit = {},
     onAddRecipe: (Int) -> Unit = {},
@@ -53,11 +53,17 @@ fun HomeScreen(
     val currentRecipeIndex by viewModel.currentRecipeIndex.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
-    val stackOptions = listOf("For dinner", "For breakfast", "For lunch")
+    // NEW: stacks + selected stack
+    val stacks by viewModel.stacks.collectAsState()
+    val selectedStackId by viewModel.selectedStackId.collectAsState()
+
     var stackMenuExpanded by remember { mutableStateOf(false) }
-    var selectedStack by remember { mutableStateOf(stackOptions.first()) }
+
+    val selectedStackName = stacks.firstOrNull { it.id == selectedStackId }?.name
+        ?: "Choose a stack"
 
     val scrollState = rememberScrollState()
+
 
     Box(
         modifier = Modifier
@@ -82,7 +88,7 @@ fun HomeScreen(
                 thickness = 2.dp
             )
 
-            // "Find you match:" header + dropdown
+            // "Find your match:" header + dropdown
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -107,7 +113,7 @@ fun HomeScreen(
                             contentPadding = PaddingValues(0.dp)
                         ) {
                             Text(
-                                text = selectedStack,
+                                text = selectedStackName,
                                 fontSize = 18.sp,
                                 fontFamily = JuaFont,
                                 color = Color.LightGray
@@ -124,16 +130,16 @@ fun HomeScreen(
                             expanded = stackMenuExpanded,
                             onDismissRequest = { stackMenuExpanded = false }
                         ) {
-                            stackOptions.forEach { option ->
+                            stacks.forEach { stack ->
                                 DropdownMenuItem(
                                     text = {
                                         Text(
-                                            text = option,
+                                            text = stack.name,
                                             fontFamily = JuaFont
                                         )
                                     },
                                     onClick = {
-                                        selectedStack = option
+                                        viewModel.selectStack(stack.id)
                                         stackMenuExpanded = false
                                     }
                                 )
@@ -142,6 +148,7 @@ fun HomeScreen(
                     }
                 }
             }
+
 
             // Recipe Card Stack
             val currentRecipe = featuredRecipes.getOrNull(currentRecipeIndex)
