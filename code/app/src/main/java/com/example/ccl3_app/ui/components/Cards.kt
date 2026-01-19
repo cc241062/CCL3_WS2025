@@ -273,10 +273,6 @@ fun WelcomeCard() {
                 )
             }
 
-            Text(
-                text = "🥄",
-                fontSize = 48.sp
-            )
         }
     }
 }}

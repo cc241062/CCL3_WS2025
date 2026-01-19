@@ -53,7 +53,7 @@ abstract class OopsDatabase : RoomDatabase() {
 
         private suspend fun prepopulateQuests(questDao: QuestDao) {
             val quests = listOf(
-                QuestEntity(0, "Fry an Egg", "Learn how to fry a perfect sunny-side up egg!", false, 1), // 👈 NOW LEVEL 1
+                QuestEntity(0, "Fry an Egg", "Learn how to fry a perfect sunny-side up egg!", false, 1),
                 QuestEntity(0, "Boil Water", "Learn the basics of boiling water safely", false, 2),
                 QuestEntity(0, "Make Toast", "Toast bread to golden perfection", false, 3),
                 QuestEntity(0, "Scramble Eggs", "Master the art of fluffy scrambled eggs", false, 4),

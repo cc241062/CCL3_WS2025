@@ -76,17 +76,21 @@ fun HomeScreen(
                 .fillMaxSize()
                 .verticalScroll(scrollState)
                 .padding(horizontal = 10.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+            verticalArrangement = Arrangement.Top
         ) {
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(30.dp))
 
             // Welcome Card
             WelcomeQuestCard(onClick = onNavigateToQuests)
+
+            Spacer(Modifier.height(12.dp))
 
             Divider(
                 color = Color(0xFFE0E0E0),
                 thickness = 2.dp
             )
+
+            Spacer(Modifier.height(8.dp))
 
             // "Find your match:" header + dropdown
             Row(
@@ -99,7 +103,7 @@ fun HomeScreen(
                 ) {
                     Text(
                         text = "Find your match:",
-                        fontSize = 32.sp,
+                        fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         fontFamily = JuaFont,
                         color = Orange
@@ -114,7 +118,7 @@ fun HomeScreen(
                         ) {
                             Text(
                                 text = selectedStackName,
-                                fontSize = 18.sp,
+                                fontSize = 16.sp,
                                 fontFamily = JuaFont,
                                 color = Color.LightGray
                             )
@@ -148,6 +152,8 @@ fun HomeScreen(
                     }
                 }
             }
+            Spacer(modifier = Modifier.height(8.dp))
+
 
 
             // Recipe Card Stack
@@ -192,7 +198,7 @@ fun WelcomeQuestCard(onClick: () -> Unit = {}) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(130.dp)
+            .height(110.dp)
     ) {
         // BACK CARD
         Card(
@@ -219,7 +225,7 @@ fun WelcomeQuestCard(onClick: () -> Unit = {}) {
             Row(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(start = 24.dp, end = 20.dp),
+                    .padding(start = 16.dp, end = 20.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // ----- Text -----
@@ -229,14 +235,14 @@ fun WelcomeQuestCard(onClick: () -> Unit = {}) {
                 ) {
                     Text(
                         text = "Hi, hungry.",
-                        fontSize = 26.sp,
+                        fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         fontFamily = JuaFont,
                         color = Color.White
                     )
                     Text(
                         text = "Welcome back!",
-                        fontSize = 20.sp,
+                        fontSize = 18.sp,
                         fontFamily = JuaFont,
                         color = Color.White
                     )
@@ -278,7 +284,7 @@ fun RecipeCardStack(
     onRecipeClick: () -> Unit = {},
     onPreviousClick: () -> Unit = {},
     onNextClick: () -> Unit = {},
-    onAddRecipe: (Int) -> Unit = {}          // you can keep this if you still want to use it later
+    onAddRecipe: (Int) -> Unit = {}
 ) {
     Box(
         modifier = Modifier
