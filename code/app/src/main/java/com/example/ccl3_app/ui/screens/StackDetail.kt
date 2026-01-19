@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -23,6 +24,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ccl3_app.data.RecipeRepository
 import com.example.ccl3_app.data.StackRepository
 import com.example.ccl3_app.database.OopsDatabase
+import com.example.ccl3_app.ui.theme.LightTeal
 import com.example.ccl3_app.ui.theme.Orange
 import com.example.ccl3_app.ui.theme.PostItYellow
 import com.example.ccl3_app.ui.theme.Teal
@@ -139,10 +141,11 @@ fun StackDetailScreen(
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(recipes) { recipe ->
+                    itemsIndexed(recipes) { index, recipe ->
                         RecipeListItem(
                             title = recipe.title,
                             description = recipe.description,
+                            index = index,
                             onClick = { onRecipeClick(recipe.id) }
                         )
                     }
@@ -156,15 +159,23 @@ fun StackDetailScreen(
 private fun RecipeListItem(
     title: String,
     description: String,
+    index: Int = 0,
     onClick: () -> Unit
 ) {
+    val cardColors = listOf(
+        PostItYellow.copy(alpha = 0.6f),
+        LightTeal,
+        Orange.copy(alpha = 0.2f),
+        Teal.copy(alpha = 0.3f)
+    )
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = PostItYellow.copy(alpha = 0.6f)
+            containerColor = cardColors[index % cardColors.size]
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp
