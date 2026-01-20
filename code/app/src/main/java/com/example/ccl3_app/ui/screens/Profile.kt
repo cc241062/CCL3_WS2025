@@ -43,8 +43,9 @@ import com.example.ccl3_app.ui.viewmodels.ProfileViewModel
 import com.example.ccl3_app.ui.viewmodels.ProfileViewModelFactory
 import com.example.ccl3_app.ui.viewmodels.StackViewModel
 import kotlinx.coroutines.flow.flowOf
+import com.example.ccl3_app.ui.theme.Jua
 
-val Jua = FontFamily(Font(R.font.jua_regular))
+
 
 data class StackUi(
     val id: Int,

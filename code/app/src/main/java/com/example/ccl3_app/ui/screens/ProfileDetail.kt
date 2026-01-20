@@ -2,31 +2,37 @@ package com.example.ccl3_app.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.ccl3_app.R
 import com.example.ccl3_app.data.Profile
 import com.example.ccl3_app.data.ProfileRepository
 import com.example.ccl3_app.database.OopsDatabase
 import com.example.ccl3_app.ui.theme.Teal
 import com.example.ccl3_app.ui.viewmodels.ProfileDetailViewModel
 import com.example.ccl3_app.ui.viewmodels.ProfileDetailViewModelFactory
+import com.example.ccl3_app.ui.theme.Jua
+
+
 
 @Composable
 fun ProfileDetailScreen(
@@ -51,7 +57,6 @@ fun ProfileDetailScreen(
     var password by remember { mutableStateOf("") }
     var showCannotDeleteDialog by remember { mutableStateOf(false) }
 
-
     LaunchedEffect(profile) {
         profile?.let {
             name = it.name
@@ -66,35 +71,64 @@ fun ProfileDetailScreen(
             .fillMaxSize()
             .background(Color.White)
     ) {
-        // Top header bar like mock (mint background + centered title)
+        // Top header bar
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Teal.copy(alpha = 0.15f))
+                .background(Color(0xFF4B9DA9))  // blue-teal header
                 .padding(vertical = 16.dp),
-            contentAlignment = Alignment.Center
         ) {
+
+            // Back arrow in top-left
+            IconButton(
+                onClick = onBack,
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .padding(start = 8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    tint = Color.White   // icon white
+                )
+            }
+
+            // Centered title
             Text(
-                text = "Profile",
+                text = "Profil",
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black
+                color = Color.White,   // text white
+                fontFamily = Jua,
+                modifier = Modifier.align(Alignment.Center)
             )
         }
+
+
 
         if (showCannotDeleteDialog) {
             AlertDialog(
                 onDismissRequest = { showCannotDeleteDialog = false },
-                title = { Text("Not possible") },
-                text = { Text("You can not delete the test user.") },
+                title = {
+                    Text(
+                        "Not possible",
+                        fontFamily = Jua,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                text = {
+                    Text(
+                        "You can not delete the test user.",
+                        fontFamily = Jua
+                    )
+                },
                 confirmButton = {
                     TextButton(onClick = { showCannotDeleteDialog = false }) {
-                        Text("OK")
+                        Text("OK", fontFamily = Jua)
                     }
                 }
             )
         }
-
 
         Column(
             modifier = Modifier
@@ -102,36 +136,9 @@ fun ProfileDetailScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 18.dp, vertical = 14.dp)
         ) {
-            // Avatar circle
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(170.dp)
-                        .clip(CircleShape)
-                        .background(Color.White)
-                        .border(2.dp, Color.Black, CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(text = "🍴", fontSize = 72.sp)
-                }
-            }
+            // (Profile picture removed on purpose)
 
             Spacer(modifier = Modifier.height(10.dp))
-
-            Text(
-                text = "Change profile pic",
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .clickable { /* TODO: open image picker */ },
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
 
             ProfileField(
                 label = "Name",
@@ -166,7 +173,7 @@ fun ProfileDetailScreen(
 
             Spacer(modifier = Modifier.height(28.dp))
 
-            // Buttons row at bottom like mock
+            // Buttons row at bottom
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -174,10 +181,24 @@ fun ProfileDetailScreen(
             ) {
                 OutlinedButton(
                     onClick = { showCannotDeleteDialog = true },
-                    // keep the rest of your styling the same...
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        containerColor = Color(0x33FF0000),
+                        contentColor = Color(0xFF730000)
+                    ),
+                    border = androidx.compose.foundation.BorderStroke(
+                        width = 1.dp,
+                        color = Color(0xFF730000)
+                    ),
+                    shape = RoundedCornerShape(26.dp),
+                    modifier = Modifier.height(48.dp)
                 ) {
-                    Text("Delete account")
+                    Text(
+                        text = "Delete account",
+                        fontFamily = Jua,
+                        fontWeight = FontWeight.SemiBold
+                    )
                 }
+
 
                 Button(
                     onClick = {
@@ -196,27 +217,28 @@ fun ProfileDetailScreen(
                     },
                     shape = RoundedCornerShape(26.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Teal.copy(alpha = 0.35f),
-                        contentColor = Color.Black
+                        containerColor = Color(0xFFE37434),
+                        contentColor = Color.White
                     ),
                     modifier = Modifier.height(48.dp)
                 ) {
                     Text(
                         text = "Save changes",
                         fontSize = 18.sp,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.SemiBold,
+                        fontFamily = Jua
                     )
                 }
+
             }
 
             Spacer(modifier = Modifier.height(18.dp))
 
-            // Optional back button (if you still want it visible)
             TextButton(
                 onClick = onBack,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
-                Text("Back")
+                Text("Back", fontFamily = Jua)
             }
         }
     }
@@ -234,7 +256,8 @@ private fun ProfileField(
             text = label,
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Black
+            color = Color.Black,
+            fontFamily = Jua
         )
 
         Spacer(modifier = Modifier.height(6.dp))
@@ -244,6 +267,7 @@ private fun ProfileField(
             onValueChange = onValueChange,
             singleLine = true,
             visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
+            textStyle = LocalTextStyle.current.copy(fontFamily = Jua),
             shape = RoundedCornerShape(22.dp),
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = Teal.copy(alpha = 0.15f),
