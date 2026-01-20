@@ -38,4 +38,14 @@ interface RecipeDao {
 
     @Query("SELECT * FROM recipes WHERE stackId IS NULL")
     fun getRecipesWithoutStack(): Flow<List<RecipeEntity>>
+
+    @Query(
+        """
+    SELECT * FROM recipes
+    WHERE title LIKE '%' || :query || '%'
+    ORDER BY title ASC
+    """
+    )
+    fun searchRecipes(query: String): Flow<List<RecipeEntity>>
+
 }

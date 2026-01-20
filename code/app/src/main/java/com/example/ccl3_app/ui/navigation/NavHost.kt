@@ -131,6 +131,10 @@ fun AppNavHost(
                 onStackClick = { stackId ->  // ← Handle navigation here
                     navController.navigate(Routes.stackDetail(stackId))
                 },
+                onRecipeClick = { recipeId ->
+                    navController.navigate(Routes.recipeDetail(recipeId))
+                }
+                ,
                 onAddStack = { /* TODO */ }
             )
 

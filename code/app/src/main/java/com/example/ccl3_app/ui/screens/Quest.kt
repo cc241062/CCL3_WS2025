@@ -177,9 +177,11 @@ fun QuestScreen(
             // Quest Path
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .weight(1f)
+                    .fillMaxWidth()
                     .verticalScroll(rememberScrollState())
-            ) {
+                    .padding(bottom = 36.dp)
+            )  {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()

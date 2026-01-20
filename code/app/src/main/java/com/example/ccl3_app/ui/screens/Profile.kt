@@ -1,22 +1,19 @@
 package com.example.ccl3_app.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import com.example.ccl3_app.ui.navigation.Routes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -24,22 +21,30 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.ccl3_app.R
 import com.example.ccl3_app.data.ProfileRepository
 import com.example.ccl3_app.data.RecipeRepository
-import com.example.ccl3_app.data.Stack
 import com.example.ccl3_app.data.StackRepository
 import com.example.ccl3_app.database.OopsDatabase
+import com.example.ccl3_app.ui.components.RecipeCard
 import com.example.ccl3_app.ui.theme.Orange
-import com.example.ccl3_app.ui.theme.Teal
 import com.example.ccl3_app.ui.theme.PostItYellow
+import com.example.ccl3_app.ui.theme.Teal
 import com.example.ccl3_app.ui.viewmodels.ProfileViewModel
 import com.example.ccl3_app.ui.viewmodels.ProfileViewModelFactory
 import com.example.ccl3_app.ui.viewmodels.StackViewModel
+import kotlinx.coroutines.flow.flowOf
+
+val Jua = FontFamily(Font(R.font.jua_regular))
 
 data class StackUi(
     val id: Int,
@@ -55,40 +60,43 @@ fun ProfileScreen(
     onRecipeClick: (Int) -> Unit = {},
     onEditStack: (Int) -> Unit = {}
 ) {
-
     val context = LocalContext.current
 
     val database = OopsDatabase.getDatabase(context)
-    val repo = ProfileRepository(database.ProfileDao())
+    val profileRepo = ProfileRepository(database.ProfileDao())
     val stackRepository = StackRepository(database.StackDao())
     val recipeRepository = RecipeRepository(database.RecipeDao())
 
     val profileViewModel: ProfileViewModel = viewModel(
-        factory = ProfileViewModelFactory(repo)
+        factory = ProfileViewModelFactory(profileRepo)
     )
-
 
     val stackViewModel: StackViewModel = viewModel(
         factory = object : androidx.lifecycle.ViewModelProvider.Factory {
             override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+                @Suppress("UNCHECKED_CAST")
                 return StackViewModel(stackRepository, recipeRepository) as T
             }
         }
     )
 
-
-    // set which profile to observe
+    // ensure profile exists
     LaunchedEffect(Unit) {
-        repo.ensureDefaultProfile()
+        profileRepo.ensureDefaultProfile()
     }
 
-    val profile by repo.observeSingleProfile().collectAsState(initial = null)
-
+    val profile by profileRepo.observeSingleProfile().collectAsState(initial = null)
     val query by profileViewModel.searchQuery.collectAsState()
 
-    // For now, static stacks list (replace with your real stack data later)
-    val stacks by stackViewModel.stacks.collectAsState(initial = emptyList())
+    // recipes search
+    val recipeResultsFlow = remember(query) {
+        if (query.isBlank()) flowOf(emptyList())
+        else stackViewModel.searchRecipes(query)   // <- must exist in your ViewModel
+    }
+    val recipeResults by recipeResultsFlow.collectAsState(initial = emptyList())
 
+    // stacks
+    val stacks by stackViewModel.stacks.collectAsState(initial = emptyList())
 
     val filteredStacks = remember(query, stacks) {
         if (query.isBlank()) stacks
@@ -110,48 +118,47 @@ fun ProfileScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 16.dp, end = 10.dp, top = 16.dp),
+                    .padding(start = 16.dp, end = 10.dp, top = 24.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
+
                 Text(
                     text = profile?.username ?: "Loading...",
                     fontSize = 32.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    color = Color.Black
+                    color = Color(0xFFE37434), // orange username
+                    fontFamily = Jua
                 )
 
-                IconButton(onClick = onSettingsClick ) {
+                IconButton(onClick = onSettingsClick) {
                     Icon(
                         imageVector = Icons.Default.Settings,
                         contentDescription = "Settings",
-                        tint = Color.Black
+                        tint = Color(0xFF0E4851) // settings color
                     )
                 }
             }
 
-            // Avatar / mascot in center
+            // Avatar in center
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(top = 46.dp),
                 contentAlignment = Alignment.TopCenter
             ) {
-                Box(
+                Image(
+                    painter = painterResource(R.drawable.profile_pic),
+                    contentDescription = "Profile picture",
                     modifier = Modifier
-                        .size(140.dp)
-                        .clip(CircleShape)
-                        .background(Color.White)
-                        .border(3.dp, Color.White, CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    // Replace with Image later (profile.profileImage)
-                    Text(text = "🍴", fontSize = 72.sp)
-                }
+                        .size(160.dp)
+                        .offset(y = 30.dp),
+                    contentScale = ContentScale.Fit
+                )
             }
         }
 
-        // CONTENT AREA (search + stacks)
+        // CONTENT AREA (search + stacks / recipes)
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -166,45 +173,72 @@ fun ProfileScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
+            if (query.isBlank()) {
+                // NORMAL MODE: show stacks grid
                 Text(
                     text = "All Stacks",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    color = Color.Black,
+                    fontFamily = Jua
                 )
-            }
 
-            Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                horizontalArrangement = Arrangement.spacedBy(14.dp),
-                verticalArrangement = Arrangement.spacedBy(14.dp),
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(filteredStacks) { stack ->
-                    val recipes by stackViewModel.getRecipesForStack(stack.id).collectAsState(initial = emptyList())
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    horizontalArrangement = Arrangement.spacedBy(14.dp),
+                    verticalArrangement = Arrangement.spacedBy(14.dp),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(filteredStacks) { stack ->
+                        val recipes by stackViewModel.getRecipesForStack(stack.id)
+                            .collectAsState(initial = emptyList())
 
-                    StackCard(
-                        title = stack.name,
-                        emoji = "🍳",
-                        recipeCount = recipes.size,
-                        onClick = { onStackClick(stack.id) },
-                        onLongClick = { onEditStack(stack.id) }
-                    )
+                        StackCard(
+                            title = stack.name,
+                            emoji = "🍳",
+                            recipeCount = recipes.size,
+                            onClick = { onStackClick(stack.id) },
+                            onLongClick = { onEditStack(stack.id) }
+                        )
+                    }
+
+                    item {
+                        AddStackCard(
+                            modifier = Modifier.fillMaxWidth(),
+                            onClick = { stackViewModel.addStack() }
+                        )
+                    }
+                }
+            } else {
+                // SEARCH MODE: show recipes list (direct access)
+                Text(
+                    text = "Recipes",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black,
+                    fontFamily = Jua
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    horizontalArrangement = Arrangement.spacedBy(14.dp),
+                    verticalArrangement = Arrangement.spacedBy(14.dp),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(recipeResults) { recipe ->
+                        RecipeSearchCard(
+                            title = recipe.title,
+                            emoji = "🍽️",
+                            onClick = { onRecipeClick(recipe.id) }
+                        )
+                    }
                 }
 
-                item {
-                    AddStackCard(
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = { stackViewModel.addStack() }
-                    )
-                }
+
             }
         }
     }
@@ -226,21 +260,28 @@ private fun SearchBar(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 14.dp, vertical = 12.dp),
+                .padding(horizontal = 8.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                imageVector = Icons.Default.Search,
+                painter = painterResource(R.drawable.lupe),
                 contentDescription = "Search",
-                tint = Color.White.copy(alpha = 0.9f)
+                tint = Color.Unspecified,
+                modifier = Modifier
+                    .padding(start = 8.dp)
+                    .size(24.dp)
             )
-            Spacer(modifier = Modifier.width(10.dp))
+            Spacer(modifier = Modifier.width(4.dp))
 
             TextField(
                 value = value,
                 onValueChange = onValueChange,
                 placeholder = {
-                    Text("search...", color = Color.White.copy(alpha = 0.7f))
+                    Text(
+                        "search...",
+                        color = Color.White.copy(alpha = 0.8f),
+                        fontFamily = Jua
+                    )
                 },
                 singleLine = true,
                 colors = TextFieldDefaults.colors(
@@ -262,7 +303,7 @@ private fun SearchBar(
 private fun StackCard(
     title: String,
     emoji: String,
-    recipeCount: Int = 0,  // ← Add this
+    recipeCount: Int = 0,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
     onLongClick: () -> Unit = {}
@@ -272,7 +313,8 @@ private fun StackCard(
             .height(180.dp)
             .combinedClickable(
                 onClick = onClick,
-                onLongClick = onLongClick),
+                onLongClick = onLongClick
+            ),
         shape = RoundedCornerShape(18.dp),
         tonalElevation = 2.dp,
         shadowElevation = 4.dp,
@@ -293,7 +335,11 @@ private fun StackCard(
                     .background(Color.LightGray.copy(alpha = 0.45f)),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = emoji, fontSize = 44.sp)
+                Text(
+                    text = emoji,
+                    fontSize = 44.sp,
+                    fontFamily = Jua
+                )
             }
 
             Row(
@@ -305,15 +351,16 @@ private fun StackCard(
                     text = title,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    color = Color.Black,
+                    fontFamily = Jua
                 )
 
-                // ← Add recipe count badge
                 Text(
                     text = "$recipeCount",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Orange,
+                    fontFamily = Jua,
                     modifier = Modifier
                         .background(Orange.copy(alpha = 0.2f), RoundedCornerShape(8.dp))
                         .padding(horizontal = 8.dp, vertical = 4.dp)
@@ -322,6 +369,57 @@ private fun StackCard(
         }
     }
 }
+
+
+@Composable
+private fun RecipeSearchCard(
+    title: String,
+    emoji: String = "🍽️",
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
+) {
+    Surface(
+        modifier = modifier
+            .height(180.dp)
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(18.dp),
+        tonalElevation = 2.dp,
+        shadowElevation = 4.dp,
+        color = PostItYellow.copy(alpha = 0.55f)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(12.dp),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(110.dp)
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(Color.LightGray.copy(alpha = 0.45f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = emoji,
+                    fontSize = 44.sp,
+                    fontFamily = Jua
+                )
+            }
+
+            Text(
+                text = title,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black,
+                fontFamily = Jua,
+                maxLines = 1
+            )
+        }
+    }
+}
+
 
 @Composable
 private fun AddStackCard(
@@ -365,7 +463,39 @@ private fun AddStackCard(
                 text = "Add a new stack",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black.copy(alpha = 0.75f)
+                color = Color.Black.copy(alpha = 0.75f),
+                fontFamily = Jua
+            )
+        }
+    }
+}
+
+@Composable
+private fun RecipeRow(
+    title: String,
+    onClick: () -> Unit
+) {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(14.dp),
+        tonalElevation = 1.dp,
+        shadowElevation = 2.dp,
+        color = Color(0xFFF3F3F3)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 14.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = title,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium,
+                color = Color.Black,
+                fontFamily = Jua
             )
         }
     }

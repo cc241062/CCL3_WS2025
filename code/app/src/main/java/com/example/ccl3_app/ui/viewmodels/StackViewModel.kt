@@ -2,9 +2,12 @@ package com.example.ccl3_app.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ccl3_app.data.Recipe
 import com.example.ccl3_app.data.RecipeRepository
 import com.example.ccl3_app.data.Stack
 import com.example.ccl3_app.data.StackRepository
+import com.example.ccl3_app.database.RecipeEntity
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.stateIn
@@ -43,5 +46,9 @@ class StackViewModel(
         viewModelScope.launch {
             stackRepository.deleteStack(stack)
         }
+    }
+
+    fun searchRecipes(query: String): Flow<List<RecipeEntity>> {
+        return recipeRepository.searchRecipes(query)
     }
 }

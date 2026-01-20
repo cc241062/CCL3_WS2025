@@ -136,4 +136,9 @@ class RecipeRepository(private val recipeDao: RecipeDao) {
             )
         )
     }
+
+    fun searchRecipes(query: String): Flow<List<RecipeEntity>> {
+        return recipeDao.searchRecipes(query)
+    }
+
 }

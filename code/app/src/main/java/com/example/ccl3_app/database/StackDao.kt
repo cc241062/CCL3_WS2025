@@ -26,4 +26,6 @@ interface StackDao {
 
     @Query("SELECT * FROM stacks")
     fun getAllStacks(): Flow<List<StackEntity>>
+
+
 }
