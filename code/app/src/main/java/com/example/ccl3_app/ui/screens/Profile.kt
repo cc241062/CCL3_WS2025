@@ -209,7 +209,15 @@ fun ProfileScreen(
                             columns = GridCells.Fixed(2),
                             horizontalArrangement = Arrangement.spacedBy(14.dp),
                             verticalArrangement = Arrangement.spacedBy(14.dp),
-                            modifier = Modifier.fillMaxSize()
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .navigationBarsPadding(),
+                            contentPadding = PaddingValues(
+                                top = 0.dp,
+                                start = 0.dp,
+                                end = 0.dp,
+                                bottom = 140.dp
+                            )
                         ) {
                             items(filteredStacks) { stack ->
                                 val recipes by stackViewModel.getRecipesForStack(stack.id)
@@ -223,8 +231,8 @@ fun ProfileScreen(
                                     onLongClick = { onEditStack(stack.id) }
                                 )
                             }
-
                         }
+
                     } else {
                         // SEARCH MODE: show recipes grid (direct access)
                         Text(

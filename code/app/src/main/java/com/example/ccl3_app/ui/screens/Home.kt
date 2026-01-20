@@ -35,6 +35,8 @@ import com.example.ccl3_app.ui.theme.*
 import com.example.ccl3_app.ui.viewmodels.HomeViewModel
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.unit.Dp
 
 val JuaFont = FontFamily(
     Font(R.font.jua_regular, FontWeight.Normal)
@@ -43,7 +45,7 @@ val JuaFont = FontFamily(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel = viewModel(), // assuming factory is wired wherever this is called
+    viewModel: HomeViewModel = viewModel(),
     onOpenProfiles: () -> Unit = {},
     onRecipeClick: (Int) -> Unit = {},
     onAddRecipe: (Int) -> Unit = {},
@@ -51,12 +53,9 @@ fun HomeScreen(
 ) {
     val featuredRecipes by viewModel.featuredRecipes.collectAsState()
     val currentRecipeIndex by viewModel.currentRecipeIndex.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
 
-    // NEW: stacks + selected stack
     val stacks by viewModel.stacks.collectAsState()
     val selectedStackId by viewModel.selectedStackId.collectAsState()
-
     var stackMenuExpanded by remember { mutableStateOf(false) }
 
     val selectedStackName = stacks.firstOrNull { it.id == selectedStackId }?.name
@@ -64,13 +63,16 @@ fun HomeScreen(
 
     val scrollState = rememberScrollState()
 
+    // ✅ get screen height for the card
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
+            .navigationBarsPadding()
     ) {
-        // -------- Scrollable content --------
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -80,23 +82,19 @@ fun HomeScreen(
         ) {
             Spacer(modifier = Modifier.height(30.dp))
 
-            // Welcome Card
             WelcomeQuestCard(onClick = onNavigateToQuests)
 
             Spacer(Modifier.height(18.dp))
 
-            Divider(
-                color = Color(0xFFE0E0E0),
-                thickness = 2.dp
-            )
+            Divider(color = Color(0xFFE0E0E0), thickness = 2.dp)
 
             Spacer(Modifier.height(14.dp))
 
-            // "Find your match:" header + dropdown
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Bottom
+            // ------- "Find your match:" header + dropdown -------
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp)
             ) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(2.dp)
@@ -109,9 +107,7 @@ fun HomeScreen(
                         color = Color(0xFFE37434)
                     )
 
-                    Box(
-                        modifier = Modifier.offset(y = (-4).dp)
-                    ) {
+                    Box {
                         TextButton(
                             onClick = { stackMenuExpanded = true },
                             contentPadding = PaddingValues(0.dp)
@@ -152,18 +148,20 @@ fun HomeScreen(
                     }
                 }
             }
+
+
             Spacer(modifier = Modifier.height(8.dp))
 
-
-
-            // Recipe Card Stack
+            // --- Recipe Card Stack (takes ~80% of screen height) ---
             val currentRecipe = featuredRecipes.getOrNull(currentRecipeIndex)
             if (currentRecipe != null) {
                 RecipeCardStack(
                     recipe = currentRecipe,
                     onRecipeClick = { onRecipeClick(currentRecipe.id) },
                     onPreviousClick = { viewModel.previousRecipe() },
-                    onNextClick = { viewModel.nextRecipe() }
+                    onNextClick = { viewModel.nextRecipe() },
+                    cardHeight = screenHeight * 0.8f,
+                    modifier = Modifier.padding(horizontal = 16.dp)
                 )
             } else {
                 EmptyRecipeCard(onAddRecipe = onAddRecipe)
@@ -277,105 +275,101 @@ fun WelcomeQuestCard(onClick: () -> Unit = {}) {
     }
 }
 
-
 @Composable
 fun RecipeCardStack(
     recipe: Recipe,
     onRecipeClick: () -> Unit = {},
     onPreviousClick: () -> Unit = {},
     onNextClick: () -> Unit = {},
-    onAddRecipe: (Int) -> Unit = {}
+    cardHeight: Dp,
+    modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight(),
         contentAlignment = Alignment.Center
     ) {
-        // Back cards
+        // ---------- BACK CARD (dark teal, biggest, lowest) ----------
         Card(
             modifier = Modifier
-                .fillMaxWidth(0.92f)
-                .height(480.dp)
-                .offset(x = 12.dp, y = 12.dp),
+                .fillMaxWidth()
+                .height(cardHeight)
+                .offset(y = 24.dp),
             shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.cardColors(
-                containerColor = Orange.copy(alpha = 0.3f)
-            )
+                containerColor = Color(0xFF0E4851)     // DARK TEAL
+            ),
+            elevation = CardDefaults.cardElevation(0.dp)
         ) {}
 
+        // ---------- MIDDLE CARD (mid teal) ----------
         Card(
             modifier = Modifier
-                .fillMaxWidth(0.96f)
-                .height(480.dp)
-                .offset(x = 6.dp, y = 6.dp),
+                .fillMaxWidth(0.97f)
+                .height(cardHeight)
+                .offset(y = 12.dp),
             shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.cardColors(
-                containerColor = Color(0xFFC8F4EC)
-            )
+                containerColor = Color(0xFF4B9DA9)     // MID TEAL
+            ),
+            elevation = CardDefaults.cardElevation(0.dp)
         ) {}
 
-        // Main card
+        // ---------- FRONT / MAIN CARD (light teal) ----------
         Card(
             onClick = onRecipeClick,
             modifier = Modifier
-                .fillMaxWidth()
-                .height(480.dp),
+                .fillMaxWidth(0.92f)
+                .height(cardHeight),
             shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.cardColors(
-                containerColor = LightTeal
+                containerColor = Color(0xFFC8F4EC)     // LIGHT TEAL
             ),
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = 8.dp
-            )
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(20.dp)
             ) {
-                // Recipe Image
+                // Recipe image
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(240.dp)
+                        .height(cardHeight * 0.45f)
                         .clip(RoundedCornerShape(16.dp))
                         .background(Color.DarkGray),
                     contentAlignment = Alignment.Center
                 ) {
-                    // TODO: actual image
-                    Text(
-                        text = "🍳",
-                        fontSize = 80.sp
-                    )
+                    // TODO: real image
+                    Text("🍳", fontSize = 80.sp)
                 }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-                // Recipe Title
+                // Title
                 Text(
                     text = recipe.title,
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
                     fontFamily = JuaFont,
-                    color = Teal
+                    color = Color(0xFF0E4851)           // DARK TEAL
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
-                // Duration with clock icon
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                // Duration
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         painter = painterResource(id = R.drawable.clock),
-                        contentDescription = "Duration",
+                        contentDescription = null,
                         tint = Color.Gray,
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = "5min", // make dynamic later
+                        text = "5min",
                         fontSize = 16.sp,
                         fontFamily = JuaFont,
                         color = Color.Gray
@@ -384,18 +378,16 @@ fun RecipeCardStack(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Description header
                 Text(
                     text = "Description:",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     fontFamily = JuaFont,
-                    color = Teal
+                    color = Color(0xFF0E4851)           // DARK TEAL
                 )
 
                 Spacer(modifier = Modifier.height(4.dp))
 
-                // Description text
                 Text(
                     text = recipe.description,
                     fontSize = 14.sp,
@@ -407,44 +399,35 @@ fun RecipeCardStack(
             }
         }
 
-        // Navigation arrows
+        // ---------- CENTERED ARROWS ----------
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp)
-                .align(Alignment.Center),
+                .align(Alignment.Center)
+                .padding(horizontal = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            IconButton(
-                onClick = onPreviousClick,
-                modifier = Modifier
-                    .size(48.dp)
-                    .offset(x = (-16).dp)
-            ) {
+            IconButton(onClick = onPreviousClick) {
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = "Previous",
                     tint = Color.White,
-                    modifier = Modifier.size(32.dp)
+                    modifier = Modifier.size(28.dp)
                 )
             }
 
-            IconButton(
-                onClick = onNextClick,
-                modifier = Modifier
-                    .size(48.dp)
-                    .offset(x = 16.dp)
-            ) {
+            IconButton(onClick = onNextClick) {
                 Icon(
                     imageVector = Icons.Default.ArrowForward,
                     contentDescription = "Next",
                     tint = Color.White,
-                    modifier = Modifier.size(32.dp)
+                    modifier = Modifier.size(28.dp)
                 )
             }
         }
     }
 }
+
 
 @Composable
 fun EmptyRecipeCard(

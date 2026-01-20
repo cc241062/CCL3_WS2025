@@ -1,5 +1,6 @@
 package com.example.ccl3_app.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -16,7 +17,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -24,10 +27,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ccl3_app.data.RecipeRepository
 import com.example.ccl3_app.data.StackRepository
 import com.example.ccl3_app.database.OopsDatabase
+import com.example.ccl3_app.ui.theme.Jua
 import com.example.ccl3_app.ui.theme.Orange
 import com.example.ccl3_app.ui.theme.PostItYellow
 import com.example.ccl3_app.ui.theme.Teal
 import com.example.ccl3_app.ui.viewmodels.StackDetailViewModel
+import com.example.ccl3_app.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,6 +51,7 @@ fun StackDetailScreen(
     val viewModel: StackDetailViewModel = viewModel(
         factory = object : androidx.lifecycle.ViewModelProvider.Factory {
             override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+                @Suppress("UNCHECKED_CAST")
                 return StackDetailViewModel(stackRepository, recipeRepository, stackId) as T
             }
         }
@@ -54,118 +60,144 @@ fun StackDetailScreen(
     val stack by viewModel.stack.collectAsState()
     val recipes by viewModel.recipes.collectAsState()
 
-    val isAllRecipes = stackId == -1
+    val isAllRecipes = stackId == StackDetailViewModel.ALL_RECIPES_STACK_ID
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = if (isAllRecipes) "All Recipes" else (stack?.name ?: "Stack"),
-                        fontWeight = FontWeight.Bold
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                    }
-                },
-                actions = {
-                    if (!isAllRecipes) {
-                        IconButton(onClick = { onEditStack(stackId) }) {
-                            Icon(
-                                Icons.Default.Edit,
-                                contentDescription = "Edit Stack",
-                                tint = Color.White
-                            )
+    // ✅ Apply Jua to all Text in this screen
+    CompositionLocalProvider(
+        LocalTextStyle provides LocalTextStyle.current.copy(fontFamily = Jua)
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = if (isAllRecipes) "All Recipes" else (stack?.name ?: "Stack"),
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = Jua,
+                            fontSize = 22.sp
+                        )
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = onBack) {
+                            Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                         }
+                    },
+                    actions = {
+                        if (!isAllRecipes) {
 
-                        IconButton(onClick = {
-                            stack?.let {
-                                viewModel.deleteStack(it)
-                                onBack()
+                            IconButton(onClick = { onEditStack(stackId) }) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.edit),
+                                    contentDescription = "Edit Stack",
+                                    modifier = Modifier.size(32.dp),
+                                    contentScale = ContentScale.Fit
+                                )
                             }
-                        }) {
-                            Icon(
-                                Icons.Default.Delete,
-                                contentDescription = "Delete",
-                                tint = Color.Red
-                            )
+
+                            IconButton(onClick = {
+                                stack?.let {
+                                    viewModel.deleteStack(it)
+                                    onBack()
+                                }
+                            }) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.delete),
+                                    contentDescription = "Delete Stack",
+                                    modifier = Modifier.size(28.dp),
+                                    contentScale = ContentScale.Fit
+                                )
+                            }
                         }
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Teal,
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Teal,
+                        titleContentColor = Color.White,
+                        navigationIconContentColor = Color.White,
+                        actionIconContentColor = Color.White
+                    )
                 )
-            )
-        },
-        floatingActionButton = {
-            if (!isAllRecipes) {
-                FloatingActionButton(
-                    onClick = { onAddRecipe(stackId) },
-                    containerColor = Orange,
-                    contentColor = Color.White
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = "Add Recipe")
+            },
+            floatingActionButton = {
+                if (!isAllRecipes) {
+                    Box(
+                        modifier = Modifier
+                                .size(80.dp)
+                                .offset(y = (-56).dp)
+                                .clickable { onAddRecipe(stackId) },
+                            contentAlignment = Alignment.Center
+
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.add_recipe),
+                            contentDescription = "Add Recipe",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Fit
+                        )
+                    }
                 }
             }
-        }
 
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .background(Color.White)
-        ) {
-            if (recipes.isEmpty()) {
-                // Empty state
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .background(Color.White)
+            ) {
+                if (recipes.isEmpty()) {
+                    // Empty state
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = "📝",
-                            fontSize = 72.sp
-                        )
-                        Text(
-                            text = "No recipes in this stack yet",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = Color.Gray
-                        )
-                        Button(
-                            onClick = { onAddRecipe(stackId) },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Orange
-                            )
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
-                            Icon(Icons.Default.Add, contentDescription = null)
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text("Add First Recipe")
+                            Text(
+                                text = "📝",
+                                fontSize = 72.sp
+                            )
+                            Text(
+                                text = "No recipes in this stack yet",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = Color.Gray
+                            )
+                            Button(
+                                onClick = { onAddRecipe(stackId) },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Orange,
+                                    contentColor = Color.White
+                                )
+                            ) {
+                                Icon(Icons.Default.Add, contentDescription = null)
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Add First Recipe")
+                            }
                         }
                     }
-                }
-            } else {
-                // Recipe list
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(recipes) { recipe ->
-                        RecipeListItem(
-                            title = recipe.title,
-                            description = recipe.description,
-                            onClick = { onRecipeClick(recipe.id) }
-                        )
+                } else {
+                    // Recipe list
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(
+                            start = 16.dp,
+                            top = 16.dp,
+                            end = 16.dp,
+                            bottom = 120.dp
+                        ),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(recipes) { recipe ->
+                            RecipeListItem(
+                                title = recipe.title,
+                                description = recipe.description,
+                                onClick = { onRecipeClick(recipe.id) }
+                            )
+                        }
                     }
+
                 }
             }
         }
