@@ -135,9 +135,13 @@ fun AppNavHost(
                     navController.navigate(Routes.recipeDetail(recipeId))
                 }
                 ,
-                onAddStack = { /* TODO */ }
+                onAddStack = {
+                    navController.navigate(Routes.stackForm())  // open "create stack" form
+                },
+                onEditStack = { stackId ->
+                    navController.navigate(Routes.stackForm(stackId))
+                }
             )
-
         }
 
         /* ---------------- Profile Detail ---------------- */

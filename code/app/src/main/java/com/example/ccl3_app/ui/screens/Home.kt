@@ -83,14 +83,14 @@ fun HomeScreen(
             // Welcome Card
             WelcomeQuestCard(onClick = onNavigateToQuests)
 
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(18.dp))
 
             Divider(
                 color = Color(0xFFE0E0E0),
                 thickness = 2.dp
             )
 
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(14.dp))
 
             // "Find your match:" header + dropdown
             Row(
@@ -106,7 +106,7 @@ fun HomeScreen(
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         fontFamily = JuaFont,
-                        color = Orange
+                        color = Color(0xFFE37434)
                     )
 
                     Box(
@@ -176,8 +176,8 @@ fun HomeScreen(
         Box(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(bottom = 88.dp, end = 16.dp)
-                .size(96.dp)
+                .padding(bottom = 75.dp, end = 16.dp)
+                .size(80.dp)
                 .clickable { onAddRecipe(1) },
             contentAlignment = Alignment.Center
         ) {

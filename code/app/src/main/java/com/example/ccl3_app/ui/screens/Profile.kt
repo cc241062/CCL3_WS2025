@@ -109,139 +109,167 @@ fun ProfileScreen(
             .fillMaxSize()
             .background(Color.White)
     ) {
-        // HEADER AREA
+
         Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(240.dp)
-                .background(Teal.copy(alpha = 0.15f))
+                .fillMaxSize()
+                .background(Color.White)
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 16.dp, end = 10.dp, top = 24.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+            // -------- Main content (what you already had) --------
+            Column(
+                modifier = Modifier.fillMaxSize()
             ) {
+                // HEADER AREA
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(240.dp)
+                        .background(Teal.copy(alpha = 0.15f))
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 16.dp, end = 10.dp, top = 24.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
 
-                Text(
-                    text = profile?.username ?: "Loading...",
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = Color(0xFFE37434), // orange username
-                    fontFamily = Jua
-                )
+                        Text(
+                            text = profile?.username ?: "Loading...",
+                            fontSize = 32.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = Color(0xFFE37434), // orange username
+                            fontFamily = Jua
+                        )
 
-                IconButton(onClick = onSettingsClick) {
-                    Icon(
-                        imageVector = Icons.Default.Settings,
-                        contentDescription = "Settings",
-                        tint = Color(0xFF0E4851) // settings color
+                        IconButton(onClick = onSettingsClick) {
+                            Icon(
+                                imageVector = Icons.Default.Settings,
+                                contentDescription = "Settings",
+                                tint = Color(0xFF0E4851) // settings color
+                            )
+                        }
+                    }
+
+                    // Avatar in center
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top = 46.dp),
+                        contentAlignment = Alignment.TopCenter
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.profile_pic),
+                            contentDescription = "Profile picture",
+                            modifier = Modifier
+                                .size(160.dp)
+                                .offset(y = 30.dp),
+                            contentScale = ContentScale.Fit
+                        )
+                    }
+                }
+
+                // CONTENT AREA (search + stacks / recipes)
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp)
+                        .offset(y = (-28).dp)
+                ) {
+                    SearchBar(
+                        value = query,
+                        onValueChange = profileViewModel::setSearchQuery,
+                        modifier = Modifier.fillMaxWidth()
                     )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    if (query.isBlank()) {
+                        // NORMAL MODE: show stacks grid
+                        Text(
+                            text = "All Stacks",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Black,
+                            fontFamily = Jua
+                        )
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(2),
+                            horizontalArrangement = Arrangement.spacedBy(14.dp),
+                            verticalArrangement = Arrangement.spacedBy(14.dp),
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            items(filteredStacks) { stack ->
+                                val recipes by stackViewModel.getRecipesForStack(stack.id)
+                                    .collectAsState(initial = emptyList())
+
+                                StackCard(
+                                    title = stack.name,
+                                    emoji = "🍳",
+                                    recipeCount = recipes.size,
+                                    onClick = { onStackClick(stack.id) },
+                                    onLongClick = { onEditStack(stack.id) }
+                                )
+                            }
+
+                            item {
+                                AddStackCard(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    onClick = { stackViewModel.addStack() }
+                                )
+                            }
+                        }
+                    } else {
+                        // SEARCH MODE: show recipes grid (direct access)
+                        Text(
+                            text = "Recipes",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Black,
+                            fontFamily = Jua
+                        )
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(2),
+                            horizontalArrangement = Arrangement.spacedBy(14.dp),
+                            verticalArrangement = Arrangement.spacedBy(14.dp),
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            items(recipeResults) { recipe ->
+                                RecipeSearchCard(
+                                    title = recipe.title,
+                                    emoji = "🍽️",
+                                    onClick = { onRecipeClick(recipe.id) }
+                                )
+                            }
+                        }
+                    }
                 }
             }
 
-            // Avatar in center
+            // -------- Floating Add Stack button anchored to screen --------
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = 46.dp),
-                contentAlignment = Alignment.TopCenter
+                    .align(Alignment.BottomEnd)
+                    .padding(bottom = 74.dp, end = 16.dp)
+                    .size(80.dp)
+                    .clickable { onAddStack() },
+                contentAlignment = Alignment.Center
             ) {
                 Image(
-                    painter = painterResource(R.drawable.profile_pic),
-                    contentDescription = "Profile picture",
-                    modifier = Modifier
-                        .size(160.dp)
-                        .offset(y = 30.dp),
+                    painter = painterResource(id = R.drawable.add_stack),
+                    contentDescription = "Add Stack",
+                    modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Fit
                 )
             }
         }
 
-        // CONTENT AREA (search + stacks / recipes)
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp)
-                .offset(y = (-28).dp)
-        ) {
-            SearchBar(
-                value = query,
-                onValueChange = profileViewModel::setSearchQuery,
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            if (query.isBlank()) {
-                // NORMAL MODE: show stacks grid
-                Text(
-                    text = "All Stacks",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black,
-                    fontFamily = Jua
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    horizontalArrangement = Arrangement.spacedBy(14.dp),
-                    verticalArrangement = Arrangement.spacedBy(14.dp),
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    items(filteredStacks) { stack ->
-                        val recipes by stackViewModel.getRecipesForStack(stack.id)
-                            .collectAsState(initial = emptyList())
-
-                        StackCard(
-                            title = stack.name,
-                            emoji = "🍳",
-                            recipeCount = recipes.size,
-                            onClick = { onStackClick(stack.id) },
-                            onLongClick = { onEditStack(stack.id) }
-                        )
-                    }
-
-                    item {
-                        AddStackCard(
-                            modifier = Modifier.fillMaxWidth(),
-                            onClick = { stackViewModel.addStack() }
-                        )
-                    }
-                }
-            } else {
-                // SEARCH MODE: show recipes list (direct access)
-                Text(
-                    text = "Recipes",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black,
-                    fontFamily = Jua
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    horizontalArrangement = Arrangement.spacedBy(14.dp),
-                    verticalArrangement = Arrangement.spacedBy(14.dp),
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    items(recipeResults) { recipe ->
-                        RecipeSearchCard(
-                            title = recipe.title,
-                            emoji = "🍽️",
-                            onClick = { onRecipeClick(recipe.id) }
-                        )
-                    }
-                }
-
-
-            }
-        }
     }
 }
 
