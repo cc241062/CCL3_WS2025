@@ -66,7 +66,8 @@ fun RecipeDetailScreen(
                 text = recipe?.title ?: "Recipe name",
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                color = Color.Black
             )
 
             Row {
@@ -91,7 +92,7 @@ fun RecipeDetailScreen(
             Text(
                 text = recipe?.description ?: "",
                 fontSize = 14.sp,
-                color = Color.Gray,
+                color = Color.Black,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
         }
@@ -143,7 +144,8 @@ fun RecipeDetailScreen(
                                 Text(
                                     text = "• $ingredient",
                                     fontSize = 16.sp,
-                                    modifier = Modifier.padding(vertical = 4.dp)
+                                    modifier = Modifier.padding(vertical = 4.dp),
+                                    color = Color.Black
                                 )
                             }
                             if (recipe?.ingredients.isNullOrEmpty()) {
@@ -157,7 +159,8 @@ fun RecipeDetailScreen(
                             Text(
                                 text = instruction,
                                 fontSize = 16.sp,
-                                lineHeight = 24.sp
+                                lineHeight = 24.sp,
+                                color = Color.Black
                             )
                         }
                     }
