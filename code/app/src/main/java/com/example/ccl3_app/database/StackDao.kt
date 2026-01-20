@@ -22,7 +22,7 @@ interface StackDao {
     suspend fun deleteStack(stackEntity: StackEntity)
 
     @Query("SELECT * FROM stacks WHERE id = :id")
-    suspend fun findStackById(id: Int): StackEntity
+    suspend fun findStackById(id: Int): StackEntity?
 
     @Query("SELECT * FROM stacks")
     fun getAllStacks(): Flow<List<StackEntity>>

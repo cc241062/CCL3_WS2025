@@ -17,6 +17,12 @@ class StackDetailViewModel(
     private val stackId: Int
 ) : ViewModel() {
 
+    companion object {
+        const val ALL_RECIPES_STACK_ID = -1
+    }
+
+    private val isAllRecipes = stackId == ALL_RECIPES_STACK_ID
+
     private val _stack = MutableStateFlow<Stack?>(null)
     val stack: StateFlow<Stack?> = _stack.asStateFlow()
 
@@ -24,25 +30,32 @@ class StackDetailViewModel(
     val recipes: StateFlow<List<Recipe>> = _recipes.asStateFlow()
 
     init {
-        loadStack()
+        if (!isAllRecipes) loadStack()
         loadRecipes()
     }
 
     private fun loadStack() {
         viewModelScope.launch {
-            _stack.value = stackRepository.findStackById(stackId)
+            _stack.value = stackRepository.findStackById(stackId) // Stack? (nullable)
         }
     }
 
     private fun loadRecipes() {
         viewModelScope.launch {
-            recipeRepository.getRecipesByStack(stackId).collect { recipeList ->
-                _recipes.value = recipeList
+            if (isAllRecipes) {
+                recipeRepository.getAllRecipes().collect { recipeList ->
+                    _recipes.value = recipeList
+                }
+            } else {
+                recipeRepository.getRecipesByStack(stackId).collect { recipeList ->
+                    _recipes.value = recipeList
+                }
             }
         }
     }
 
     fun deleteStack(stack: Stack) {
+        if (isAllRecipes) return
         viewModelScope.launch {
             stackRepository.deleteStack(stack)
         }

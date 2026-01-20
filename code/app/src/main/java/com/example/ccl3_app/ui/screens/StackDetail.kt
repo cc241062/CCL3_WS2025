@@ -54,12 +54,14 @@ fun StackDetailScreen(
     val stack by viewModel.stack.collectAsState()
     val recipes by viewModel.recipes.collectAsState()
 
+    val isAllRecipes = stackId == -1
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        text = stack?.name ?: "Stack",
+                        text = if (isAllRecipes) "All Recipes" else (stack?.name ?: "Stack"),
                         fontWeight = FontWeight.Bold
                     )
                 },
@@ -68,23 +70,28 @@ fun StackDetailScreen(
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 },
-
                 actions = {
-                    IconButton(onClick = { onEditStack(stackId) }) {
-                        Icon(
-                            Icons.Default.Edit,
-                            contentDescription = "Edit Stack",
-                            tint = Color.White
-                        )
-                    }
-
-                    IconButton(onClick = {
-                        stack?.let {
-                            viewModel.deleteStack(it)
-                            onBack()
+                    if (!isAllRecipes) {
+                        IconButton(onClick = { onEditStack(stackId) }) {
+                            Icon(
+                                Icons.Default.Edit,
+                                contentDescription = "Edit Stack",
+                                tint = Color.White
+                            )
                         }
-                    }) {
-                        Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color.Red)
+
+                        IconButton(onClick = {
+                            stack?.let {
+                                viewModel.deleteStack(it)
+                                onBack()
+                            }
+                        }) {
+                            Icon(
+                                Icons.Default.Delete,
+                                contentDescription = "Delete",
+                                tint = Color.Red
+                            )
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -95,14 +102,17 @@ fun StackDetailScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { onAddRecipe(stackId) },
-                containerColor = Orange,
-                contentColor = Color.White
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Add Recipe")
+            if (!isAllRecipes) {
+                FloatingActionButton(
+                    onClick = { onAddRecipe(stackId) },
+                    containerColor = Orange,
+                    contentColor = Color.White
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = "Add Recipe")
+                }
             }
         }
+
     ) { paddingValues ->
         Column(
             modifier = Modifier

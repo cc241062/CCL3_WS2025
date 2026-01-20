@@ -99,10 +99,19 @@ fun ProfileScreen(
     // stacks
     val stacks by stackViewModel.stacks.collectAsState(initial = emptyList())
 
-    val filteredStacks = remember(query, stacks) {
-        if (query.isBlank()) stacks
-        else stacks.filter { it.name.contains(query, ignoreCase = true) }
+    val stacksWithAll = remember(stacks) {
+        val allStack = com.example.ccl3_app.data.Stack(   // use your actual Stack type
+            id = StackViewModel.ALL_RECIPES_STACK_ID,
+            name = "All Recipes"
+        )
+        listOf(allStack) + stacks
     }
+
+    val filteredStacks = remember(query, stacksWithAll) {
+        if (query.isBlank()) stacksWithAll
+        else stacksWithAll.filter { it.name.contains(query, ignoreCase = true) }
+    }
+
 
     Column(
         modifier = Modifier

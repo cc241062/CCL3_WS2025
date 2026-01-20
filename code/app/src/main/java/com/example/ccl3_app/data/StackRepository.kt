@@ -50,8 +50,9 @@ class StackRepository(private val stackDao: StackDao) {
         )
     }
 
-    suspend fun findStackById(stackId: Int): Stack {
-        val stackEntity = stackDao.findStackById(stackId)
+    suspend fun findStackById(stackId: Int): Stack? {
+        val stackEntity = stackDao.findStackById(stackId) ?: return null
+
         return Stack(
             id = stackEntity.id,
             name = stackEntity.name,
@@ -59,6 +60,7 @@ class StackRepository(private val stackDao: StackDao) {
             color = stackEntity.color
         )
     }
+
 
     suspend fun deleteStack(stack: Stack) {
         stackDao.deleteStack(

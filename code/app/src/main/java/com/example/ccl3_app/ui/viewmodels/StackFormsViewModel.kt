@@ -22,11 +22,20 @@ class StackFormsViewModel(
 
     suspend fun loadStack(id: Int) {
         stackId = id
-        val stack = stackRepository.findStackById(id)
-        name = stack.name
-        description = stack.description
-        emoji = "🍳"  // You can add emoji field to Stack data class later
-        color = stack.color
+
+        val stack: Stack? = stackRepository.findStackById(id)
+
+        // If the stack doesn't exist (or it's the virtual All Recipes id),
+        // just keep defaults and don't crash.
+        if (stack != null) {
+            name = stack.name
+            description = stack.description
+            emoji = "🍳" // still static for now
+            color = stack.color
+        } else {
+            // Optional: reset form or keep as-is
+            // clearForm()
+        }
     }
 
     fun saveStack() {

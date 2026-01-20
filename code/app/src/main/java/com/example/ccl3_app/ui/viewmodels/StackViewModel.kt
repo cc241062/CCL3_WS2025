@@ -25,12 +25,13 @@ class StackViewModel(
         emptyList()
     )
 
-    fun getRecipesForStack(stackId: Int) = recipeRepository.getRecipesByStack(stackId)
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            emptyList()
-        )
+    fun getRecipesForStack(stackId: Int) =
+        if (stackId == ALL_RECIPES_STACK_ID) {
+            recipeRepository.getAllRecipes()
+        } else {
+            recipeRepository.getRecipesForStack(stackId)
+        }
+
 
     fun addStack(
         name: String = "New Stack",
@@ -51,4 +52,9 @@ class StackViewModel(
     fun searchRecipes(query: String): Flow<List<RecipeEntity>> {
         return recipeRepository.searchRecipes(query)
     }
+
+    companion object {
+        const val ALL_RECIPES_STACK_ID = -1
+    }
+
 }
