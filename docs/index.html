@@ -1,52 +1,212 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Your App Name</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 40px;
-      max-width: 900px;
-    }
-    h1, h2 {
-      color: #333;
-    }
-    img {
-      max-width: 100%;
-      border: 1px solid #ccc;
-      margin-top: 10px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Oops! I can cook – Documentation</title>
+    <style>
+        :root {
+          --accent: #E37434;
+          --bg: #0F3C43;
+        }
+
+        body {
+          margin: 0;
+          padding: 0;
+          font-family: "Inter", Arial, sans-serif;
+          background: var(--bg);
+          color: #fff;
+          line-height: 1.6;
+        }
+
+        /* ---------- HEADER ---------- */
+        header {
+          text-align: center;
+          padding: 80px 20px 60px;
+        }
+
+        header h1 {
+          font-size: 48px;
+          margin-bottom: 10px;
+          color: #ffffff;
+          font-weight: 700;
+        }
+
+        header p {
+          font-size: 18px;
+          color: #e8e8e8;
+          max-width: 700px;
+          margin: 0 auto;
+        }
+
+        /* ---------- CONTENT BOXES ---------- */
+        .content-box {
+          background: #ffffff;
+          color: #333;
+          max-width: 900px;
+          margin: 40px auto;
+          padding: 40px 50px;
+          border-radius: 20px;
+          box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+        }
+
+        h2 {
+          color: var(--accent);
+          margin-top: 0;
+          font-size: 28px;
+        }
+
+        h3 {
+          color: var(--accent);
+          margin-top: 30px;
+          font-size: 22px;
+        }
+
+        h4 {
+          color: var(--accent);
+          margin-top: 20px;
+          font-size: 18px;
+        }
+
+        a {
+          color: var(--accent);
+          text-decoration: none;
+          font-weight: 600;
+        }
+
+        a:hover {
+          text-decoration: underline;
+        }
+
+        ul {
+          padding-left: 20px;
+        }
+    </style>
 </head>
+
 <body>
 
-  <h1>Oops! I can cook</h1>
-  <p><strong>Short description:</strong> Oops! I can cook is a learning app for beginner chefs. Users can create and edit their own profiles, learn pre-made recipes in a monthly “Quest mode” and add their own recipes and search for them.</p>
+<!-- ---------- HEADER ---------- -->
+<header>
+    <h1>Oops! I can cook</h1>
+    <p>A learning app for beginner cooks that combines guided recipes, personal creations, and monthly cooking quests.</p>
+</header>
 
-  <h2>Team Members</h2>
-  <ul>
-    <li>Antonia Hruschka</li>
-    <li>Katharina Lipp</li>
-  </ul>
+<!-- ---------- MAIN CONTENT ---------- -->
 
-  <h2>App Concept</h2>
+<div class="content-box">
+    <h2>Overview</h2>
+    <p><strong>Short description:</strong> Oops! I can cook is a learning app for beginner chefs. Users can create and edit their own profiles, learn pre-made recipes in a monthly “Quest mode”, and add their own recipes and search for them.</p>
 
-  <h3>Use Case</h3>
-  <p>Oops! I can cook is designed to teach beginners how to cook from scratch, build confidence in the kitchen, and stay motivated to prepare home-cooked meals instead of relying on takeout, all through step-by-step lessons, personal recipe creation, and fun monthly cooking quests!</p>
+    <h3>Team Members</h3>
+    <ul>
+        <li>Antonia Hruschka</li>
+        <li>Katharina Lipp</li>
+    </ul>
 
-  <h3>Target User</h3>
-  <p>Oops! I can cook is for inexperienced home cooks, who want to start eating healthier and learn to cook for themselves.
-</p>
+    <h3>App Concept</h3>
 
-  <h3>User Flow / Hi-Fi Prototype</h3>
-  <p>
-    Explain how users move through the app from screen to screen.
-    Add screenshots or a Figma export below.
-  </p>
+    <h4>Use Case</h4>
+    <p>Oops! I can cook is designed to teach beginners how to cook from scratch, build confidence in the kitchen, and stay motivated to prepare home-cooked meals instead of relying on takeout.</p>
 
-  <!-- Example image -->
-  <a href="https://www.figma.com/proto/f5kmf9qPA9E0VyJapWmWkS/CCL3?node-id=10-197&t=05rv1OQNk3YqdZyz-1">Figma Prototype</a>
+    <h4>Target User</h4>
+    <p>Oops! I can cook is for inexperienced home cooks who want to start eating healthier and learn to cook for themselves.</p>
+
+    <h3>User Flow / Hi-Fi Prototype</h3>
+    <p>
+        Explore the interactive prototype here:<br>
+        <a href="https://www.figma.com/proto/f5kmf9qPA9E0VyJapWmWkS/CCL3?node-id=10-197&t=05rv1OQNk3YqdZyz-1" target="_blank">
+            Figma Prototype – Oops! I can cook
+        </a>
+    </p>
+</div>
+
+<div class="content-box">
+    <h2>Heuristic Evaluation – Conclusion</h2>
+    <p>
+        The evaluation suggests that the app’s core structure is sound, but several small to medium usability
+        problems accumulate and could noticeably slow down or confuse users—especially beginners, who are
+        the target audience. Navigation clarity, consistency, and visibility of system status are the most
+        prominent themes across the identified issues.
+    </p>
+
+    <p>
+        Addressing the high-severity items, such as navigation clarity, missing UI elements, and unclear
+        dropdown behavior, will significantly improve the overall user experience. Enhancing the Quest
+        screen’s visual clarity and motivational cues will further support the app’s goal of keeping users
+        engaged and encouraging repeated use.
+    </p>
+</div>
+
+<div class="content-box">
+    <h2>Hypotheses & Testable Questions</h2>
+
+    <h3>Main Hypothesis</h3>
+    <p><strong>H1:</strong> Visual cues in the interface significantly impact how users interact with the app, influencing navigation efficiency, content recognition, and overall enjoyment.</p>
+
+    <h3>Testable Questions</h3>
+
+    <h4>Navigation</h4>
+    <p><em>Do first-time users navigate to main features more successfully with or without onboarding instructions?</em></p>
+    <ul>
+        <li><strong>IV:</strong> Onboarding instructions present vs absent</li>
+        <li><strong>DV:</strong> Time to reach each feature</li>
+    </ul>
+
+    <h4>Visual Design – Recipe Cards</h4>
+    <p><em>Do colored recipe cards improve users’ ability to distinguish recipes compared to neutral cards?</em></p>
+    <ul>
+        <li><strong>IV:</strong> Card color (colored vs neutral)</li>
+        <li><strong>DV:</strong> Distinguishability (accuracy, error rate)</li>
+    </ul>
+
+    <h4>Gamification – Quest Screen</h4>
+    <p><em>Do gamified quest screen elements increase users’ perceived enjoyment?</em></p>
+    <ul>
+        <li><strong>IV:</strong> Gamified elements</li>
+        <li><strong>DV:</strong> User enjoyment</li>
+    </ul>
+</div>
+
+<div class="content-box">
+    <h2>Data to Be Collected</h2>
+
+    <h3>Qualitative</h3>
+    <ul>
+        <li>Users’ perception of visual design & navigation cues</li>
+        <li>Pain points & frustrations</li>
+        <li>Expectations and emotional reactions</li>
+    </ul>
+
+    <h3>Quantitative</h3>
+    <ul>
+        <li>Task completion times</li>
+        <li>Error rates (misclicks, backtracking)</li>
+        <li>SUS / SEQ usability scores</li>
+    </ul>
+</div>
+
+<div class="content-box">
+    <h2>Methods & Data Collection</h2>
+
+    <h3>Study Design</h3>
+    <ul>
+        <li>Between-subjects design</li>
+    </ul>
+
+    <h3>Evaluation Methods</h3>
+    <ul>
+        <li>Moderated usability testing + think-aloud</li>
+        <li>Observation</li>
+        <li>Screen or video recording</li>
+        <li>Short interviews</li>
+    </ul>
+
+    <h3>Questionnaires</h3>
+    <ul>
+        <li>SEQ after each task</li>
+        <li>SUS after all tasks</li>
+    </ul>
+</div>
 
 </body>
 </html>

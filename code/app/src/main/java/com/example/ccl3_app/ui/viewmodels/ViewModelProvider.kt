@@ -11,8 +11,12 @@ object ViewModelProvider {
 
         initializer {
             val oopsApplication = this[APPLICATION_KEY] as OopsApplication
-            HomeViewModel(oopsApplication.recipeRepository)
+            HomeViewModel(
+                oopsApplication.recipeRepository,
+                oopsApplication.stackRepository
+            )
         }
+
 
         initializer {
             val oopsApplication = this[APPLICATION_KEY] as OopsApplication
