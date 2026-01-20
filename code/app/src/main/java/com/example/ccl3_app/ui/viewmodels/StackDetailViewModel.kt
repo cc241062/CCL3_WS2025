@@ -41,4 +41,10 @@ class StackDetailViewModel(
             }
         }
     }
+
+    fun deleteStack(stack: Stack) {
+        viewModelScope.launch {
+            stackRepository.deleteStack(stack)
+        }
+    }
 }

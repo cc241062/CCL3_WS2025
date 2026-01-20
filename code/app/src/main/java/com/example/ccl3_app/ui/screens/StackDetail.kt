@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -68,13 +69,22 @@ fun StackDetailScreen(
                     }
                 },
 
-                actions = {  // ← Add this actions block
+                actions = {
                     IconButton(onClick = { onEditStack(stackId) }) {
                         Icon(
                             Icons.Default.Edit,
                             contentDescription = "Edit Stack",
                             tint = Color.White
                         )
+                    }
+
+                    IconButton(onClick = {
+                        stack?.let {
+                            viewModel.deleteStack(it)
+                            onBack()
+                        }
+                    }) {
+                        Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color.Red)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
