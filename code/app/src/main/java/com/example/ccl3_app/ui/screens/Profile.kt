@@ -224,12 +224,6 @@ fun ProfileScreen(
                                 )
                             }
 
-                            item {
-                                AddStackCard(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    onClick = { stackViewModel.addStack() }
-                                )
-                            }
                         }
                     } else {
                         // SEARCH MODE: show recipes grid (direct access)
@@ -458,55 +452,6 @@ private fun RecipeSearchCard(
     }
 }
 
-
-@Composable
-private fun AddStackCard(
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit = {}
-) {
-    Surface(
-        modifier = modifier
-            .height(180.dp)
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(18.dp),
-        tonalElevation = 2.dp,
-        shadowElevation = 4.dp,
-        color = Color(0xFFE0E0E0)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(14.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(64.dp)
-                    .clip(CircleShape)
-                    .background(Color.Black.copy(alpha = 0.12f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add",
-                    tint = Color.Black.copy(alpha = 0.65f),
-                    modifier = Modifier.size(26.dp)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Text(
-                text = "Add a new stack",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black.copy(alpha = 0.75f),
-                fontFamily = Jua
-            )
-        }
-    }
-}
 
 @Composable
 private fun RecipeRow(
