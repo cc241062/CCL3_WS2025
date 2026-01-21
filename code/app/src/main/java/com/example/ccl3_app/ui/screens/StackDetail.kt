@@ -60,7 +60,14 @@ fun StackDetailScreen(
     val stack by viewModel.stack.collectAsState()
     val recipes by viewModel.recipes.collectAsState()
 
+    val headerColor: Color = remember(stack?.color) {
+        stack?.color
+            ?.let { runCatching { Color(android.graphics.Color.parseColor("#$it")) }.getOrNull() }
+            ?: Teal
+    }
+
     val isAllRecipes = stackId == StackDetailViewModel.ALL_RECIPES_STACK_ID
+
 
     // ✅ Apply Jua to all Text in this screen
     CompositionLocalProvider(
@@ -70,8 +77,10 @@ fun StackDetailScreen(
             topBar = {
                 TopAppBar(
                     title = {
+                        val titleEmoji = stack?.emoji ?: "🍳"
+                        val titleText = stack?.name ?: "Stack"
                         Text(
-                            text = if (isAllRecipes) "All Recipes" else (stack?.name ?: "Stack"),
+                            text = if (isAllRecipes) "All Recipes" else "$titleEmoji  $titleText",
                             fontWeight = FontWeight.Bold,
                             fontFamily = Jua,
                             fontSize = 22.sp
@@ -110,11 +119,12 @@ fun StackDetailScreen(
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Teal,
+                        containerColor = headerColor,
                         titleContentColor = Color.White,
                         navigationIconContentColor = Color.White,
                         actionIconContentColor = Color.White
                     )
+
                 )
             },
             floatingActionButton = {

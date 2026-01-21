@@ -16,45 +16,34 @@ class StackFormsViewModel(
     private var stackId: Int? = null
 
     var name by mutableStateOf("")
-    var description by mutableStateOf("")
     var emoji by mutableStateOf("🍳")
-    var color by mutableStateOf("FFB6C1")
+    var color by mutableStateOf("E37434")   // default: orange
 
     suspend fun loadStack(id: Int) {
         stackId = id
-
-        val stack: Stack? = stackRepository.findStackById(id)
-
-        // If the stack doesn't exist (or it's the virtual All Recipes id),
-        // just keep defaults and don't crash.
+        val stack = stackRepository.findStackById(id)
         if (stack != null) {
             name = stack.name
-            description = stack.description
-            emoji = "🍳" // still static for now
+            emoji = stack.emoji
             color = stack.color
-        } else {
-            // Optional: reset form or keep as-is
-            // clearForm()
         }
     }
 
     fun saveStack() {
         viewModelScope.launch {
             if (stackId == null) {
-                // Create new stack
                 stackRepository.addStack(
                     name = name.ifBlank { "New Stack" },
-                    description = description,
-                    color = color
+                    color = color,
+                    emoji = emoji
                 )
             } else {
-                // Update existing stack
                 stackRepository.updateStack(
                     Stack(
                         id = stackId!!,
                         name = name.ifBlank { "New Stack" },
-                        description = description,
-                        color = color
+                        color = color,
+                        emoji = emoji
                     )
                 )
             }
@@ -64,8 +53,7 @@ class StackFormsViewModel(
     fun clearForm() {
         stackId = null
         name = ""
-        description = ""
         emoji = "🍳"
-        color = "FFB6C1"
+        color = "E37434"
     }
 }

@@ -8,6 +8,6 @@ data class StackEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val name: String,
-    val description: String = "",
-    val color: String = "FF4A90E2"
+    val color: String = "FF4A90E2",
+    val emoji: String = "🍳"
 )

@@ -8,12 +8,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -24,7 +20,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -35,7 +30,6 @@ import com.example.ccl3_app.data.ProfileRepository
 import com.example.ccl3_app.data.RecipeRepository
 import com.example.ccl3_app.data.StackRepository
 import com.example.ccl3_app.database.OopsDatabase
-import com.example.ccl3_app.ui.components.RecipeCard
 import com.example.ccl3_app.ui.theme.Orange
 import com.example.ccl3_app.ui.theme.PostItYellow
 import com.example.ccl3_app.ui.theme.Teal
@@ -44,14 +38,9 @@ import com.example.ccl3_app.ui.viewmodels.ProfileViewModelFactory
 import com.example.ccl3_app.ui.viewmodels.StackViewModel
 import kotlinx.coroutines.flow.flowOf
 import com.example.ccl3_app.ui.theme.Jua
+import com.example.ccl3_app.data.Recipe
+import android.graphics.Color as AndroidColor
 
-
-
-data class StackUi(
-    val id: Int,
-    val title: String,
-    val emoji: String = "🍳"
-)
 
 @Composable
 fun ProfileScreen(
@@ -89,20 +78,22 @@ fun ProfileScreen(
     val profile by profileRepo.observeSingleProfile().collectAsState(initial = null)
     val query by profileViewModel.searchQuery.collectAsState()
 
-    // recipes search
-    val recipeResultsFlow = remember(query) {
-        if (query.isBlank()) flowOf(emptyList())
-        else stackViewModel.searchRecipes(query)   // <- must exist in your ViewModel
-    }
-    val recipeResults by recipeResultsFlow.collectAsState(initial = emptyList())
 
-    // stacks
+    val recipeResultsFlow = remember(query) {
+        if (query.isBlank()) flowOf(emptyList<Recipe>())
+        else stackViewModel.searchRecipes(query)
+    }
+    val recipeResults by recipeResultsFlow.collectAsState(initial = emptyList<Recipe>())
+
+
     val stacks by stackViewModel.stacks.collectAsState(initial = emptyList())
 
     val stacksWithAll = remember(stacks) {
-        val allStack = com.example.ccl3_app.data.Stack(   // use your actual Stack type
+        val allStack = com.example.ccl3_app.data.Stack(
             id = StackViewModel.ALL_RECIPES_STACK_ID,
-            name = "All Recipes"
+            name = "All Recipes",
+            color = "F6F3C2",
+            emoji = "🍳"
         )
         listOf(allStack) + stacks
     }
@@ -111,7 +102,6 @@ fun ProfileScreen(
         if (query.isBlank()) stacksWithAll
         else stacksWithAll.filter { it.name.contains(query, ignoreCase = true) }
     }
-
 
     Column(
         modifier = Modifier
@@ -124,7 +114,7 @@ fun ProfileScreen(
                 .fillMaxSize()
                 .background(Color.White)
         ) {
-            // -------- Main content (what you already had) --------
+            // -------- Main content --------
             Column(
                 modifier = Modifier.fillMaxSize()
             ) {
@@ -147,7 +137,7 @@ fun ProfileScreen(
                             text = profile?.username ?: "Loading...",
                             fontSize = 32.sp,
                             fontWeight = FontWeight.ExtraBold,
-                            color = Color(0xFFE37434), // orange username
+                            color = Color(0xFFE37434),
                             fontFamily = Jua
                         )
 
@@ -155,7 +145,7 @@ fun ProfileScreen(
                             Icon(
                                 imageVector = Icons.Default.Settings,
                                 contentDescription = "Settings",
-                                tint = Color(0xFF0E4851) // settings color
+                                tint = Color(0xFF0E4851)
                             )
                         }
                     }
@@ -185,6 +175,7 @@ fun ProfileScreen(
                         .padding(horizontal = 16.dp)
                         .offset(y = (-28).dp)
                 ) {
+
                     SearchBar(
                         value = query,
                         onValueChange = profileViewModel::setSearchQuery,
@@ -220,17 +211,30 @@ fun ProfileScreen(
                             )
                         ) {
                             items(filteredStacks) { stack ->
-                                val recipes by stackViewModel.getRecipesForStack(stack.id)
+                                val recipes by stackViewModel
+                                    .getRecipesForStack(stack.id)
                                     .collectAsState(initial = emptyList())
+
+                                val cardColor = remember(stack.color, stack.id) {
+                                    if (stack.id == StackViewModel.ALL_RECIPES_STACK_ID) {
+                                        Color(0xFFF6F3C2)  // fixed color for "All Recipes"
+                                    } else {
+                                        runCatching {
+                                            Color(AndroidColor.parseColor("#${stack.color}"))
+                                        }.getOrDefault(PostItYellow.copy(alpha = 0.55f))
+                                    }
+                                }
 
                                 StackCard(
                                     title = stack.name,
-                                    emoji = "🍳",
+                                    emoji = stack.emoji,
                                     recipeCount = recipes.size,
+                                    backgroundColor = cardColor,
                                     onClick = { onStackClick(stack.id) },
                                     onLongClick = { onEditStack(stack.id) }
                                 )
                             }
+
                         }
 
                     } else {
@@ -263,7 +267,7 @@ fun ProfileScreen(
                 }
             }
 
-            // -------- Floating Add Stack button anchored to screen --------
+            // -------- Floating Add Stack button --------
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
@@ -280,7 +284,6 @@ fun ProfileScreen(
                 )
             }
         }
-
     }
 }
 
@@ -344,6 +347,7 @@ private fun StackCard(
     title: String,
     emoji: String,
     recipeCount: Int = 0,
+    backgroundColor: Color,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
     onLongClick: () -> Unit = {}
@@ -358,9 +362,8 @@ private fun StackCard(
         shape = RoundedCornerShape(18.dp),
         tonalElevation = 2.dp,
         shadowElevation = 4.dp,
-        color = PostItYellow.copy(alpha = 0.55f)
+        color = backgroundColor
     ) {
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -378,7 +381,7 @@ private fun StackCard(
                 Text(
                     text = emoji,
                     fontSize = 44.sp,
-                    fontFamily = Jua
+                    fontFamily = FontFamily.Default
                 )
             }
 
@@ -409,7 +412,6 @@ private fun StackCard(
         }
     }
 }
-
 
 @Composable
 private fun RecipeSearchCard(
@@ -459,7 +461,6 @@ private fun RecipeSearchCard(
         }
     }
 }
-
 
 @Composable
 private fun RecipeRow(

@@ -11,8 +11,6 @@ class ProfileViewModel(
     private val profileRepository: ProfileRepository
 ) : ViewModel() {
 
-
-    // Which profile is currently being shown (for now default to 1)
     private val selectedProfileId = MutableStateFlow(1)
 
     // Profile the screen should display

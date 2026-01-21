@@ -24,6 +24,9 @@ interface StackDao {
     @Query("SELECT * FROM stacks WHERE id = :id")
     suspend fun findStackById(id: Int): StackEntity?
 
+    @Query("SELECT * FROM stacks WHERE id = :id")
+    fun observeStackById(id: Int): kotlinx.coroutines.flow.Flow<StackEntity?>
+
     @Query("SELECT * FROM stacks")
     fun getAllStacks(): Flow<List<StackEntity>>
 

@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ccl3_app.data.Recipe
 import com.example.ccl3_app.data.RecipeRepository
-import com.example.ccl3_app.database.RecipeEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,7 +28,7 @@ class RecipeDetailViewModel(
         }
     }
 
-    fun searchRecipes(query: String): Flow<List<RecipeEntity>> {
+    fun searchRecipes(query: String): Flow<List<Recipe>> {
         return recipeRepository.searchRecipes(query)
     }
 

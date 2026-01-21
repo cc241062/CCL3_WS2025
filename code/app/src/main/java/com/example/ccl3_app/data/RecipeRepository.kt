@@ -137,8 +137,20 @@ class RecipeRepository(private val recipeDao: RecipeDao) {
         )
     }
 
-    fun searchRecipes(query: String): Flow<List<RecipeEntity>> {
-        return recipeDao.searchRecipes(query)
+    fun searchRecipes(query: String): Flow<List<Recipe>> {
+        return recipeDao.searchRecipes(query).map { entityList ->
+            entityList.map { entity ->
+                Recipe(
+                    id = entity.id,
+                    stackId = entity.stackId,
+                    title = entity.title,
+                    description = entity.description,
+                    ingredients = entity.ingredients,
+                    instructions = entity.instructions
+                )
+            }
+        }
     }
+
 
 }

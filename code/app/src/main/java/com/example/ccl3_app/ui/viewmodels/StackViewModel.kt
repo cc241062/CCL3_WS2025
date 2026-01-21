@@ -2,22 +2,17 @@ package com.example.ccl3_app.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.ccl3_app.data.Recipe
-import com.example.ccl3_app.data.RecipeRepository
 import com.example.ccl3_app.data.Stack
 import com.example.ccl3_app.data.StackRepository
-import com.example.ccl3_app.database.RecipeEntity
-import kotlinx.coroutines.flow.Flow
+import com.example.ccl3_app.data.RecipeRepository
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 class StackViewModel(
     private val stackRepository: StackRepository,
     private val recipeRepository: RecipeRepository
 ) : ViewModel() {
-
-    //val stacks = stackRepository.stacks
 
     val stacks = stackRepository.getAllStacks().stateIn(
         viewModelScope,
@@ -25,6 +20,7 @@ class StackViewModel(
         emptyList()
     )
 
+    // ✅ Let Kotlin infer the type from RecipeRepository
     fun getRecipesForStack(stackId: Int) =
         if (stackId == ALL_RECIPES_STACK_ID) {
             recipeRepository.getAllRecipes()
@@ -32,14 +28,19 @@ class StackViewModel(
             recipeRepository.getRecipesForStack(stackId)
         }
 
+    // ✅ Same here – no explicit type
+    fun searchRecipes(query: String) =
+        recipeRepository.searchRecipes(query)
 
     fun addStack(
         name: String = "New Stack",
         description: String = "",
-        color: String = "FF4A90E2"
+        color: String = "FFB6C1",
+        emoji: String = "🍳"
     ) {
         viewModelScope.launch {
-            stackRepository.addStack(name, description, color)
+
+            stackRepository.addStack(name,  color, emoji)
         }
     }
 
@@ -49,12 +50,7 @@ class StackViewModel(
         }
     }
 
-    fun searchRecipes(query: String): Flow<List<RecipeEntity>> {
-        return recipeRepository.searchRecipes(query)
-    }
-
     companion object {
         const val ALL_RECIPES_STACK_ID = -1
     }
-
 }

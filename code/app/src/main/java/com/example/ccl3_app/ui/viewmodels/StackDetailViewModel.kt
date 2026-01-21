@@ -10,6 +10,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.SharingStarted
+
 
 class StackDetailViewModel(
     private val stackRepository: StackRepository,
@@ -23,21 +26,23 @@ class StackDetailViewModel(
 
     private val isAllRecipes = stackId == ALL_RECIPES_STACK_ID
 
-    private val _stack = MutableStateFlow<Stack?>(null)
-    val stack: StateFlow<Stack?> = _stack.asStateFlow()
+
+    val stack: StateFlow<Stack?> =
+        if (isAllRecipes) {
+            MutableStateFlow(null)
+        } else {
+            stackRepository.observeStack(stackId).stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                null
+            )
+        }
 
     private val _recipes = MutableStateFlow<List<Recipe>>(emptyList())
     val recipes: StateFlow<List<Recipe>> = _recipes.asStateFlow()
 
     init {
-        if (!isAllRecipes) loadStack()
         loadRecipes()
-    }
-
-    private fun loadStack() {
-        viewModelScope.launch {
-            _stack.value = stackRepository.findStackById(stackId) // Stack? (nullable)
-        }
     }
 
     private fun loadRecipes() {
@@ -47,7 +52,7 @@ class StackDetailViewModel(
                     _recipes.value = recipeList
                 }
             } else {
-                recipeRepository.getRecipesByStack(stackId).collect { recipeList ->
+                recipeRepository.getRecipesForStack(stackId).collect { recipeList ->
                     _recipes.value = recipeList
                 }
             }

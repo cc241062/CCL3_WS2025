@@ -2,8 +2,10 @@ package com.example.ccl3_app.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -12,8 +14,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -22,6 +26,7 @@ import com.example.ccl3_app.data.StackRepository
 import com.example.ccl3_app.database.OopsDatabase
 import com.example.ccl3_app.ui.theme.Jua
 import com.example.ccl3_app.ui.theme.Orange
+import com.example.ccl3_app.ui.theme.PostItYellow
 import com.example.ccl3_app.ui.theme.Teal
 import com.example.ccl3_app.ui.viewmodels.StackFormsViewModel
 
@@ -51,16 +56,27 @@ fun StackFormScreen(
 
     val scrollState = rememberScrollState()
 
+    // fixed palette: hex string + Compose Color
+    val colorOptions = listOf(
+        "E37434" to Color(0xFFE37434), // orange
+        "4B9DA9" to Color(0xFF4B9DA9), // teal-blue
+        "FFCF6E" to Color(0xFFFFCF6E)  // yellow
+    )
+
+    // emoji palette – change as you like
+    val emojiOptions = listOf("🍳", "🍽️", "🥗", "🍰", "🥐", "🍣", "🍜", "🧁")
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
     ) {
-        // ----- HEADER (same vibe as Recipe form) -----
+
+        // HEADER
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(0xFF4B9DA9)) // teal header
+                .background(Color(0xFF4B9DA9))
                 .padding(vertical = 16.dp),
         ) {
             IconButton(
@@ -86,7 +102,7 @@ fun StackFormScreen(
             )
         }
 
-        // ----- CONTENT -----
+        // CONTENT
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -95,6 +111,7 @@ fun StackFormScreen(
             verticalArrangement = Arrangement.spacedBy(18.dp)
         ) {
 
+            // NAME
             StackField(
                 label = "Stack name",
                 value = viewModel.name,
@@ -105,25 +122,84 @@ fun StackFormScreen(
                 multiLine = false
             )
 
-            StackField(
-                label = "Description (optional)",
-                value = viewModel.description,
-                onValueChange = { viewModel.description = it },
-                placeholder = "What kind of recipes will be in this stack?",
-                containerColor = Teal.copy(alpha = 0.12f),
-                borderColor = Teal.copy(alpha = 0.75f),
-                multiLine = true
+            // COLOR PICKER
+            Text(
+                text = "Color",
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = Jua,
+                color = Color.Black
             )
 
-            StackField(
-                label = "Emoji",
-                value = viewModel.emoji,
-                onValueChange = { viewModel.emoji = it },
-                placeholder = "🍳",
-                containerColor = Teal.copy(alpha = 0.10f),
-                borderColor = Teal.copy(alpha = 0.7f),
-                multiLine = false
+            Spacer(modifier = Modifier.height(6.dp))
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                colorOptions.forEach { (hex, color) ->
+                    val isSelected = hex == viewModel.color
+                    Box(
+                        modifier = Modifier
+                            .size(if (isSelected) 40.dp else 32.dp)
+                            .clip(CircleShape)
+                            .background(color)
+                            .border(
+                                width = if (isSelected) 3.dp else 1.dp,
+                                color = if (isSelected)
+                                    Color.Black.copy(alpha = 0.4f)
+                                else
+                                    Color.Transparent,
+                                shape = CircleShape
+                            )
+                            .clickable { viewModel.color = hex }
+                    )
+                }
+            }
+
+            // EMOJI PICKER (no TextField, so no "??")
+            Text(
+                text = "Emoji",
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = Jua,
+                color = Color.Black
             )
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                emojiOptions.forEach { emoji ->
+                    val isSelected = emoji == viewModel.emoji
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        tonalElevation = if (isSelected) 4.dp else 0.dp,
+                        shadowElevation = if (isSelected) 4.dp else 0.dp,
+                        color = if (isSelected)
+                            PostItYellow.copy(alpha = 0.9f)
+                        else
+                            Color.Transparent,
+                        modifier = Modifier
+                            .padding(vertical = 2.dp)
+                            .clickable { viewModel.emoji = emoji }
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .padding(horizontal = 10.dp, vertical = 6.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = emoji,
+                                fontSize = 28.sp // no fontFamily => system emoji
+                            )
+                        }
+                    }
+                }
+            }
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -150,8 +226,6 @@ fun StackFormScreen(
             }
 
             Spacer(modifier = Modifier.height(18.dp))
-
-
         }
     }
 }
