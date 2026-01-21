@@ -37,7 +37,6 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.zIndex
 
 val JuaFont = FontFamily(Font(R.font.jua_regular, FontWeight.Normal))
 
@@ -55,6 +54,10 @@ fun HomeScreen(
     val selectedStackId by viewModel.selectedStackId.collectAsState()
     val currentRecipeIndex by viewModel.currentRecipeIndex.collectAsState()
 
+    // Make currentRecipe reactive - recalculate when index or recipes change
+    val currentRecipe: Recipe? = remember(currentRecipeIndex, selectedStackId, featuredRecipes) {
+        viewModel.getCurrentRecipe()
+    }
 
     var stackMenuExpanded by remember { mutableStateOf(false) }
 
@@ -66,8 +69,6 @@ fun HomeScreen(
     // screen height for card sizing
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
-
-    val currentRecipe: Recipe? = viewModel.getCurrentRecipe()
 
     Box(
         modifier = Modifier
@@ -155,11 +156,22 @@ fun HomeScreen(
 
             // --- Recipe Card Stack ---
             if (currentRecipe != null) {
+                // Debug: Check how many recipes are available
+                val recipesInStack = featuredRecipes.filter { it.stackId == selectedStackId }
+
                 RecipeCardStack(
                     recipe = currentRecipe,
+                    recipesCount = recipesInStack.size,
+                    currentIndex = currentRecipeIndex,
                     onRecipeClick = { onRecipeClick(currentRecipe.id) },
-                    onPreviousClick = { viewModel.previousRecipe() },
-                    onNextClick = { viewModel.nextRecipe() },
+                    onPreviousClick = {
+                        println("Previous clicked - current index: $currentRecipeIndex")
+                        viewModel.previousRecipe()
+                    },
+                    onNextClick = {
+                        println("Next clicked - current index: $currentRecipeIndex")
+                        viewModel.nextRecipe()
+                    },
                     cardHeight = screenHeight * 0.8f,
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
@@ -282,6 +294,8 @@ fun WelcomeQuestCard(onClick: () -> Unit = {}) {
 @Composable
 fun RecipeCardStack(
     recipe: Recipe,
+    recipesCount: Int = 1,
+    currentIndex: Int = 0,
     onRecipeClick: () -> Unit = {},
     onPreviousClick: () -> Unit = {},
     onNextClick: () -> Unit = {},
@@ -292,137 +306,180 @@ fun RecipeCardStack(
         modifier = modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center
     ) {
-        // ---------- BACK CARD (smallest) ----------
-        Card(
-            modifier = Modifier
-                .fillMaxWidth(0.92f)
-                .height(cardHeight * 0.88f)
-                .offset(y = 24.dp),
-            shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = Color(0xFF0E4851)  // dark teal
-            ),
-            elevation = CardDefaults.cardElevation(0.dp)
-        ) {}
-
-        // ---------- MIDDLE CARD ----------
-        Card(
-            modifier = Modifier
-                .fillMaxWidth(0.96f)
-                .height(cardHeight * 0.94f)
-                .offset(y = 12.dp),
-            shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = Color(0xFF4B9DA9)  // mid teal
-            ),
-            elevation = CardDefaults.cardElevation(0.dp)
-        ) {}
-
-        // ---------- FRONT / MAIN CARD ----------
-        Card(
-            onClick = onRecipeClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(cardHeight),
-            shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = Color(0xFFC8F4EC)  // light teal
-            ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        // Card stack container
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center
         ) {
-            Column(
+            // ---------- BACK CARD (smallest) ----------
+            Card(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(20.dp)
+                    .fillMaxWidth(0.92f)
+                    .height(cardHeight * 0.88f)
+                    .offset(y = 24.dp),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color(0xFF0E4851)  // dark teal
+                ),
+                elevation = CardDefaults.cardElevation(0.dp)
+            ) {}
+
+            // ---------- MIDDLE CARD ----------
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth(0.96f)
+                    .height(cardHeight * 0.94f)
+                    .offset(y = 12.dp),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color(0xFF4B9DA9)  // mid teal
+                ),
+                elevation = CardDefaults.cardElevation(0.dp)
+            ) {}
+
+            // ---------- FRONT / MAIN CARD ----------
+            Card(
+                onClick = onRecipeClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(cardHeight),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color(0xFFC8F4EC)  // light teal
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {
-                // Image
-                Box(
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(cardHeight * 0.45f)
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(Color.DarkGray),
-                    contentAlignment = Alignment.Center
+                        .fillMaxSize()
+                        .padding(20.dp)
                 ) {
-                    // TODO: actual image
-                    Text("🍳", fontSize = 80.sp)
-                }
+                    // Image
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(cardHeight * 0.45f)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(Color.DarkGray),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        // TODO: actual image
+                        Text("🍳", fontSize = 80.sp)
+                    }
 
-                Spacer(Modifier.height(16.dp))
+                    Spacer(Modifier.height(16.dp))
 
-                Text(
-                    text = recipe.title,
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = JuaFont,
-                    color = Color(0xFF0E4851)
-                )
-
-                Spacer(Modifier.height(6.dp))
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.clock),
-                        contentDescription = null,
-                        tint = Color.Gray,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(Modifier.width(6.dp))
                     Text(
-                        "5min",
-                        fontSize = 16.sp,
+                        text = recipe.title,
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Bold,
                         fontFamily = JuaFont,
-                        color = Color.Gray
+                        color = Color(0xFF0E4851)
                     )
+
+                    Spacer(Modifier.height(6.dp))
+
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.clock),
+                            contentDescription = null,
+                            tint = Color.Gray,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(Modifier.width(6.dp))
+                        Text(
+                            "5min",
+                            fontSize = 16.sp,
+                            fontFamily = JuaFont,
+                            color = Color.Gray
+                        )
+                    }
+
+                    Spacer(Modifier.height(12.dp))
+
+                    Text(
+                        "Description:",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = JuaFont,
+                        color = Color(0xFF0E4851)
+                    )
+
+                    Spacer(Modifier.height(4.dp))
+
+                    Text(
+                        recipe.description,
+                        fontSize = 14.sp,
+                        fontFamily = JuaFont,
+                        color = Color.Black.copy(alpha = 0.7f),
+                        lineHeight = 20.sp,
+                        maxLines = 3
+                    )
+
+                    Spacer(Modifier.height(8.dp))
+
+                    // Debug: Show current position
+                    if (recipesCount > 1) {
+                        Text(
+                            "${currentIndex + 1} / $recipesCount",
+                            fontSize = 12.sp,
+                            fontFamily = JuaFont,
+                            color = Color.Gray,
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
+                    }
                 }
-
-                Spacer(Modifier.height(12.dp))
-
-                Text(
-                    "Description:",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = JuaFont,
-                    color = Color(0xFF0E4851)
-                )
-
-                Spacer(Modifier.height(4.dp))
-
-                Text(
-                    recipe.description,
-                    fontSize = 14.sp,
-                    fontFamily = JuaFont,
-                    color = Color.Black.copy(alpha = 0.7f),
-                    lineHeight = 20.sp,
-                    maxLines = 3
-                )
             }
         }
 
-        // ---------- ARROWS ON TOP ----------
+        // ---------- ARROWS ON TOP (outside card Box) ----------
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.Center)
-                .padding(horizontal = 8.dp)
-                .zIndex(10f),     // ensure arrows sit above cards
+                .padding(horizontal = 0.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            IconButton(onClick = onPreviousClick) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "Previous",
-                    tint = Color.White,
-                    modifier = Modifier.size(28.dp)
-                )
+            // Left Arrow with Background
+            Surface(
+                modifier = Modifier
+                    .size(48.dp)
+                    .clickable { onPreviousClick() },
+                shape = RoundedCornerShape(24.dp),
+                color = Color(0xFF0E4851).copy(alpha = 0.9f)
+            ) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "Previous",
+                        tint = Color.White,
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
             }
-            IconButton(onClick = onNextClick) {
-                Icon(
-                    imageVector = Icons.Default.ArrowForward,
-                    contentDescription = "Next",
-                    tint = Color.White,
-                    modifier = Modifier.size(28.dp)
-                )
+
+            // Right Arrow with Background
+            Surface(
+                modifier = Modifier
+                    .size(48.dp)
+                    .clickable { onNextClick() },
+                shape = RoundedCornerShape(24.dp),
+                color = Color(0xFF0E4851).copy(alpha = 0.9f)
+            ) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowForward,
+                        contentDescription = "Next",
+                        tint = Color.White,
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
             }
         }
     }

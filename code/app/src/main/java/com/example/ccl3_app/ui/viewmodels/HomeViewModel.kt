@@ -9,6 +9,7 @@ import com.example.ccl3_app.data.StackRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
@@ -53,6 +54,7 @@ class HomeViewModel(
     }
 
     fun selectStack(stackId: Int) {
+        println("HomeViewModel: Selecting stack $stackId")
         _selectedStackId.value = stackId
         _currentRecipeIndex.value = 0       // start at first recipe of that stack
     }
@@ -63,9 +65,11 @@ class HomeViewModel(
             _isLoading.value = true
             try {
                 recipeRepository.getAllRecipes().collect { recipes ->
+                    println("HomeViewModel: Loaded ${recipes.size} recipes")
                     _featuredRecipes.value = recipes
                     // keep index in range for current stack
                     val filtered = recipesForSelectedStack()
+                    println("HomeViewModel: ${filtered.size} recipes in selected stack")
                     if (filtered.isNotEmpty() && _currentRecipeIndex.value >= filtered.size) {
                         _currentRecipeIndex.value = 0
                     }
@@ -84,26 +88,39 @@ class HomeViewModel(
 
     fun nextRecipe() {
         val recipes = recipesForSelectedStack()
+        println("HomeViewModel: nextRecipe called, current index: ${_currentRecipeIndex.value}, total recipes: ${recipes.size}")
         if (recipes.isNotEmpty()) {
-            _currentRecipeIndex.value =
-                (_currentRecipeIndex.value + 1) % recipes.size
+            val newIndex = (_currentRecipeIndex.value + 1) % recipes.size
+            println("HomeViewModel: Moving to index $newIndex")
+            _currentRecipeIndex.value = newIndex
+        } else {
+            println("HomeViewModel: No recipes available")
         }
     }
 
     fun previousRecipe() {
         val recipes = recipesForSelectedStack()
+        println("HomeViewModel: previousRecipe called, current index: ${_currentRecipeIndex.value}, total recipes: ${recipes.size}")
         if (recipes.isNotEmpty()) {
-            _currentRecipeIndex.value =
-                if (_currentRecipeIndex.value == 0) recipes.size - 1
-                else _currentRecipeIndex.value - 1
+            val newIndex = if (_currentRecipeIndex.value == 0) recipes.size - 1
+            else _currentRecipeIndex.value - 1
+            println("HomeViewModel: Moving to index $newIndex")
+            _currentRecipeIndex.value = newIndex
+        } else {
+            println("HomeViewModel: No recipes available")
         }
     }
 
     fun getCurrentRecipe(): Recipe? {
         val recipes = recipesForSelectedStack()
-        if (recipes.isEmpty()) return null
+        if (recipes.isEmpty()) {
+            println("HomeViewModel: getCurrentRecipe - no recipes")
+            return null
+        }
         val idx = _currentRecipeIndex.value.coerceIn(0, recipes.size - 1)
-        return recipes[idx]
+        val recipe = recipes[idx]
+        println("HomeViewModel: getCurrentRecipe - returning recipe at index $idx: ${recipe.title}")
+        return recipe
     }
 
     fun getRecipesForStack(stackId: Int) =

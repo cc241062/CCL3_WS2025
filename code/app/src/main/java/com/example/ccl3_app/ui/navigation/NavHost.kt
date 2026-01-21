@@ -270,7 +270,7 @@ fun BottomNavBar(navController: NavHostController) {
     val currentRoute = navBackStackEntry?.destination?.route
 
     Column {
-
+        
         // Thin grey line on top
         HorizontalDivider(
             thickness = 1.dp,
