@@ -38,8 +38,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
 import com.example.ccl3_app.data.StackRepository
-
-
 import com.example.ccl3_app.ui.screens.StackDetailScreen
 import com.example.ccl3_app.ui.screens.StackFormScreen
 
@@ -133,8 +131,7 @@ fun AppNavHost(
                 },
                 onRecipeClick = { recipeId ->
                     navController.navigate(Routes.recipeDetail(recipeId))
-                }
-                ,
+                },
                 onAddStack = {
                     navController.navigate(Routes.stackForm())  // open "create stack" form
                 },
@@ -168,7 +165,8 @@ fun AppNavHost(
                 },
                 onEdit = { id ->
                     navController.navigate(Routes.recipeForm(/*stackId = id,*/ recipeId = id))
-                }
+                },
+
             )
         }
 
@@ -290,9 +288,8 @@ fun BottomNavBar(navController: NavHostController) {
                     selected = selected,
                     onClick = {
                         navController.navigate(item.route) {
-                            popUpTo(navController.graph.startDestinationId) { saveState = true }
+                            popUpTo(Routes.HOME) { inclusive = false }
                             launchSingleTop = true
-                            restoreState = true
                         }
                     },
                     label = null,
