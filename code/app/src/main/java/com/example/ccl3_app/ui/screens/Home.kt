@@ -116,12 +116,12 @@ fun HomeScreen(
                                 text = selectedStackName,
                                 fontSize = 16.sp,
                                 fontFamily = JuaFont,
-                                color = Color.LightGray
+                                color = Color(0xFF555555)   // DARK GREY for label ✔
                             )
                             Icon(
                                 imageVector = Icons.Default.ArrowDropDown,
                                 contentDescription = null,
-                                tint = Color.LightGray,
+                                tint = Color(0xFF555555),   // dark grey arrow ✔
                                 modifier = Modifier.size(22.dp)
                             )
                         }
@@ -130,37 +130,50 @@ fun HomeScreen(
                             expanded = stackMenuExpanded,
                             onDismissRequest = { stackMenuExpanded = false }
                         ) {
-                            // --- ALWAYS VISIBLE "All recipes" OPTION ---
-                            DropdownMenuItem(
-                                text = {
-                                    Text(
-                                        text = "All recipes",
-                                        fontFamily = JuaFont
-                                    )
-                                },
-                                onClick = {
-                                    viewModel.selectStack(null)   // <-- null means ALL
-                                    stackMenuExpanded = false
-                                }
-                            )
-
-                            Divider()
-
-                            // --- EXISTING STACKS ---
-                            stacks.forEach { stack ->
+                            DropdownMenu(
+                                expanded = stackMenuExpanded,
+                                onDismissRequest = { stackMenuExpanded = false },
+                                modifier = Modifier
+                                    .background(Color(0xFFFFE4C7))
+                            ) {
+                                // ---- ALL RECIPES OPTION ----
                                 DropdownMenuItem(
                                     text = {
                                         Text(
-                                            text = stack.name,
-                                            fontFamily = JuaFont
+                                            text = "All recipes",
+                                            fontFamily = JuaFont,
+                                            color = Color(0xFFAA5423)
                                         )
                                     },
                                     onClick = {
-                                        viewModel.selectStack(stack.id)
+                                        viewModel.selectStack(null)
                                         stackMenuExpanded = false
-                                    }
+                                    },
+                                    modifier = Modifier.background(Color.Transparent)
                                 )
+
+                                Divider(color = Color(0xFFE0A36E))  // subtle orange-ish divider
+
+                                // ---- STACK ITEMS ----
+                                stacks.forEach { stack ->
+                                    DropdownMenuItem(
+                                        text = {
+                                            Text(
+                                                text = stack.name,
+                                                fontFamily = JuaFont,
+                                                color = Color(0xFFAA5423)
+                                            )
+                                        },
+                                        onClick = {
+                                            viewModel.selectStack(stack.id)
+                                            stackMenuExpanded = false
+                                        },
+                                        modifier = Modifier.background(Color.Transparent)
+                                    )
+                                }
                             }
+
+
                         }
                     }
                 }
