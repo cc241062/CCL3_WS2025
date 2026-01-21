@@ -34,6 +34,8 @@ import com.example.ccl3_app.ui.theme.Teal
 import com.example.ccl3_app.ui.viewmodels.StackDetailViewModel
 import com.example.ccl3_app.R
 
+val RecipeCardColor = Color(0xFFFFCF6E)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StackDetailScreen(
@@ -201,11 +203,14 @@ fun StackDetailScreen(
                     ) {
                         items(recipes) { recipe ->
                             RecipeListItem(
+
                                 title = recipe.title,
                                 description = recipe.description,
                                 onClick = { onRecipeClick(recipe.id) }
+
                             )
                         }
+
                     }
 
                 }
@@ -226,11 +231,9 @@ private fun RecipeListItem(
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = PostItYellow.copy(alpha = 0.6f)
+            containerColor = RecipeCardColor
         ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 4.dp
-        )
+
     ) {
         Column(
             modifier = Modifier
