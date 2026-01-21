@@ -56,8 +56,10 @@ fun HomeScreen(
 
     var stackMenuExpanded by remember { mutableStateOf(false) }
 
-    val selectedStackName = stacks.firstOrNull { it.id == selectedStackId }?.name
-        ?: "Choose a stack"
+    val selectedStackName = when (selectedStackId) {
+        null -> "All recipes"
+        else -> stacks.firstOrNull { it.id == selectedStackId }?.name ?: "All recipes"
+    }
 
     val scrollState = rememberScrollState()
 
@@ -128,6 +130,23 @@ fun HomeScreen(
                             expanded = stackMenuExpanded,
                             onDismissRequest = { stackMenuExpanded = false }
                         ) {
+                            // --- ALWAYS VISIBLE "All recipes" OPTION ---
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        text = "All recipes",
+                                        fontFamily = JuaFont
+                                    )
+                                },
+                                onClick = {
+                                    viewModel.selectStack(null)   // <-- null means ALL
+                                    stackMenuExpanded = false
+                                }
+                            )
+
+                            Divider()
+
+                            // --- EXISTING STACKS ---
                             stacks.forEach { stack ->
                                 DropdownMenuItem(
                                     text = {

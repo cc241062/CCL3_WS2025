@@ -19,30 +19,48 @@ class RecipeFormsViewModel(
     var description by mutableStateOf("")
     var ingredients by mutableStateOf("")
     var instructions by mutableStateOf("")
-    var stackId by mutableStateOf(1)
 
-    /*suspend*/ fun loadRecipe(id: Int) {
+    // nullable now – we don’t assume 1 as default
+    var stackId by mutableStateOf<Int?>(null)
+
+    fun loadRecipe(id: Int) {
         recipeId = id
         viewModelScope.launch {
             val recipe = recipeRepository.findRecipeById(id)
+            // if recipe is found, fill the form
             title = recipe.title
             description = recipe.description
             ingredients = recipe.ingredients.joinToString("\n")
             instructions = recipe.instructions.joinToString("\n")
             stackId = recipe.stackId
         }
-
     }
 
-    fun saveRecipe(stackId: Int) {
+    /**
+     * Save the recipe.
+     * `stackIdParam` comes from the screen (selected stack in dropdown).
+     * If it's null we just don't save to avoid crashes.
+     */
+    fun saveRecipe(stackIdParam: Int?) {
         viewModelScope.launch {
-            val ingredientsList = ingredients.split("\n").filter { it.isNotBlank() }
-            val instructionsList = instructions.split("\n").filter { it.isNotBlank() }
+            val resolvedStackId = stackIdParam ?: stackId
+            // if still null → nothing to do (no valid stack to link to)
+            if (resolvedStackId == null) return@launch
+
+            val ingredientsList = ingredients
+                .split("\n")
+                .map { it.trim() }
+                .filter { it.isNotBlank() }
+
+            val instructionsList = instructions
+                .split("\n")
+                .map { it.trim() }
+                .filter { it.isNotBlank() }
 
             if (recipeId == null) {
                 // Create new recipe
                 recipeRepository.addRecipe(
-                    stackId = stackId,
+                    stackId = resolvedStackId,
                     title = title,
                     description = description,
                     ingredients = ingredientsList,
@@ -53,7 +71,7 @@ class RecipeFormsViewModel(
                 recipeRepository.updateRecipe(
                     Recipe(
                         id = recipeId!!,
-                        stackId = stackId,
+                        stackId = resolvedStackId,
                         title = title,
                         description = description,
                         ingredients = ingredientsList,
@@ -70,5 +88,6 @@ class RecipeFormsViewModel(
         description = ""
         ingredients = ""
         instructions = ""
+        stackId = null
     }
 }

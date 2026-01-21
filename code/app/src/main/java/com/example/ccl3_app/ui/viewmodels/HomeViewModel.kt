@@ -21,6 +21,7 @@ class HomeViewModel(
     private val _stacks = MutableStateFlow<List<Stack>>(emptyList())
     val stacks: StateFlow<List<Stack>> = _stacks.asStateFlow()
 
+    // null = ALL RECIPES
     private val _selectedStackId = MutableStateFlow<Int?>(null)
     val selectedStackId: StateFlow<Int?> = _selectedStackId.asStateFlow()
 
@@ -44,20 +45,15 @@ class HomeViewModel(
         viewModelScope.launch {
             stackRepository.getAllStacks().collect { stackList ->
                 _stacks.value = stackList
-
-                // set default selected stack once when data arrives
-                if (_selectedStackId.value == null && stackList.isNotEmpty()) {
-                    _selectedStackId.value = stackList.first().id
-                }
             }
         }
     }
 
-    fun selectStack(stackId: Int) {
-        println("HomeViewModel: Selecting stack $stackId")
+    // ✅ allow null so we can call selectStack(null) for "All recipes"
+    fun selectStack(stackId: Int?) {
+        println("HomeViewModel: Selecting stack ${stackId ?: "ALL"}")
         _selectedStackId.value = stackId
-        _currentRecipeIndex.value = 0       // start at first recipe of that stack
-    }
+        _currentRecipeIndex.value = 0          }
 
     // all recipes from DB (we filter per stack on top)
     private fun loadFeaturedRecipes() {
@@ -67,9 +63,10 @@ class HomeViewModel(
                 recipeRepository.getAllRecipes().collect { recipes ->
                     println("HomeViewModel: Loaded ${recipes.size} recipes")
                     _featuredRecipes.value = recipes
-                    // keep index in range for current stack
+
+                    // keep index in range for current selection (including ALL)
                     val filtered = recipesForSelectedStack()
-                    println("HomeViewModel: ${filtered.size} recipes in selected stack")
+                    println("HomeViewModel: ${filtered.size} recipes in selected view")
                     if (filtered.isNotEmpty() && _currentRecipeIndex.value >= filtered.size) {
                         _currentRecipeIndex.value = 0
                     }
@@ -80,10 +77,15 @@ class HomeViewModel(
         }
     }
 
-    // helper: recipes for the currently selected stack
+    // helper: recipes for the currently selected stack (null = ALL)
     private fun recipesForSelectedStack(): List<Recipe> {
-        val sid = _selectedStackId.value ?: return emptyList()
-        return _featuredRecipes.value.filter { it.stackId == sid }
+        val sid = _selectedStackId.value
+        return if (sid == null) {
+            // ✅ "All recipes" = no filtering
+            _featuredRecipes.value
+        } else {
+            _featuredRecipes.value.filter { it.stackId == sid }
+        }
     }
 
     fun nextRecipe() {
