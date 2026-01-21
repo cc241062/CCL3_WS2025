@@ -9,9 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,9 +24,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.compose.ui.platform.LocalContext
-import com.example.ccl3_app.database.OopsDatabase
-import com.example.ccl3_app.data.StackRepository
 import com.example.ccl3_app.R
 import com.example.ccl3_app.data.Recipe
 import com.example.ccl3_app.ui.theme.*
@@ -54,7 +49,7 @@ fun HomeScreen(
     val selectedStackId by viewModel.selectedStackId.collectAsState()
     val currentRecipeIndex by viewModel.currentRecipeIndex.collectAsState()
 
-    // Make currentRecipe reactive - recalculate when index or recipes change
+    // Make currentRecipe reactive
     val currentRecipe: Recipe? = remember(currentRecipeIndex, selectedStackId, featuredRecipes) {
         viewModel.getCurrentRecipe()
     }
@@ -156,28 +151,42 @@ fun HomeScreen(
 
             // --- Recipe Card Stack ---
             if (currentRecipe != null) {
-                // Debug: Check how many recipes are available
                 val recipesInStack = featuredRecipes.filter { it.stackId == selectedStackId }
 
-                RecipeCardStack(
-                    recipe = currentRecipe,
-                    recipesCount = recipesInStack.size,
-                    currentIndex = currentRecipeIndex,
-                    onRecipeClick = { onRecipeClick(currentRecipe.id) },
-                    onPreviousClick = {
-                        println("Previous clicked - current index: $currentRecipeIndex")
-                        viewModel.previousRecipe()
-                    },
-                    onNextClick = {
-                        println("Next clicked - current index: $currentRecipeIndex")
-                        viewModel.nextRecipe()
-                    },
-                    cardHeight = screenHeight * 0.8f,
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(screenHeight * 0.8f)
+                ) {
+                    RecipeCardStack(
+                        recipe = currentRecipe,
+                        recipesCount = recipesInStack.size,
+                        currentIndex = currentRecipeIndex,
+                        onRecipeClick = { onRecipeClick(currentRecipe.id) },
+                        cardHeight = screenHeight * 0.8f,
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .fillMaxWidth(0.8f)
+                    )
+
+                    RecipeStackArrows(
+                        modifier = Modifier
+                            .align(Alignment.Center),
+                        onPreviousClick = {
+                            println("Previous clicked - current index: $currentRecipeIndex")
+                            viewModel.previousRecipe()
+                        },
+                        onNextClick = {
+                            println("Next clicked - current index: $currentRecipeIndex")
+                            viewModel.nextRecipe()
+                        }
+                    )
+                }
             } else {
                 EmptyRecipeCard(onAddRecipe = onAddRecipe)
             }
+
+
 
             Spacer(modifier = Modifier.height(80.dp))
         }
@@ -297,8 +306,6 @@ fun RecipeCardStack(
     recipesCount: Int = 1,
     currentIndex: Int = 0,
     onRecipeClick: () -> Unit = {},
-    onPreviousClick: () -> Unit = {},
-    onNextClick: () -> Unit = {},
     cardHeight: Dp,
     modifier: Modifier = Modifier
 ) {
@@ -431,59 +438,47 @@ fun RecipeCardStack(
                 }
             }
         }
+    }
+}
 
-        // ---------- ARROWS ON TOP (outside card Box) ----------
+
+@Composable
+fun RecipeStackArrows(
+    modifier: Modifier = Modifier,
+    onPreviousClick: () -> Unit = {},
+    onNextClick: () -> Unit = {}
+) {
+    Box(
+        modifier = modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.Center)
-                .padding(horizontal = 0.dp),
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // Left Arrow with Background
-            Surface(
+            // LEFT ARROW
+            Image(
+                painter = painterResource(id = R.drawable.arrow_right),
+                contentDescription = "Previous",
                 modifier = Modifier
-                    .size(48.dp)
-                    .clickable { onPreviousClick() },
-                shape = RoundedCornerShape(24.dp),
-                color = Color(0xFF0E4851).copy(alpha = 0.9f)
-            ) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "Previous",
-                        tint = Color.White,
-                        modifier = Modifier.size(28.dp)
-                    )
-                }
-            }
+                    .padding(start = 4.dp)
+                    .size(32.dp)
+                    .clickable { onPreviousClick() }
+            )
 
-            // Right Arrow with Background
-            Surface(
+            // RIGHT ARROW
+            Image(
+                painter = painterResource(id = R.drawable.arrow_left),
+                contentDescription = "Next",
                 modifier = Modifier
-                    .size(48.dp)
-                    .clickable { onNextClick() },
-                shape = RoundedCornerShape(24.dp),
-                color = Color(0xFF0E4851).copy(alpha = 0.9f)
-            ) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowForward,
-                        contentDescription = "Next",
-                        tint = Color.White,
-                        modifier = Modifier.size(28.dp)
-                    )
-                }
-            }
+                    .padding(end = 4.dp)
+                    .size(32.dp)
+                    .clickable { onNextClick() }
+            )
         }
     }
 }
+
 
 
 
