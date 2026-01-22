@@ -3,6 +3,7 @@ package com.example.ccl3_app.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -17,17 +18,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ccl3_app.data.StackRepository
 import com.example.ccl3_app.database.OopsDatabase
 import com.example.ccl3_app.ui.theme.Jua
-import com.example.ccl3_app.ui.theme.Orange
-import com.example.ccl3_app.ui.theme.PostItYellow
 import com.example.ccl3_app.ui.theme.Teal
+import com.example.ccl3_app.ui.theme.PostItYellow
 import com.example.ccl3_app.ui.viewmodels.StackFormsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -56,15 +56,15 @@ fun StackFormScreen(
 
     val scrollState = rememberScrollState()
 
-    // fixed palette: hex string + Compose Color
+    // fixed palette
     val colorOptions = listOf(
         "E37434" to Color(0xFFE37434), // orange
         "4B9DA9" to Color(0xFF4B9DA9), // teal-blue
         "FFCF6E" to Color(0xFFFFCF6E)  // yellow
     )
 
-    // emoji palette – change as you like
-    val emojiOptions = listOf("🍳", "🍽️", "🥗", "🍰", "🥐", "🍣", "🍜", "🧁")
+    // emoji palette
+    val emojiOptions = listOf("🍳", "🍽️", "🥗", "🍰", "🥐", "🍣", "🍜", "🧁", "🍕", "🌮", "🥪", "🥞")
 
     Column(
         modifier = Modifier
@@ -127,8 +127,7 @@ fun StackFormScreen(
                 text = "Color",
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
-                fontFamily = Jua,
-                color = Color.Black
+                fontFamily = Jua
             )
 
             Spacer(modifier = Modifier.height(6.dp))
@@ -157,21 +156,24 @@ fun StackFormScreen(
                 }
             }
 
-            // EMOJI PICKER (no TextField, so no "??")
+            // EMOJI PICKER
             Text(
                 text = "Emoji",
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
-                fontFamily = Jua,
-                color = Color.Black
+                fontFamily = Jua
             )
 
             Spacer(modifier = Modifier.height(6.dp))
 
+            val emojiScroll = rememberScrollState()
+
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(emojiScroll)
             ) {
                 emojiOptions.forEach { emoji ->
                     val isSelected = emoji == viewModel.emoji
@@ -194,7 +196,7 @@ fun StackFormScreen(
                         ) {
                             Text(
                                 text = emoji,
-                                fontSize = 28.sp // no fontFamily => system emoji
+                                fontSize = 28.sp
                             )
                         }
                     }
@@ -245,8 +247,7 @@ private fun StackField(
             text = label,
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
-            fontFamily = Jua,
-            color = Color.Black
+            fontFamily = Jua
         )
 
         Spacer(modifier = Modifier.height(6.dp))
@@ -270,8 +271,7 @@ private fun StackField(
                 focusedContainerColor = containerColor,
                 unfocusedContainerColor = containerColor,
                 focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                cursorColor = Teal
+                unfocusedIndicatorColor = Color.Transparent
             ),
             modifier = Modifier
                 .fillMaxWidth()
