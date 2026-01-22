@@ -1,22 +1,36 @@
+package com.example.ccl3_app.ui.screens
+
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.ccl3_app.R
 import kotlinx.coroutines.launch
+
+// Data class for one step in the quest
+data class FryEggStep(
+    val title: String,
+    val body: String,
+    val imageRes: Int
+)
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -25,21 +39,33 @@ fun FryEggQuestScreen(
     onClose: () -> Unit,      // X button
     onFinished: () -> Unit    // Finish button on last step
 ) {
-    // Hard-coded steps
+    // Steps with images
     val steps = listOf(
-        "Overview" to
-                "In this quest you’ll learn how to fry a sunny-side-up egg safely. " +
-                "You’ll prepare your tools, heat the pan, and cook the egg without burning it.",
-        "Step 1 – Get your tools ready" to
-                "You’ll need: a non-stick pan, a spatula, a small bowl, some oil or butter, " +
-                "and one egg. Place everything close to the stove so you don’t have to reach over heat later.",
-        "Step 2 – Heat the pan" to
-                "Place the pan on medium heat. Add about 1 teaspoon of oil or a small knob of butter. " +
-                "Wait until the fat is melted and gently shimmering, but not smoking.",
-        "Step 3 – Crack & cook the egg" to
-                "Crack the egg into a small bowl first, then gently slide it into the pan. " +
-                "Cook until the white is set and the yolk is still soft (about 2–3 minutes). " +
-                "Turn off the heat and use the spatula to lift the egg onto a plate."
+        FryEggStep(
+            title = "Overview",
+            body = "In this quest you’ll learn how to fry a sunny-side-up egg safely. " +
+                    "You’ll prepare your tools, heat the pan, and cook the egg without burning it.",
+            imageRes = R.drawable.egg_overview
+        ),
+        FryEggStep(
+            title = "Step 1 – Get your tools ready",
+            body = "You’ll need: a non-stick pan, a spatula, a small bowl, some oil or butter, " +
+                    "and one egg. Place everything close to the stove so you don’t have to reach over heat later.",
+            imageRes = R.drawable.egg_step1
+        ),
+        FryEggStep(
+            title = "Step 2 – Heat the pan",
+            body = "Place the pan on medium heat. Add about 1 teaspoon of oil or a small knob of butter. " +
+                    "Wait until the fat is melted and gently shimmering, but not smoking.",
+            imageRes = R.drawable.egg_step2
+        ),
+        FryEggStep(
+            title = "Step 3 – Crack & cook the egg",
+            body = "Crack the egg into a small bowl first, then gently slide it into the pan. " +
+                    "Cook until the white is set and the yolk is still soft (about 2–3 minutes). " +
+                    "Turn off the heat and use the spatula to lift the egg onto a plate.",
+            imageRes = R.drawable.egg_step3
+        )
     )
 
     val pagerState = rememberPagerState(
@@ -57,7 +83,7 @@ fun FryEggQuestScreen(
             .fillMaxSize()
             .background(Color.White)
             .padding(horizontal = 16.dp)
-            .navigationBarsPadding()      // keep content above system/bottom nav
+            .navigationBarsPadding()
     ) {
 
         // ─── Top bar: X + progress ───
@@ -94,11 +120,11 @@ fun FryEggQuestScreen(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // ─── Card block (same size/position as before) ───
+        // ─── Card block with pager ───
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(420.dp),          // keep card height fixed
+                .height(420.dp),
             contentAlignment = Alignment.TopCenter
         ) {
             // Back shadow card
@@ -111,14 +137,14 @@ fun FryEggQuestScreen(
                     .background(Color(0xFFAA5423)) // darker orange shadow
             )
 
-            // Front card with pager inside (swipe left/right)
+            // Front card with pager
             Card(
                 modifier = Modifier
                     .fillMaxWidth(0.86f)
                     .fillMaxHeight(),
                 shape = RoundedCornerShape(28.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFFE37434) // E37434 front card
+                    containerColor = Color(0xFFE37434) // orange front card
                 ),
                 elevation = CardDefaults.cardElevation(0.dp)
             ) {
@@ -126,17 +152,17 @@ fun FryEggQuestScreen(
                     state = pagerState,
                     modifier = Modifier.fillMaxSize()
                 ) { pageIndex ->
-                    val (title, body) = steps[pageIndex]
+                    val step = steps[pageIndex]
 
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(24.dp),
-                        verticalArrangement = Arrangement.Top,
-                        horizontalAlignment = Alignment.Start
+                        verticalArrangement = Arrangement.SpaceBetween,
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = title,
+                            text = step.title,
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                             fontFamily = fontFamily,
@@ -145,8 +171,22 @@ fun FryEggQuestScreen(
 
                         Spacer(modifier = Modifier.height(12.dp))
 
+                        // Image for this step
+                        Image(
+                            painter = painterResource(id = step.imageRes),
+                            contentDescription = step.title,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1.0f)
+                                .clip(RoundedCornerShape(20.dp))
+                                .background(Color.White.copy(alpha = 0.15f)),
+                            contentScale = ContentScale.Crop
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
                         Text(
-                            text = body,
+                            text = step.body,
                             fontSize = 16.sp,
                             fontFamily = fontFamily,
                             color = Color.White,
@@ -157,9 +197,9 @@ fun FryEggQuestScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))  // small gap between card and button
+        Spacer(modifier = Modifier.height(24.dp))
 
-        // ─── Bottom Next / Finish button (now visible) ───
+        // ─── Bottom Next / Finish button ───
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -182,7 +222,7 @@ fun FryEggQuestScreen(
             Button(
                 onClick = {
                     if (isLastPage) {
-                        onFinished()   // ✅ mark quest done + close from outside
+                        onFinished()
                     } else {
                         scope.launch {
                             pagerState.animateScrollToPage(page + 1)

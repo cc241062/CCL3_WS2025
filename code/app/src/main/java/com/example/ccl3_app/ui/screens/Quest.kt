@@ -1,6 +1,5 @@
 package com.example.ccl3_app.ui.screens
 
-import FryEggQuestScreen
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -25,7 +24,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ccl3_app.data.Quest
 import com.example.ccl3_app.ui.theme.*
 import com.example.ccl3_app.ui.viewmodels.QuestViewModel
-
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.Dp
@@ -37,8 +35,6 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.PathEffect
-
-
 
 @Composable
 fun QuestScreen(
@@ -94,8 +90,6 @@ fun QuestScreen(
                 )
             }
         } else {
-
-
             // Progress Card with shadow behind
             Box(
                 modifier = Modifier
@@ -106,15 +100,15 @@ fun QuestScreen(
                 Card(
                     modifier = Modifier
                         .matchParentSize()
-                        .offset(y = 6.dp),                    // slight drop shadow effect
+                        .offset(y = 6.dp), // slight drop shadow effect
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFF1C393D)    // same dark teal as other shadows
+                        containerColor = Color(0xFF1C393D) // same dark teal as other shadows
                     ),
                     elevation = CardDefaults.cardElevation(0.dp)
                 ) {}
 
-                // FRONT PROGRESS CARD (your original one)
+                // FRONT PROGRESS CARD
                 Card(
                     modifier = Modifier,
                     shape = RoundedCornerShape(16.dp),
@@ -149,7 +143,7 @@ fun QuestScreen(
                                     modifier = Modifier
                                         .fillMaxHeight()
                                         .fillMaxWidth(completedCount.toFloat() / totalQuests)
-                                        .background(Color(0xFFE37434)) // your orange
+                                        .background(Color(0xFFE37434)) // orange
                                 )
                             }
 
@@ -170,10 +164,6 @@ fun QuestScreen(
                 }
             }
 
-
-
-
-
             // Quest Path
             Box(
                 modifier = Modifier
@@ -181,7 +171,7 @@ fun QuestScreen(
                     .fillMaxWidth()
                     .verticalScroll(rememberScrollState())
                     .padding(bottom = 36.dp)
-            )  {
+            ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -194,29 +184,28 @@ fun QuestScreen(
                             if ((index - 1) % 2 == 0) (-50).dp else 50.dp
                         }
 
-                        // ✅ draw connector only if there is a previous node
+                        // draw connector only if there is a previous node
                         if (prevOffsetX != null) {
                             OrganicQuestPathConnector(
                                 fromOffsetX = prevOffsetX,
                                 toOffsetX = offsetX,
                                 index = index,
-                                isDone = quests[index - 1].isDone  // ✅ segment becomes solid when the previous quest is done
+                                isDone = quests[index - 1].isDone // segment becomes solid when the previous quest is done
                             )
                         }
-
 
                         QuestNode(
                             quest = quest,
                             isCurrentQuest = !quest.isDone &&
                                     (index == 0 || quests.getOrNull(index - 1)?.isDone == true),
                             onClick = {
-                                if (!quest.isDone) selectedQuest = quest
+                                // now also opens dialog when quest is already done
+                                selectedQuest = quest
                             },
                             offsetX = offsetX,
                             fontFamily = juaFont
                         )
                     }
-
                 }
             }
         }
@@ -228,11 +217,11 @@ fun QuestScreen(
             quest = quest,
             onDismiss = { selectedQuest = null },
             onStart = {
-                // ✅ only open the steps screen for Fry an Egg for now
+                // only open the steps screen for Fry an Egg for now
                 if (quest.title == "Fry an Egg") {
                     showFryEggScreen = true
                 } else {
-                    // keep your old behavior for other quests (optional)
+                    // for other quests, still mark complete
                     viewModel.completeQuest(quest)
                 }
             },
@@ -251,14 +240,13 @@ fun QuestScreen(
                 showFryEggScreen = false
             },
             onFinished = {
-                // user tapped Finish on last step → complete quest 1 and close
+                // user tapped Finish on last step → complete quest and close
                 showFryEggScreen = false
                 fryQuest?.let { viewModel.completeQuest(it) }
             }
         )
     }
 }
-
 
 @Composable
 fun OrganicQuestPathConnector(
@@ -295,12 +283,12 @@ fun OrganicQuestPathConnector(
         }
 
         val stroke = Stroke(
-            width = 12.dp.toPx(),                 // thinner line
+            width = 12.dp.toPx(),
             cap = StrokeCap.Round,
             pathEffect = if (isDone) null else PathEffect.dashPathEffect(
                 floatArrayOf(
-                    4.dp.toPx(),                  // short dash
-                    25.dp.toPx()                  // space
+                    4.dp.toPx(),  // short dash
+                    25.dp.toPx()  // space
                 ),
                 0f
             )
@@ -314,13 +302,12 @@ fun OrganicQuestPathConnector(
     }
 }
 
-
 @Composable
 fun QuestNode(
     quest: Quest,
     isCurrentQuest: Boolean,
     onClick: () -> Unit,
-    offsetX: androidx.compose.ui.unit.Dp,
+    offsetX: Dp,
     fontFamily: FontFamily
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
@@ -378,7 +365,8 @@ fun QuestNode(
                     .size(70.dp)
                     .clip(CircleShape)
                     .background(circleColor)
-                    .clickable(enabled = isCurrentQuest && !quest.isDone) { onClick() },
+                    // 🔧 allow click if it's the current quest OR already done
+                    .clickable(enabled = isCurrentQuest || quest.isDone) { onClick() },
                 contentAlignment = Alignment.Center
             ) {
                 // Display level number for completed and current quests
@@ -393,15 +381,15 @@ fun QuestNode(
                 }
             }
 
-                // Triangle marker pointing DOWN at current quest
-                if (isCurrentQuest && !quest.isDone) {
-                    DownTriangleMarker(
-                        modifier = Modifier
-                            .width(44.dp)
-                            .height(30.dp)
-                            .offset(y = (-32).dp),
-                        color = Color(0xFFFEE22B)
-                    )
+            // Triangle marker pointing DOWN at current quest
+            if (isCurrentQuest && !quest.isDone) {
+                DownTriangleMarker(
+                    modifier = Modifier
+                        .width(44.dp)
+                        .height(30.dp)
+                        .offset(y = (-32).dp),
+                    color = Color(0xFFFEE22B)
+                )
             }
         }
     }
@@ -424,6 +412,7 @@ fun DownTriangleMarker(
         drawPath(path = path, color = color)
     }
 }
+
 @Composable
 fun QuestDetailDialog(
     quest: Quest,
@@ -500,6 +489,7 @@ fun QuestDetailDialog(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
+                    // Button row
                     Box(
                         modifier = Modifier.fillMaxWidth(),
                         contentAlignment = Alignment.Center
@@ -513,10 +503,13 @@ fun QuestDetailDialog(
                                 .background(Color(0xFF0A3941))
                         )
 
+                        val buttonLabel =
+                            if (quest.isDone) "Do it again" else "Start" // 🔧 dynamic label
+
                         Button(
                             onClick = {
                                 onStart()
-                                onDismiss() // ✅ close dialog after pressing Start
+                                onDismiss()
                             },
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color(0xFF4B9DA9)
@@ -527,7 +520,7 @@ fun QuestDetailDialog(
                                 .height(48.dp)
                         ) {
                             Text(
-                                text = "Start",
+                                text = buttonLabel,
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold,
                                 fontFamily = fontFamily,
