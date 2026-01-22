@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 
 @Database(
     entities = [StackEntity::class, RecipeEntity::class, ProfileEntity::class, QuestEntity::class],
-    version = 5,
+    version = 6,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -53,21 +53,85 @@ abstract class OopsDatabase : RoomDatabase() {
 
         private suspend fun prepopulateQuests(questDao: QuestDao) {
             val quests = listOf(
-                QuestEntity(0, "Fry an Egg", "Learn how to fry a perfect sunny-side up egg!", false, 1),
-                QuestEntity(0, "Boil Water", "Learn the basics of boiling water safely", false, 2),
-                QuestEntity(0, "Make Toast", "Toast bread to golden perfection", false, 3),
-                QuestEntity(0, "Scramble Eggs", "Master the art of fluffy scrambled eggs", false, 4),
-                QuestEntity(0, "Make Tea", "Brew a perfect cup of tea", false, 5),
-                QuestEntity(0, "Cook Pasta", "Boil pasta al dente", false, 6),
-                QuestEntity(0, "Make a Sandwich", "Create a delicious sandwich", false, 7),
-                QuestEntity(0, "Dice Vegetables", "Learn proper knife skills for dicing", false, 8),
-                QuestEntity(0, "Make a Salad", "Prepare a fresh and healthy salad", false, 9),
-                QuestEntity(0, "Bake Cookies", "Bake your first batch of cookies", false, 10)
+                QuestEntity(
+                    0,
+                    "Fry an Egg",
+                    "Learn how to fry a perfect sunny-side up egg!",
+                    false,
+                    1
+                ),
+
+                QuestEntity(
+                    0,
+                    "Green Goddess Salad",
+                    "Blend a herb-packed green dressing and toss a crunchy salad.",
+                    false,
+                    2
+                ),
+
+                QuestEntity(
+                    0,
+                    "Beef Tartare",
+                    "Learn the basics of preparing a classic beef tartare safely.",
+                    false,
+                    3
+                ),
+
+                QuestEntity(
+                    0,
+                    "Scramble Eggs",
+                    "Master the art of fluffy scrambled eggs",
+                    false,
+                    4
+                ),
+                QuestEntity(
+                    0,
+                    "Make Tea",
+                    "Brew a perfect cup of tea",
+                    false,
+                    5
+                ),
+                QuestEntity(
+                    0,
+                    "Cook Pasta",
+                    "Boil pasta al dente",
+                    false,
+                    6
+                ),
+                QuestEntity(
+                    0,
+                    "Make a Sandwich",
+                    "Create a delicious sandwich",
+                    false,
+                    7
+                ),
+                QuestEntity(
+                    0,
+                    "Dice Vegetables",
+                    "Learn proper knife skills for dicing",
+                    false,
+                    8
+                ),
+                QuestEntity(
+                    0,
+                    "Make a Salad",
+                    "Prepare a fresh and healthy salad",
+                    false,
+                    9
+                ),
+                QuestEntity(
+                    0,
+                    "Bake Cookies",
+                    "Bake your first batch of cookies",
+                    false,
+                    10
+                )
             )
 
             quests.forEach { quest ->
                 questDao.addQuest(quest)
             }
         }
+
     }
 }

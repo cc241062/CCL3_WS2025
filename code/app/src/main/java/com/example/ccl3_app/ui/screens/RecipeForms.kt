@@ -321,17 +321,7 @@ fun RecipeFormScreen(
 
             Spacer(modifier = Modifier.height(18.dp))
 
-            TextButton(
-                onClick = onBack,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            ) {
-                Text(
-                    text = "Back",
-                    fontFamily = Jua
-                )
-            }
 
-            Spacer(modifier = Modifier.height(18.dp))
         }
     }
 }

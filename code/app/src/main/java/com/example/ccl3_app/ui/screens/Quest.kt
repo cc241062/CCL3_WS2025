@@ -29,7 +29,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.Dp
 import com.example.ccl3_app.R
 import androidx.compose.foundation.Canvas
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -46,6 +45,9 @@ fun QuestScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     var selectedQuest by remember { mutableStateOf<Quest?>(null) }
     var showFryEggScreen by remember { mutableStateOf(false) }
+    var showGreenGoddessScreen by remember { mutableStateOf(false) }
+    var showBeefTartareScreen by remember { mutableStateOf(false) }
+    var showFinishScreen by remember { mutableStateOf(false) }
 
     val completedCount = quests.count { it.isDone }
     val totalQuests = quests.size
@@ -217,20 +219,20 @@ fun QuestScreen(
             quest = quest,
             onDismiss = { selectedQuest = null },
             onStart = {
-                // only open the steps screen for Fry an Egg for now
-                if (quest.title == "Fry an Egg") {
-                    showFryEggScreen = true
-                } else {
-                    // for other quests, still mark complete
-                    viewModel.completeQuest(quest)
+                when (quest.title) {
+                    "Fry an Egg" -> showFryEggScreen = true
+                    "Green Goddess Salad" -> showGreenGoddessScreen = true
+                    "Beef Tartare" -> showBeefTartareScreen = true
+                    else -> viewModel.completeQuest(quest)
                 }
             },
+
             fontFamily = juaFont
         )
     }
 
+    // Fry an Egg quest steps screen
     if (showFryEggScreen) {
-        // find the Fry an Egg quest in the current list
         val fryQuest = quests.firstOrNull { it.title == "Fry an Egg" }
 
         FryEggQuestScreen(
@@ -240,9 +242,57 @@ fun QuestScreen(
                 showFryEggScreen = false
             },
             onFinished = {
-                // user tapped Finish on last step → complete quest and close
+                // user finished the quest steps
                 showFryEggScreen = false
                 fryQuest?.let { viewModel.completeQuest(it) }
+                showFinishScreen = true            // 👈 trigger finish screen
+            }
+        )
+    }
+
+    // Green Goddess Salad quest steps screen
+    if (showGreenGoddessScreen) {
+        val saladQuest = quests.firstOrNull { it.title == "Green Goddess Salad" }
+
+        GreenGoddessQuestScreen(
+            fontFamily = juaFont,
+            onClose = {
+                // close without completing
+                showGreenGoddessScreen = false
+            },
+            onFinished = {
+                showGreenGoddessScreen = false
+                saladQuest?.let { viewModel.completeQuest(it) }
+                showFinishScreen = true
+            }
+        )
+    }
+
+// Beef Tartare quest steps screen
+    if (showBeefTartareScreen) {
+        val tartareQuest = quests.firstOrNull { it.title == "Beef Tartare" }
+
+        BeefTartareQuestScreen(
+            fontFamily = juaFont,
+            onClose = {
+                // close without completing
+                showBeefTartareScreen = false
+            },
+            onFinished = {
+                showBeefTartareScreen = false
+                tartareQuest?.let { viewModel.completeQuest(it) }
+                showFinishScreen = true
+            }
+        )
+    }
+
+
+    // Duolingo-style finish screen overlay
+    if (showFinishScreen) {
+        QuestFinishScreen(
+            fontFamily = juaFont,
+            onContinue = {
+                showFinishScreen = false
             }
         )
     }
@@ -365,11 +415,10 @@ fun QuestNode(
                     .size(70.dp)
                     .clip(CircleShape)
                     .background(circleColor)
-                    // 🔧 allow click if it's the current quest OR already done
+                    // allow click if it's the current quest OR already done
                     .clickable(enabled = isCurrentQuest || quest.isDone) { onClick() },
                 contentAlignment = Alignment.Center
             ) {
-                // Display level number for completed and current quests
                 if (quest.isDone || isCurrentQuest) {
                     Text(
                         text = "${quest.level}",
@@ -427,7 +476,6 @@ fun QuestDetailDialog(
             .clickable(onClick = onDismiss),
         contentAlignment = Alignment.Center
     ) {
-        // Wrap triangle + card together
         Box(
             modifier = Modifier.fillMaxWidth(0.8f),
             contentAlignment = Alignment.TopCenter
@@ -489,7 +537,6 @@ fun QuestDetailDialog(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // Button row
                     Box(
                         modifier = Modifier.fillMaxWidth(),
                         contentAlignment = Alignment.Center
@@ -504,7 +551,7 @@ fun QuestDetailDialog(
                         )
 
                         val buttonLabel =
-                            if (quest.isDone) "Do it again" else "Start" // 🔧 dynamic label
+                            if (quest.isDone) "Do it again" else "Start"
 
                         Button(
                             onClick = {
