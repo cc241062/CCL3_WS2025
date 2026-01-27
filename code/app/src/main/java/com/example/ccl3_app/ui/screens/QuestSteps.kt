@@ -6,7 +6,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
@@ -55,175 +57,214 @@ fun QuestStepsPagerScreen(
     val pageCount = steps.size
     val progress = (page + 1f) / pageCount.toFloat()
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
             .padding(horizontal = 16.dp)
-            .navigationBarsPadding()
     ) {
-
-        // Top bar: X + progress
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            IconButton(onClick = onClose) {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = "Close"
-                )
-            }
 
-            Spacer(modifier = Modifier.width(8.dp))
-
-            Box(
+            // ───────── Top bar: close + progress ─────────
+            Row(
                 modifier = Modifier
-                    .weight(1f)
-                    .height(10.dp)
-                    .clip(RoundedCornerShape(50))
-                    .background(Color(0xFF305B63)) // dark teal track
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
+                IconButton(onClick = onClose) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Close"
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
                 Box(
                     modifier = Modifier
-                        .fillMaxHeight()
-                        .fillMaxWidth(progress)
-                        .background(Color(0xFFD9FFF2)) // mint fill
-                )
+                        .weight(1f)
+                        .height(10.dp)
+                        .clip(RoundedCornerShape(50))
+                        .background(Color(0xFF305B63)) // dark teal track
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .fillMaxWidth(progress)
+                            .background(Color(0xFFD9FFF2)) // mint fill
+                    )
+                }
             }
-        }
 
-        Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-        // Card block with pager
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(420.dp),
-            contentAlignment = Alignment.TopCenter
-        ) {
-            // Back shadow card
+            // ───────── Card area: stretches between top bar and button ─────────
             Box(
                 modifier = Modifier
-                    .fillMaxWidth(0.86f)
-                    .fillMaxHeight()
-                    .offset(x = 16.dp, y = 12.dp)
-                    .clip(RoundedCornerShape(28.dp))
-                    .background(Color(0xFFAA5423)) // darker orange shadow
-            )
-
-            // Front card with pager
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth(0.86f)
-                    .fillMaxHeight(),
-                shape = RoundedCornerShape(28.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFFE37434) // orange front card
-                ),
-                elevation = CardDefaults.cardElevation(0.dp)
+                    .fillMaxWidth()
+                    .weight(1f),        // 👈 use all remaining vertical space
+                contentAlignment = Alignment.TopCenter
             ) {
-                HorizontalPager(
-                    state = pagerState,
-                    modifier = Modifier.fillMaxSize()
-                ) { pageIndex ->
-                    val step = steps[pageIndex]
+                // Back shadow card
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(0.86f)
+                        .fillMaxHeight()
+                        .offset(x = 16.dp, y = 12.dp)
+                        .clip(RoundedCornerShape(28.dp))
+                        .background(Color(0xFFAA5423)) // darker orange shadow
+                )
 
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(24.dp),
-                        verticalArrangement = Arrangement.SpaceBetween,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = step.title,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = fontFamily,
-                            color = Color.White
-                        )
+                // Front card with pager
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth(0.86f)
+                        .fillMaxHeight(),
+                    shape = RoundedCornerShape(28.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color(0xFFE37434) // orange front card
+                    ),
+                    elevation = CardDefaults.cardElevation(0.dp)
+                ) {
+                    HorizontalPager(
+                        state = pagerState,
+                        modifier = Modifier.fillMaxSize()
+                    ) { pageIndex ->
+                        val step = steps[pageIndex]
 
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        Image(
-                            painter = painterResource(id = step.imageRes),
-                            contentDescription = step.title,
+                        // 👇 Scrollable content INSIDE the card
+                        Column(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(1f)
-                                .clip(RoundedCornerShape(20.dp))
-                                .background(Color.White.copy(alpha = 0.15f)),
-                            contentScale = ContentScale.Crop
-                        )
+                                .fillMaxSize()
+                                .padding(24.dp)
+                                .verticalScroll(rememberScrollState()),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = step.title,
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = fontFamily,
+                                color = Color.White
+                            )
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(12.dp))
 
-                        Text(
-                            text = step.body,
-                            fontSize = 16.sp,
-                            fontFamily = fontFamily,
-                            color = Color.White,
-                            lineHeight = 22.sp
-                        )
+                            Image(
+                                painter = painterResource(id = step.imageRes),
+                                contentDescription = step.title,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .aspectRatio(4f / 3f) // works well on most screens
+                                    .clip(RoundedCornerShape(20.dp))
+                                    .background(Color.White.copy(alpha = 0.15f)),
+                                contentScale = ContentScale.Crop
+                            )
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            Text(
+                                text = step.body,
+                                fontSize = 16.sp,
+                                fontFamily = fontFamily,
+                                color = Color.White,
+                                lineHeight = 22.sp
+                            )
+
+                            Spacer(modifier = Modifier.height(24.dp))
+                        }
                     }
                 }
             }
-        }
 
-        Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-        // Bottom Next / Finish button
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 12.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            // Shadow behind button
+            // ───────── Bottom button: a bit above nav bar ─────────
             Box(
                 modifier = Modifier
-                    .fillMaxWidth(0.72f)
-                    .height(52.dp)
-                    .offset(y = 4.dp)
-                    .clip(RoundedCornerShape(26.dp))
-                    .background(Color(0xFF0A3941)) // dark teal shadow
-            )
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp) // gap above app bottom bar
+                    .navigationBarsPadding(), // gap above system nav bar
+                contentAlignment = Alignment.Center
+            ) {
+                // ───────── Bottom button: a bit above nav bar ─────────
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp)      // space above your app's bottom nav bar
+                        .navigationBarsPadding(),     // space above system nav bar
+                    contentAlignment = Alignment.Center
+                ) {
+                    BoxWithConstraints(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        val screenWidth = maxWidth
 
-            val isLastPage = page == pageCount - 1
-            val buttonText = if (isLastPage) "Finish" else "Next"
+                        // 🔹 Make width responsive:
+                        // - Very small screens  -> 55%
+                        // - Small-ish screens   -> 65%
+                        // - Normal & big screens -> 72%
+                        val buttonWidthFraction =
+                            when {
+                                screenWidth < 300.dp -> 0.55f
+                                screenWidth < 360.dp -> 0.65f
+                                else -> 0.72f
+                            }
 
-            Button(
-                onClick = {
-                    if (isLastPage) {
-                        onFinished()
-                    } else {
-                        scope.launch {
-                            pagerState.animateScrollToPage(page + 1)
+                        val baseModifier = Modifier
+                            .fillMaxWidth(buttonWidthFraction)
+                            .height(52.dp)
+
+                        val isLastPage = page == pageCount - 1
+                        val buttonText = if (isLastPage) "Finish" else "Next"
+
+                        // Shadow behind button (same responsive width)
+                        Box(
+                            modifier = baseModifier
+                                .offset(y = 4.dp)
+                                .clip(RoundedCornerShape(26.dp))
+                                .background(Color(0xFF0A3941)) // dark teal shadow
+                        )
+
+                        // Button itself (same width as shadow)
+                        Button(
+                            onClick = {
+                                if (isLastPage) {
+                                    onFinished()
+                                } else {
+                                    scope.launch {
+                                        pagerState.animateScrollToPage(page + 1)
+                                    }
+                                }
+                            },
+                            modifier = baseModifier,
+                            shape = RoundedCornerShape(26.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF4B9DA9)
+                            )
+                        ) {
+                            Text(
+                                text = buttonText,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = fontFamily,
+                                color = Color.White
+                            )
                         }
                     }
-                },
-                modifier = Modifier
-                    .fillMaxWidth(0.72f)
-                    .height(52.dp),
-                shape = RoundedCornerShape(26.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF4B9DA9)
-                )
-            ) {
-                Text(
-                    text = buttonText,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = fontFamily,
-                    color = Color.White
-                )
+                }
+
             }
         }
     }
 }
+
+
 
 // ─────────────────────────────────────────────────────────────
 // Specific quest screens

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -242,12 +243,15 @@ private fun StackField(
     borderColor: Color,
     multiLine: Boolean
 ) {
+    val darkTeal = Color(0xFF0E4851)
+
     Column {
         Text(
             text = label,
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
-            fontFamily = Jua
+            fontFamily = Jua,
+            color = darkTeal
         )
 
         Spacer(modifier = Modifier.height(6.dp))
@@ -255,12 +259,17 @@ private fun StackField(
         TextField(
             value = value,
             onValueChange = onValueChange,
-            textStyle = LocalTextStyle.current.copy(fontFamily = Jua),
+            textStyle = LocalTextStyle.current.copy(
+                fontFamily = Jua,
+                fontSize = 16.sp,
+                color = darkTeal                   // 👈 TEXT COLOR
+            ),
             placeholder = {
                 Text(
                     text = placeholder,
                     fontFamily = Jua,
-                    color = Color.Gray
+                    fontSize = 16.sp,
+                    color = darkTeal.copy(alpha = 0.5f)  // 👈 PLACEHOLDER COLOR
                 )
             },
             singleLine = !multiLine,
@@ -271,7 +280,12 @@ private fun StackField(
                 focusedContainerColor = containerColor,
                 unfocusedContainerColor = containerColor,
                 focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
+                unfocusedIndicatorColor = Color.Transparent,
+                cursorColor = darkTeal,
+                selectionColors = TextSelectionColors(
+                    handleColor = darkTeal,
+                    backgroundColor = darkTeal.copy(alpha = 0.3f)
+                )
             ),
             modifier = Modifier
                 .fillMaxWidth()

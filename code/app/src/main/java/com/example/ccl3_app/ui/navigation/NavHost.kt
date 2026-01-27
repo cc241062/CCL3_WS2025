@@ -40,6 +40,15 @@ import androidx.navigation.NavHostController
 import com.example.ccl3_app.data.StackRepository
 import com.example.ccl3_app.ui.screens.StackDetailScreen
 import com.example.ccl3_app.ui.screens.StackFormScreen
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.font.FontWeight
+import com.example.ccl3_app.ui.theme.Jua
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Spacer
+
+
 
 /* ---------------------------------------------------
    Routes (kept in same file)
@@ -86,7 +95,8 @@ fun AppNavHost(
 
     NavHost(
         navController = navController,
-        startDestination = Routes.HOME
+        startDestination = Routes.HOME,
+        modifier = modifier
     ) {
 
         /* ---------------- Home ---------------- */
@@ -256,8 +266,10 @@ data class BottomNavItem(
 )
 
 @Composable
-fun BottomNavBar(navController: NavHostController) {
-
+fun BottomNavBar(
+    navController: NavHostController,
+    modifier: Modifier = Modifier
+) {
     val items = listOf(
         BottomNavItem("Home", Routes.HOME, R.drawable.home),
         BottomNavItem("Quest", Routes.QUEST, R.drawable.quest),
@@ -267,8 +279,24 @@ fun BottomNavBar(navController: NavHostController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    Column {
-        
+
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp
+
+    val labelFontSize = when {
+        screenWidth < 340 -> 9.sp
+        screenWidth < 400 -> 10.sp
+        else -> 11.sp
+    }
+
+    val iconSize = when {
+        screenWidth < 340 -> 24.dp
+        screenWidth < 400 -> 28.dp
+        else -> 32.dp
+    }
+
+    Column(modifier = modifier) {
+
         // Thin grey line on top
         HorizontalDivider(
             thickness = 1.dp,
@@ -278,7 +306,7 @@ fun BottomNavBar(navController: NavHostController) {
         NavigationBar(
             containerColor = Color.White,
             tonalElevation = 0.dp,
-            modifier = Modifier.height(64.dp)
+            modifier = Modifier.height(72.dp)
         ) {
             items.forEach { item ->
 
@@ -294,32 +322,52 @@ fun BottomNavBar(navController: NavHostController) {
                     },
                     label = null,
                     alwaysShowLabel = false,
-
-                    // 🔹 Our custom highlight + icon
                     icon = {
                         val boxModifier =
                             if (selected) {
                                 Modifier
                                     .padding(top = 4.dp)
                                     .background(
-                                        color = Color(0xFFF3F3F3), // very light grey
+                                        color = Color(0xFFF3F3F3),
                                         shape = RoundedCornerShape(18.dp)
                                     )
-                                    .padding(10.dp)
+                                    .padding(horizontal = 12.dp, vertical = 4.dp)
                             } else {
-                                Modifier.padding(top = 4.dp)
+                                Modifier
+                                    .padding(top = 4.dp)
+                                    .padding(horizontal = 12.dp, vertical = 4.dp)
                             }
 
-                        Box(modifier = boxModifier) {
-                            Image(
-                                painter = painterResource(id = item.icon),
-                                contentDescription = item.label,
-                                modifier = Modifier.size(36.dp) // 🔸 larger icon
-                            )
+                        Box(
+                            modifier = boxModifier,
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Image(
+                                    painter = painterResource(id = item.icon),
+                                    contentDescription = item.label,
+                                    modifier = Modifier.size(iconSize)
+                                )
+
+                                Spacer(modifier = Modifier.height(2.dp))
+
+                                Text(
+                                    text = item.label,
+                                    fontFamily = Jua,
+                                    fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+                                    fontSize = labelFontSize,
+                                    color = if (selected)
+                                        Color(0xFF0E4851)
+                                    else
+                                        Color(0xFF777777)
+                                )
+                            }
                         }
                     },
 
-                    // 🔹 Turn OFF Material's default indicator & tint
                     colors = NavigationBarItemDefaults.colors(
                         indicatorColor = Color.Transparent,
                         selectedIconColor = Color.Unspecified,
@@ -332,3 +380,4 @@ fun BottomNavBar(navController: NavHostController) {
         }
     }
 }
+

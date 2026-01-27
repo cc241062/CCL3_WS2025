@@ -134,12 +134,12 @@ fun ProfileScreen(
             )
         }
 
-        // Floating Add Stack button (unchanged)
+        // Floating Add Stack button
         Box(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(bottom = 74.dp, end = 16.dp)
-                .size(80.dp)
+                .padding(bottom = 24.dp, end = 16.dp)
+                .size(72.dp)
                 .clickable { onAddStack() },
             contentAlignment = Alignment.Center
         ) {
@@ -150,6 +150,7 @@ fun ProfileScreen(
                 contentScale = ContentScale.Fit
             )
         }
+
     }
 }
 
@@ -269,14 +270,12 @@ private fun BottomContentArea(
                 columns = GridCells.Fixed(2),
                 horizontalArrangement = Arrangement.spacedBy(14.dp),
                 verticalArrangement = Arrangement.spacedBy(14.dp),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .navigationBarsPadding(),
+                modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(
                     top = 0.dp,
                     start = 0.dp,
                     end = 0.dp,
-                    bottom = 140.dp
+                    bottom = 80.dp
                 )
             ) {
                 items(filteredStacks) { stack ->

@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -30,7 +31,7 @@ import com.example.ccl3_app.ui.theme.*
 import com.example.ccl3_app.ui.viewmodels.HomeViewModel
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 
 val JuaFont = FontFamily(Font(R.font.jua_regular, FontWeight.Normal))
@@ -49,7 +50,6 @@ fun HomeScreen(
     val selectedStackId by viewModel.selectedStackId.collectAsState()
     val currentRecipeIndex by viewModel.currentRecipeIndex.collectAsState()
 
-    // Make currentRecipe reactive
     val currentRecipe: Recipe? = remember(currentRecipeIndex, selectedStackId, featuredRecipes) {
         viewModel.getCurrentRecipe()
     }
@@ -62,191 +62,202 @@ fun HomeScreen(
     }
 
     val scrollState = rememberScrollState()
-
-    // screen height for card sizing
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
+    val screenWidth = configuration.screenWidthDp
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-            .navigationBarsPadding()
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(scrollState)
-                .padding(horizontal = 10.dp),
-            verticalArrangement = Arrangement.Top
-        ) {
-            Spacer(modifier = Modifier.height(30.dp))
+    // 🔹 FAB size is responsive
+    val fabSize = when {
+        screenWidth < 340 -> 64.dp
+        screenWidth < 400 -> 72.dp
+        else -> 80.dp
+    }
 
-            WelcomeQuestCard(onClick = onNavigateToQuests)
+    // 🔹 distance above bottom (so it clears bottom nav nicely)
+    val fabBottomPadding = when {
+        configuration.screenHeightDp < 650 -> 10.dp
+        configuration.screenHeightDp < 800 -> 12.dp
+        else -> 14.dp
+    }
 
-            Spacer(Modifier.height(18.dp))
+    Scaffold(
+        containerColor = Color.Transparent,
+        contentWindowInsets = WindowInsets(0), // outer Scaffold already handles system bars
 
-            Divider(color = Color(0xFFE0E0E0), thickness = 2.dp)
-
-            Spacer(Modifier.height(14.dp))
-
-            // ------- "Find your match:" header + dropdown -------
+        floatingActionButton = {
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 4.dp)
-            ) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(2.dp)
-                ) {
-                    Text(
-                        text = "Find your match:",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = JuaFont,
-                        color = Color(0xFFE37434)
+                    .padding(
+                        bottom = fabBottomPadding,
+                        end = 8.dp
                     )
+                    .size(fabSize)
+                    .clickable {
+                        onAddRecipe(selectedStackId ?: 1)
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.add_recipe),
+                    contentDescription = "Add Recipe",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Fit
+                )
+            }
+        }
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.White)
+                .padding(innerPadding)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(scrollState)
+                    .padding(horizontal = 10.dp),
+                verticalArrangement = Arrangement.Top
+            ) {
+                Spacer(modifier = Modifier.height(30.dp))
 
-                    Box {
-                        TextButton(
-                            onClick = { stackMenuExpanded = true },
-                            contentPadding = PaddingValues(0.dp)
-                        ) {
-                            Text(
-                                text = selectedStackName,
-                                fontSize = 16.sp,
-                                fontFamily = JuaFont,
-                                color = Color(0xFF555555)   // DARK GREY for label ✔
-                            )
-                            Icon(
-                                imageVector = Icons.Default.ArrowDropDown,
-                                contentDescription = null,
-                                tint = Color(0xFF555555),   // dark grey arrow ✔
-                                modifier = Modifier.size(22.dp)
-                            )
-                        }
+                WelcomeQuestCard(onClick = onNavigateToQuests)
 
-                        DropdownMenu(
-                            expanded = stackMenuExpanded,
-                            onDismissRequest = { stackMenuExpanded = false }
-                        ) {
+                Spacer(Modifier.height(18.dp))
+
+                Divider(color = Color(0xFFE0E0E0), thickness = 2.dp)
+
+                Spacer(Modifier.height(14.dp))
+
+                // ------- "Find your match:" header + dropdown -------
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp)
+                ) {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(2.dp)
+                    ) {
+                        Text(
+                            text = "Find your match:",
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = JuaFont,
+                            color = Color(0xFFE37434)
+                        )
+
+                        Box {
+                            TextButton(
+                                onClick = { stackMenuExpanded = true },
+                                contentPadding = PaddingValues(0.dp)
+                            ) {
+                                Text(
+                                    text = selectedStackName,
+                                    fontSize = 16.sp,
+                                    fontFamily = JuaFont,
+                                    color = Color(0xFF555555)
+                                )
+                                Icon(
+                                    imageVector = Icons.Default.ArrowDropDown,
+                                    contentDescription = null,
+                                    tint = Color(0xFF555555),
+                                    modifier = Modifier.size(22.dp)
+                                )
+                            }
+
                             DropdownMenu(
                                 expanded = stackMenuExpanded,
-                                onDismissRequest = { stackMenuExpanded = false },
-                                modifier = Modifier
-                                    .background(Color(0xFFFFE4C7))
+                                onDismissRequest = { stackMenuExpanded = false }
                             ) {
-                                // ---- ALL RECIPES OPTION ----
-                                DropdownMenuItem(
-                                    text = {
-                                        Text(
-                                            text = "All recipes",
-                                            fontFamily = JuaFont,
-                                            color = Color(0xFFAA5423)
-                                        )
-                                    },
-                                    onClick = {
-                                        viewModel.selectStack(null)
-                                        stackMenuExpanded = false
-                                    },
-                                    modifier = Modifier.background(Color.Transparent)
-                                )
-
-                                Divider(color = Color(0xFFE0A36E))  // subtle orange-ish divider
-
-                                // ---- STACK ITEMS ----
-                                stacks.forEach { stack ->
+                                DropdownMenu(
+                                    expanded = stackMenuExpanded,
+                                    onDismissRequest = { stackMenuExpanded = false },
+                                    modifier = Modifier
+                                        .background(Color(0xFFFFE4C7))
+                                ) {
                                     DropdownMenuItem(
                                         text = {
                                             Text(
-                                                text = stack.name,
+                                                text = "All recipes",
                                                 fontFamily = JuaFont,
                                                 color = Color(0xFFAA5423)
                                             )
                                         },
                                         onClick = {
-                                            viewModel.selectStack(stack.id)
+                                            viewModel.selectStack(null)
                                             stackMenuExpanded = false
                                         },
                                         modifier = Modifier.background(Color.Transparent)
                                     )
+
+                                    Divider(color = Color(0xFFE0A36E))
+
+                                    stacks.forEach { stack ->
+                                        DropdownMenuItem(
+                                            text = {
+                                                Text(
+                                                    text = stack.name,
+                                                    fontFamily = JuaFont,
+                                                    color = Color(0xFFAA5423)
+                                                )
+                                            },
+                                            onClick = {
+                                                viewModel.selectStack(stack.id)
+                                                stackMenuExpanded = false
+                                            },
+                                            modifier = Modifier.background(Color.Transparent)
+                                        )
+                                    }
                                 }
                             }
-
-
                         }
                     }
                 }
-            }
 
-            Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-            // --- Recipe Card Stack ---
-            if (currentRecipe != null) {
-                val recipesInStack = featuredRecipes.filter { it.stackId == selectedStackId }
+                // --- Recipe Card Stack ---
+                if (currentRecipe != null) {
+                    val recipesInStack = featuredRecipes.filter { it.stackId == selectedStackId }
 
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(screenHeight * 0.8f)
-                ) {
-                    RecipeCardStack(
-                        recipe = currentRecipe,
-                        recipesCount = recipesInStack.size,
-                        currentIndex = currentRecipeIndex,
-                        onRecipeClick = { onRecipeClick(currentRecipe.id) },
-                        cardHeight = screenHeight * 0.8f,
+                    Box(
                         modifier = Modifier
-                            .align(Alignment.Center)
-                            .fillMaxWidth(0.8f)
-                    )
+                            .fillMaxWidth()
+                            .height(screenHeight * 0.8f)
+                    ) {
+                        RecipeCardStack(
+                            recipe = currentRecipe,
+                            recipesCount = recipesInStack.size,
+                            currentIndex = currentRecipeIndex,
+                            onRecipeClick = { onRecipeClick(currentRecipe.id) },
+                            cardHeight = screenHeight * 0.8f,
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .fillMaxWidth(0.8f)
+                        )
 
-                    RecipeStackArrows(
-                        modifier = Modifier
-                            .align(Alignment.Center),
-                        onPreviousClick = {
-                            println("Previous clicked - current index: $currentRecipeIndex")
-                            viewModel.previousRecipe()
-                        },
-                        onNextClick = {
-                            println("Next clicked - current index: $currentRecipeIndex")
-                            viewModel.nextRecipe()
-                        }
-                    )
+                        RecipeStackArrows(
+                            modifier = Modifier.align(Alignment.Center),
+                            onPreviousClick = {
+                                viewModel.previousRecipe()
+                            },
+                            onNextClick = {
+                                viewModel.nextRecipe()
+                            }
+                        )
+                    }
+                } else {
+                    EmptyRecipeCard(onAddRecipe = onAddRecipe)
                 }
-            } else {
-                EmptyRecipeCard(onAddRecipe = onAddRecipe)
+
+                Spacer(modifier = Modifier.height(80.dp))
             }
-
-
-
-            Spacer(modifier = Modifier.height(80.dp))
-        }
-
-        // -------- Floating Add Recipe button anchored to screen --------
-        Box(
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(bottom = 75.dp, end = 16.dp)
-                .size(80.dp)
-                .clickable {
-                    // if you want to add into the selected stack, pass selectedStackId ?: 1
-                    onAddRecipe(selectedStackId ?: 1)
-                },
-            contentAlignment = Alignment.Center
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.add_recipe),
-                contentDescription = "Add Recipe",
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Fit
-            )
         }
     }
 }
 
 
-
+// ------------------ other composables unchanged --------------------
 
 @Composable
 fun WelcomeQuestCard(onClick: () -> Unit = {}) {
@@ -283,7 +294,6 @@ fun WelcomeQuestCard(onClick: () -> Unit = {}) {
                     .padding(start = 16.dp, end = 20.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // ----- Text -----
                 Column(
                     modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.Center
@@ -310,7 +320,6 @@ fun WelcomeQuestCard(onClick: () -> Unit = {}) {
                     )
                 }
 
-                // ----- FULL HEIGHT vertical divider -----
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
@@ -320,7 +329,6 @@ fun WelcomeQuestCard(onClick: () -> Unit = {}) {
 
                 Spacer(modifier = Modifier.width(16.dp))
 
-                // ----- Icon -----
                 Icon(
                     painter = painterResource(id = R.drawable.quest_white),
                     contentDescription = "Quest",
@@ -345,12 +353,10 @@ fun RecipeCardStack(
         modifier = modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center
     ) {
-        // Card stack container
         Box(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
-            // ---------- BACK CARD (smallest) ----------
             Card(
                 modifier = Modifier
                     .fillMaxWidth(0.92f)
@@ -358,12 +364,11 @@ fun RecipeCardStack(
                     .offset(y = 24.dp),
                 shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFF0E4851)  // dark teal
+                    containerColor = Color(0xFF0E4851)
                 ),
                 elevation = CardDefaults.cardElevation(0.dp)
             ) {}
 
-            // ---------- MIDDLE CARD ----------
             Card(
                 modifier = Modifier
                     .fillMaxWidth(0.96f)
@@ -371,12 +376,11 @@ fun RecipeCardStack(
                     .offset(y = 12.dp),
                 shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFF4B9DA9)  // mid teal
+                    containerColor = Color(0xFF4B9DA9)
                 ),
                 elevation = CardDefaults.cardElevation(0.dp)
             ) {}
 
-            // ---------- FRONT / MAIN CARD ----------
             Card(
                 onClick = onRecipeClick,
                 modifier = Modifier
@@ -384,7 +388,7 @@ fun RecipeCardStack(
                     .height(cardHeight),
                 shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFFC8F4EC)  // light teal
+                    containerColor = Color(0xFFC8F4EC)
                 ),
                 elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {
@@ -393,7 +397,6 @@ fun RecipeCardStack(
                         .fillMaxSize()
                         .padding(20.dp)
                 ) {
-                    // Image
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -402,7 +405,6 @@ fun RecipeCardStack(
                             .background(Color.DarkGray),
                         contentAlignment = Alignment.Center
                     ) {
-                        // TODO: actual image
                         Text("🍳", fontSize = 80.sp)
                     }
 
@@ -457,7 +459,6 @@ fun RecipeCardStack(
 
                     Spacer(Modifier.height(8.dp))
 
-                    // Debug: Show current position
                     if (recipesCount > 1) {
                         Text(
                             "${currentIndex + 1} / $recipesCount",
@@ -473,7 +474,6 @@ fun RecipeCardStack(
     }
 }
 
-
 @Composable
 fun RecipeStackArrows(
     modifier: Modifier = Modifier,
@@ -488,7 +488,6 @@ fun RecipeStackArrows(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // LEFT ARROW
             Image(
                 painter = painterResource(id = R.drawable.arrow_right),
                 contentDescription = "Previous",
@@ -498,7 +497,6 @@ fun RecipeStackArrows(
                     .clickable { onPreviousClick() }
             )
 
-            // RIGHT ARROW
             Image(
                 painter = painterResource(id = R.drawable.arrow_left),
                 contentDescription = "Next",
@@ -510,9 +508,6 @@ fun RecipeStackArrows(
         }
     }
 }
-
-
-
 
 @Composable
 fun EmptyRecipeCard(
@@ -560,7 +555,7 @@ fun EmptyRecipeCard(
                 fontFamily = JuaFont,
                 color = Color.Black.copy(alpha = 0.7f),
                 lineHeight = 22.sp,
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                textAlign = TextAlign.Center
             )
 
             Spacer(modifier = Modifier.height(24.dp))

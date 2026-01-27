@@ -11,22 +11,28 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.example.ccl3_app.ui.navigation.AppNavHost
 import com.example.ccl3_app.ui.navigation.BottomNavBar
 import com.example.ccl3_app.ui.screens.SplashScreen
 import com.example.ccl3_app.ui.theme.CCL3_AppTheme
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.runtime.saveable.rememberSaveable
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         setContent {
             CCL3_AppTheme {
-                var showSplash by remember { mutableStateOf(true) }
+                var showSplash by rememberSaveable { mutableStateOf(true) }
+
 
                 if (showSplash) {
                     SplashScreen(
@@ -46,13 +52,20 @@ fun MainScreen() {
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         bottomBar = {
-            BottomNavBar(navController) // optional
+            BottomNavBar(
+                navController = navController,
+                modifier = Modifier.navigationBarsPadding()
+            )
         }
-    ) { paddingValues ->
+    ) { innerPadding ->
         AppNavHost(
             navController = navController,
-            modifier = Modifier.padding(paddingValues)
+            modifier = Modifier
+                .statusBarsPadding()
+                .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
         )
     }
 }

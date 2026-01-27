@@ -336,12 +336,14 @@ private fun RecipeField(
     borderColor: Color,
     multiLine: Boolean
 ) {
+    val darkTeal = Color(0xFF0E4851)
+
     Column {
         Text(
             text = label,
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Black,
+            color = darkTeal,
             fontFamily = Jua
         )
 
@@ -350,12 +352,17 @@ private fun RecipeField(
         TextField(
             value = value,
             onValueChange = onValueChange,
-            textStyle = LocalTextStyle.current.copy(fontFamily = Jua),
+            textStyle = LocalTextStyle.current.copy(
+                fontFamily = Jua,
+                fontSize = 16.sp,
+                color = darkTeal
+            ),
             placeholder = {
                 Text(
                     text = placeholder,
                     fontFamily = Jua,
-                    color = Color.Gray
+                    fontSize = 16.sp,
+                    color = darkTeal.copy(alpha = 0.5f)
                 )
             },
             singleLine = !multiLine,
@@ -367,7 +374,7 @@ private fun RecipeField(
                 unfocusedContainerColor = containerColor,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
-                cursorColor = Teal
+                cursorColor = darkTeal
             ),
             modifier = Modifier
                 .fillMaxWidth()
@@ -379,3 +386,4 @@ private fun RecipeField(
         )
     }
 }
+

@@ -133,11 +133,10 @@ fun StackDetailScreen(
                 if (!isAllRecipes) {
                     Box(
                         modifier = Modifier
-                                .size(80.dp)
-                                .offset(y = (-56).dp)
-                                .clickable { onAddRecipe(stackId) },
-                            contentAlignment = Alignment.Center
-
+                            .size(72.dp)
+                            .padding(bottom = 8.dp)
+                            .clickable { onAddRecipe(stackId) },
+                        contentAlignment = Alignment.Center
                     ) {
                         Image(
                             painter = painterResource(id = R.drawable.add_recipe),
@@ -148,6 +147,7 @@ fun StackDetailScreen(
                     }
                 }
             }
+
 
         ) { paddingValues ->
             Column(
