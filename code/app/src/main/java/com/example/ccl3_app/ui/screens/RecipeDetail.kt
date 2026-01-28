@@ -6,7 +6,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -43,7 +42,6 @@ fun RecipeDetailScreen(
         viewModel.loadRecipe(recipeId)
     }
 
-    // Total cards = 1 (ingredients) + number of instructions
     val totalCards = 1 + (recipe?.instructions?.size ?: 0)
 
     Column(
@@ -83,7 +81,7 @@ fun RecipeDetailScreen(
                 modifier = Modifier.weight(1f)
             )
 
-            // Edit + Delete buttons with FIT so they don't crop
+            // Edit + Delete buttons
             Row(verticalAlignment = Alignment.CenterVertically) {
 
                 IconButton(onClick = { onEdit(recipeId) }) {
@@ -114,16 +112,13 @@ fun RecipeDetailScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // 🔽 CONTENT AREA
+        // content area
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
-
-            // ----------------------------
             // DESCRIPTION TITLE + CONTENT
-            // ----------------------------
 
             Text(
                 text = "Description",
@@ -148,20 +143,17 @@ fun RecipeDetailScreen(
             Divider(color = Color(0xFFE0E0E0), thickness = 2.dp)
             Spacer(modifier = Modifier.height(16.dp))
 
-            // ----------------------------
             // RESPONSIVE RECIPE CARD
-            // ----------------------------
-
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f),   // takes all remaining space
-                contentAlignment = Alignment.TopCenter           // ⬅ moves card UP
+                    .weight(1f),
+                contentAlignment = Alignment.TopCenter
             ) {
                 BoxWithConstraints(
                     modifier = Modifier.fillMaxWidth(0.9f)
                 ) {
-                    val cardHeight = maxHeight * 0.65f   // slightly taller now
+                    val cardHeight = maxHeight * 0.65f
 
                     // Offset shadow card behind
                     Box(
@@ -174,8 +166,7 @@ fun RecipeDetailScreen(
 
                     // Front card
                     var totalDragX by remember { mutableStateOf(0f) }
-                    val swipeThreshold = 80f  // px – adjust if needed
-
+                    val swipeThreshold = 80f
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -189,11 +180,11 @@ fun RecipeDetailScreen(
                                         change.consume()
                                     },
                                     onDragEnd = {
-                                        // swipe RIGHT → previous card
+
                                         if (totalDragX > swipeThreshold && currentCardIndex > 0) {
                                             currentCardIndex--
                                         }
-                                        // swipe LEFT → next card
+
                                         else if (totalDragX < -swipeThreshold && currentCardIndex < totalCards - 1) {
                                             currentCardIndex++
                                         }
@@ -283,7 +274,7 @@ fun RecipeDetailScreen(
                                 )
                             }
 
-// PROGRESS TEXT (unchanged)
+                            // PROGRESS TEXT
                             Text(
                                 text = "${currentCardIndex + 1} / $totalCards",
                                 fontSize = 14.sp,
@@ -292,7 +283,7 @@ fun RecipeDetailScreen(
                                 fontWeight = FontWeight.SemiBold
                             )
 
-// NEXT BUTTON (right arrow)
+                            // NEXT BUTTON (right arrow)
                             IconButton(
                                 onClick = { if (currentCardIndex < totalCards - 1) currentCardIndex++ },
                                 enabled = currentCardIndex < totalCards - 1

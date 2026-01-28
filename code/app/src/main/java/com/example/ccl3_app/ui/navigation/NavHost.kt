@@ -297,7 +297,7 @@ fun BottomNavBar(
 
     Column(modifier = modifier) {
 
-        // Thin grey line on top
+        // Thin grey line
         HorizontalDivider(
             thickness = 1.dp,
             color = Color.LightGray

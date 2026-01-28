@@ -70,7 +70,7 @@ fun ProfileScreen(
         }
     )
 
-    // ensure profile exists
+
     LaunchedEffect(Unit) {
         profileRepo.ensureDefaultProfile()
     }
@@ -106,7 +106,7 @@ fun ProfileScreen(
             .fillMaxSize()
             .background(Color.White)
     ) {
-        // Main layout: top 1/3, bottom 2/3
+        // Main layout --> 3 ratio --> top 1/3, bottom 2/3
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -117,7 +117,7 @@ fun ProfileScreen(
                 onSettingsClick = onSettingsClick,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)   // 1/3
+                    .weight(1f)
             )
 
             BottomContentArea(
@@ -130,7 +130,7 @@ fun ProfileScreen(
                 onRecipeClick = onRecipeClick,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(2f)   // 2/3
+                    .weight(2f)
             )
         }
 
@@ -168,7 +168,7 @@ private fun TopProfileArea(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.8f)   // goes down behind about half of search bar
+                .fillMaxHeight(0.8f)
                 .background(Teal.copy(alpha = 0.15f))
         )
 
@@ -205,14 +205,14 @@ private fun TopProfileArea(
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            // Avatar + SearchBar stacked so bar hides neck
+            // Avatar + SearchBar
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(170.dp),
                 contentAlignment = Alignment.TopCenter
             ) {
-                // Avatar behind
+
                 Image(
                     painter = painterResource(R.drawable.profile_pic),
                     contentDescription = "Profile picture",
@@ -222,7 +222,6 @@ private fun TopProfileArea(
                     contentScale = ContentScale.Fit
                 )
 
-                // Search bar in front, overlapping lower part of avatar
                 SearchBar(
                     value = query,
                     onValueChange = onQueryChange,
@@ -285,7 +284,7 @@ private fun BottomContentArea(
 
                     val cardColor = remember(stack.color, stack.id) {
                         if (stack.id == StackViewModel.ALL_RECIPES_STACK_ID) {
-                            Color(0xFFF6F3C2)  // fixed color for "All Recipes"
+                            Color(0xFFF6F3C2)
                         } else {
                             runCatching {
                                 Color(AndroidColor.parseColor("#${stack.color}"))

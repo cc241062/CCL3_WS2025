@@ -5,7 +5,6 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -54,51 +53,45 @@ abstract class OopsDatabase : RoomDatabase() {
         private suspend fun prepopulateQuests(questDao: QuestDao) {
             val quests = listOf(
                 QuestEntity(
-                    0,
-                    "Fry an Egg",
-                    "Learn how to fry a perfect sunny-side up egg!",
-                    false,
-                    1
-                ),
-
-                QuestEntity(
-                    0,
-                    "Green Goddess Salad",
-                    "Blend a herb-packed green dressing and toss a crunchy salad.",
-                    false,
-                    2
-                ),
-
-                QuestEntity(
-                    0,
-                    "Beef Tartare",
-                    "Learn the basics of preparing a classic beef tartare safely.",
-                    false,
-                    3
-                ),
-
-                QuestEntity(
-                    0,
-                    "Scramble Eggs",
-                    "Master the art of fluffy scrambled eggs",
-                    false,
-                    4
+                    id = 0,
+                    title = "Fry an Egg",
+                    description = "Learn how to fry a perfect sunny-side up egg!",
+                    isDone = false,
+                    level = 1
                 ),
                 QuestEntity(
-                    0,
-                    "Make Tea",
-                    "Brew a perfect cup of tea",
-                    false,
-                    5
+                    id = 0,
+                    title = "Green Goddess Salad",
+                    description = "Blend a herb-packed green dressing and toss a crunchy salad.",
+                    isDone = false,
+                    level = 2
                 ),
-
-
+                QuestEntity(
+                    id = 0,
+                    title = "Beef Tartare",
+                    description = "Learn the basics of preparing a classic beef tartare safely.",
+                    isDone = false,
+                    level = 3
+                ),
+                QuestEntity(
+                    id = 0,
+                    title = "Cut an Onion Like a Pro",
+                    description = "Learn how to dice an onion safely and evenly like a professional chef.",
+                    isDone = false,
+                    level = 4
+                ),
+                QuestEntity(
+                    id = 0,
+                    title = "Fudge Brownies",
+                    description = "Bake rich, fudgy brownies with a beautiful shiny crackly top.",
+                    isDone = false,
+                    level = 5
+                )
             )
 
             quests.forEach { quest ->
                 questDao.addQuest(quest)
             }
         }
-
     }
 }

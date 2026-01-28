@@ -29,15 +29,14 @@ class QuestViewModel(
         }
     }
 
-    // Complete a quest (mark as done)
+    // Complete a quest
     fun completeQuest(quest: Quest) {
         viewModelScope.launch {
             questRepository.completeQuest(quest)
-            // The flow will automatically update _quests
         }
     }
 
-    // Get current quest (first incomplete quest)
+    // Get current quest
     fun getCurrentQuest(): Quest? {
         return _quests.value.firstOrNull { !it.isDone }
     }

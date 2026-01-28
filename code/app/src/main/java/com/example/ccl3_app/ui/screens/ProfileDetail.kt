@@ -8,22 +8,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.ccl3_app.R
 import com.example.ccl3_app.data.Profile
 import com.example.ccl3_app.data.ProfileRepository
 import com.example.ccl3_app.database.OopsDatabase
@@ -50,7 +46,6 @@ fun ProfileDetailScreen(
 
     val profile by vm.profile.collectAsState()
 
-    // Local editable states (filled when profile loads)
     var name by remember { mutableStateOf("") }
     var username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -75,7 +70,7 @@ fun ProfileDetailScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(0xFF4B9DA9))  // blue-teal header
+                .background(Color(0xFF4B9DA9))
                 .padding(vertical = 16.dp),
         ) {
 
@@ -89,7 +84,7 @@ fun ProfileDetailScreen(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
-                    tint = Color.White   // icon white
+                    tint = Color.White
                 )
             }
 
@@ -98,7 +93,7 @@ fun ProfileDetailScreen(
                 text = "Profil",
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White,   // text white
+                color = Color.White,
                 fontFamily = Jua,
                 modifier = Modifier.align(Alignment.Center)
             )
@@ -136,7 +131,7 @@ fun ProfileDetailScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 18.dp, vertical = 14.dp)
         ) {
-            // (Profile picture removed on purpose)
+
 
             Spacer(modifier = Modifier.height(10.dp))
 

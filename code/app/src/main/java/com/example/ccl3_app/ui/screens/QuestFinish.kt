@@ -33,7 +33,7 @@ fun QuestFinishScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF0A3941)), // dark teal
+            .background(Color(0xFF0A3941)),
         contentAlignment = Alignment.Center
     ) {
         // MAIN CONTENT
@@ -44,23 +44,23 @@ fun QuestFinishScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            // 👆 Mascot on top
+            // Mascot on top
             MascotCelebration(
                 bodyRes = R.drawable.body,
                 eyeRes = R.drawable.eye,
                 mouthRes = R.drawable.mouth
             )
 
-            // Title in orange
+            // Title
             Text(
                 text = "Are you a master cook ?",
-                color = Color(0xFFE37434),          // orange
+                color = Color(0xFFE37434),
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 fontFamily = fontFamily
             )
 
-            // Subtitle in white
+            // Subtitle
             Text(
                 text = "Quest complete",
                 color = Color.White,
@@ -107,7 +107,6 @@ fun QuestFinishScreen(
             }
         }
 
-        // CONFETTI POP LAYER
         ConfettiBurst(
             confettiRes = R.drawable.confetti
         )
@@ -117,12 +116,12 @@ fun QuestFinishScreen(
 @Composable
 private fun MascotCelebration(
     bodyRes: Int,
-    eyeRes: Int,   // single eye sprite
+    eyeRes: Int,
     mouthRes: Int
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "mascotAnim")
 
-    // gentle bobbing up/down for entire mascot
+
     val bobOffset by infiniteTransition.animateFloat(
         initialValue = -6f,
         targetValue = 6f,
@@ -133,7 +132,7 @@ private fun MascotCelebration(
         label = "bob"
     )
 
-    // blinking animation
+
     val blinkScaleY by infiniteTransition.animateFloat(
         initialValue = 1f,
         targetValue = 1f,
@@ -273,7 +272,7 @@ private fun ConfettiBurst(
                 contentScale = ContentScale.Fit
             )
 
-            // RIGHT CONFETTI (mirrored)
+            // RIGHT CONFETTI
             Image(
                 painter = painterResource(id = confettiRes),
                 contentDescription = "Confetti mirrored",

@@ -9,9 +9,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import com.example.ccl3_app.ui.theme.Orange
 import kotlinx.coroutines.delay
 
 @Composable
@@ -20,58 +20,93 @@ fun SplashScreen(
 ) {
     var startAnimation by remember { mutableStateOf(false) }
 
-    // Scale animation for the entire text
-    val scale by animateFloatAsState(
-        targetValue = if (startAnimation) 0f else 1f,
-        animationSpec = tween(
-            durationMillis = 1500,
-            easing = FastOutSlowInEasing
-        ),
-        label = "scale"
-    )
-
-    // Scale animation for the "O" - starts after text begins shrinking
-    val oScale by animateFloatAsState(
-        targetValue = if (startAnimation) 8f else 1f,
-        animationSpec = tween(
-            durationMillis = 1500,
-            delayMillis = 500,
-            easing = FastOutSlowInEasing
-        ),
-        label = "oScale"
-    )
-
-    LaunchedEffect(key1 = true) {
-        delay(500) // Wait a bit before starting
+    LaunchedEffect(Unit) {
+        delay(400)
         startAnimation = true
-        delay(2200) // Total animation time + buffer
+        delay(2200)
         onSplashComplete()
+    }
+
+    val transition = updateTransition(
+        targetState = startAnimation,
+        label = "splashTransition"
+    )
+
+    val textScale by transition.animateFloat(
+        transitionSpec = {
+            tween(
+                durationMillis = 900,
+                easing = FastOutSlowInEasing
+            )
+        },
+        label = "textScale"
+    ) { started ->
+        if (!started) 1f else 0.7f
+    }
+
+    val textAlpha by transition.animateFloat(
+        transitionSpec = {
+            tween(
+                durationMillis = 700,
+                delayMillis = 300
+            )
+        },
+        label = "textAlpha"
+    ) { started ->
+        if (!started) 1f else 0f
+    }
+
+    val oScale by transition.animateFloat(
+        transitionSpec = {
+            tween(
+                durationMillis = 1400,
+                delayMillis = 200,
+                easing = FastOutSlowInEasing
+            )
+        },
+        label = "oScale"
+    ) { started ->
+        if (!started) 0f else 8f
+    }
+
+    val oAlpha by transition.animateFloat(
+        transitionSpec = {
+            tween(
+                durationMillis = 900,
+                delayMillis = 500
+            )
+        },
+        label = "oAlpha"
+    ) { started ->
+        if (!started) 0f else 1f
     }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Orange),
+            .background(Color(0xFFE37434)),
         contentAlignment = Alignment.Center
     ) {
-        if (scale > 0.1f) {
-            // Show the full text while it's visible
-            Text(
-                text = "Oops! I can cook",
-                fontSize = 48.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White,
-                modifier = Modifier.scale(scale)
-            )
-        } else {
-            // Show just the "O" when text disappears
-            Text(
-                text = "O",
-                fontSize = 48.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White,
-                modifier = Modifier.scale(oScale)
-            )
-        }
+        // Full text fading / shrinking out
+        Text(
+            text = "Oops! I can cook",
+            fontSize = 48.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White,
+            modifier = Modifier
+                .scale(textScale)
+                .graphicsLayer(alpha = textAlpha)
+        )
+
+        // Big “O” zooming / fading in
+        Text(
+            text = "O",
+            fontSize = 48.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White,
+            modifier = Modifier
+                .scale(oScale)
+                .graphicsLayer(alpha = oAlpha)
+        )
     }
 }

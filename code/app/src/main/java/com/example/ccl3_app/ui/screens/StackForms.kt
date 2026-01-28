@@ -20,7 +20,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -262,14 +261,14 @@ private fun StackField(
             textStyle = LocalTextStyle.current.copy(
                 fontFamily = Jua,
                 fontSize = 16.sp,
-                color = darkTeal                   // 👈 TEXT COLOR
+                color = darkTeal
             ),
             placeholder = {
                 Text(
                     text = placeholder,
                     fontFamily = Jua,
                     fontSize = 16.sp,
-                    color = darkTeal.copy(alpha = 0.5f)  // 👈 PLACEHOLDER COLOR
+                    color = darkTeal.copy(alpha = 0.5f)
                 )
             },
             singleLine = !multiLine,

@@ -41,10 +41,10 @@ fun RecipeFormScreen(
     val database = OopsDatabase.getDatabase(context)
     val stackRepository = StackRepository(database.StackDao())
 
-    // All stacks from DB (includes "All recipes")
+    // All stacks from DB (
     val allStacks by stackRepository.stacks.collectAsState(initial = emptyList())
 
-    // Stacks used in THIS form (exclude "All recipes")
+    // Stacks used in THIS form
     val formStacks = remember(allStacks) {
         allStacks.filter { it.name != "All recipes" }
     }
@@ -66,7 +66,6 @@ fun RecipeFormScreen(
         }
     }
 
-    // Make sure selectedStackId is always a valid, real stack id
     LaunchedEffect(formStacks) {
         if (formStacks.isNotEmpty()) {
             if (selectedStackId == null || formStacks.none { it.id == selectedStackId }) {
@@ -146,14 +145,14 @@ fun RecipeFormScreen(
                     .fillMaxWidth()
                     .height(26.dp)
                     .clip(RoundedCornerShape(14.dp))
-                    .background(Color(0xFFAA5423)) // empty bar color
+                    .background(Color(0xFFAA5423))
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
                         .fillMaxWidth(filledFields.toFloat() / totalFields)
                         .clip(RoundedCornerShape(14.dp))
-                        .background(Color(0xFFE37434)) // progress color
+                        .background(Color(0xFFE37434))
                 )
 
                 Box(
@@ -179,7 +178,7 @@ fun RecipeFormScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
 
-            // STACK DROPDOWN LABEL
+            //Stack drop down label
             Text(
                 text = "Stack",
                 fontSize = 22.sp,
@@ -224,7 +223,7 @@ fun RecipeFormScreen(
                     expanded = expanded,
                     onDismissRequest = { expanded = false },
                     modifier = Modifier
-                        .background(Color(0xFFD9F3F3)) // light teal dropdown background
+                        .background(Color(0xFFD9F3F3))
                 ) {
                     formStacks.forEach { stack ->
                         DropdownMenuItem(
@@ -244,7 +243,7 @@ fun RecipeFormScreen(
                 }
             }
 
-            // TITLE – single line, bright teal
+            // title
             RecipeField(
                 label = "Title",
                 value = viewModel.title,
@@ -255,7 +254,7 @@ fun RecipeFormScreen(
                 multiLine = false
             )
 
-            // DESCRIPTION – slightly softer teal
+            // DESCRIPTION
             RecipeField(
                 label = "Description",
                 value = viewModel.description,
@@ -266,7 +265,7 @@ fun RecipeFormScreen(
                 multiLine = true
             )
 
-            // INGREDIENTS – another shade, multi-line
+            // INGREDIENTS
             RecipeField(
                 label = "Ingredients (one per line)",
                 value = viewModel.ingredients,
@@ -277,7 +276,7 @@ fun RecipeFormScreen(
                 multiLine = true
             )
 
-            // INSTRUCTIONS – lightest teal, multi-line
+            // INSTRUCTIONS
             RecipeField(
                 label = "Instructions (one per line)",
                 value = viewModel.instructions,

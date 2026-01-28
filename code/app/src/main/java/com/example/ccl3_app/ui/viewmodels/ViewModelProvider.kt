@@ -38,11 +38,5 @@ object ViewModelProvider {
             RecipeDetailViewModel(oopsApplication.recipeRepository)
         }
 
-        /*
-        initializer {
-            val oopsApplication = this[APPLICATION_KEY] as OopsApplication
-            QuestViewModel(oopsApplication.questRepository)
-        }
-        */
     }
 }

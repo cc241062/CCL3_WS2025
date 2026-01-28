@@ -74,14 +74,14 @@ fun HomeScreen(
     val screenHeight = configuration.screenHeightDp.dp
     val screenWidth = configuration.screenWidthDp
 
-    // 🔹 FAB size is responsive
+
     val fabSize = when {
         screenWidth < 340 -> 64.dp
         screenWidth < 400 -> 72.dp
         else -> 80.dp
     }
 
-    // 🔹 distance above bottom (so it clears bottom nav nicely)
+    // distance above bottom
     val fabBottomPadding = when {
         configuration.screenHeightDp < 650 -> 10.dp
         configuration.screenHeightDp < 800 -> 12.dp
@@ -90,7 +90,7 @@ fun HomeScreen(
 
     Scaffold(
         containerColor = Color.Transparent,
-        contentWindowInsets = WindowInsets(0), // outer Scaffold already handles system bars
+        contentWindowInsets = WindowInsets(0),
 
         floatingActionButton = {
             Box(
@@ -137,7 +137,7 @@ fun HomeScreen(
 
                 Spacer(Modifier.height(14.dp))
 
-                // ------- "Find your match:" header + dropdown -------
+                //Find your match: header + dropdown
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -219,7 +219,7 @@ fun HomeScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // --- Recipe Card Stack ---
+                // Recipe Card Stack
                 if (currentRecipe != null) {
                     val recipesInStack = featuredRecipes.filter { it.stackId == selectedStackId }
 
@@ -262,7 +262,6 @@ fun HomeScreen(
 }
 
 
-// ------------------ other composables --------------------
 
 @Composable
 fun WelcomeQuestCard(onClick: () -> Unit = {}) {
@@ -359,18 +358,17 @@ fun RecipeCardStack(
     val density = LocalDensity.current
     val swipeThresholdPx = with(density) { 80.dp.toPx() }
 
-    // raw drag offset controlled by gestures
+
     var rawOffsetX by remember { mutableStateOf(0f) }
-    // smooth animated offset used for the UI
+
     val animatedOffsetX by animateFloatAsState(
         targetValue = rawOffsetX,
         label = "cardSwipeOffset"
     )
 
-    // 👉 how far we are swiping, 0..1
     val swipeProgress = (abs(animatedOffsetX) / swipeThresholdPx).coerceIn(0f, 1f)
 
-    // front card base + darker color
+
     val baseFrontColor = Color(0xFFC8F4EC)
     val darkerFrontColor = Color(0xFFADDCD3) // just a bit darker
     val frontCardColor = lerp(baseFrontColor, darkerFrontColor, swipeProgress)
@@ -412,7 +410,7 @@ fun RecipeCardStack(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(cardHeight)
-                    // use the *animated* offset for smoothness
+
                     .offset { IntOffset(animatedOffsetX.roundToInt(), 0) }
                     .pointerInput(Unit) {
                         detectHorizontalDragGestures(
@@ -422,17 +420,17 @@ fun RecipeCardStack(
                             onDragEnd = {
                                 when {
                                     rawOffsetX <= -swipeThresholdPx -> {
-                                        // swipe left
+
                                         rawOffsetX = 0f
                                         onSwipeLeft()
                                     }
                                     rawOffsetX >= swipeThresholdPx -> {
-                                        // swipe right
+
                                         rawOffsetX = 0f
                                         onSwipeRight()
                                     }
                                     else -> {
-                                        // not far enough -> snap back
+
                                         rawOffsetX = 0f
                                     }
                                 }

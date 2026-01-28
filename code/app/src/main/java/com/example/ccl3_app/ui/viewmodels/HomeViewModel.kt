@@ -9,7 +9,6 @@ import com.example.ccl3_app.data.StackRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
@@ -21,7 +20,6 @@ class HomeViewModel(
     private val _stacks = MutableStateFlow<List<Stack>>(emptyList())
     val stacks: StateFlow<List<Stack>> = _stacks.asStateFlow()
 
-    // null = ALL RECIPES
     private val _selectedStackId = MutableStateFlow<Int?>(null)
     val selectedStackId: StateFlow<Int?> = _selectedStackId.asStateFlow()
 
@@ -49,13 +47,13 @@ class HomeViewModel(
         }
     }
 
-    // ✅ allow null so we can call selectStack(null) for "All recipes"
+    // allow null so we can call selectStack(null) for "All recipes"
     fun selectStack(stackId: Int?) {
         println("HomeViewModel: Selecting stack ${stackId ?: "ALL"}")
         _selectedStackId.value = stackId
         _currentRecipeIndex.value = 0          }
 
-    // all recipes from DB (we filter per stack on top)
+    // all recipes from DB
     private fun loadFeaturedRecipes() {
         viewModelScope.launch {
             _isLoading.value = true
@@ -64,7 +62,6 @@ class HomeViewModel(
                     println("HomeViewModel: Loaded ${recipes.size} recipes")
                     _featuredRecipes.value = recipes
 
-                    // keep index in range for current selection (including ALL)
                     val filtered = recipesForSelectedStack()
                     println("HomeViewModel: ${filtered.size} recipes in selected view")
                     if (filtered.isNotEmpty() && _currentRecipeIndex.value >= filtered.size) {
@@ -77,11 +74,11 @@ class HomeViewModel(
         }
     }
 
-    // helper: recipes for the currently selected stack (null = ALL)
+    // helper: recipes for the currently selected stack
     private fun recipesForSelectedStack(): List<Recipe> {
         val sid = _selectedStackId.value
         return if (sid == null) {
-            // ✅ "All recipes" = no filtering
+
             _featuredRecipes.value
         } else {
             _featuredRecipes.value.filter { it.stackId == sid }

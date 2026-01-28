@@ -17,7 +17,7 @@ class StackFormsViewModel(
 
     var name by mutableStateOf("")
     var emoji by mutableStateOf("🍳")
-    var color by mutableStateOf("E37434")   // default: orange
+    var color by mutableStateOf("E37434")
 
     suspend fun loadStack(id: Int) {
         stackId = id

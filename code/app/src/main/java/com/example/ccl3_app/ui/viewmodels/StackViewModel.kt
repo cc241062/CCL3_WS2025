@@ -20,7 +20,7 @@ class StackViewModel(
         emptyList()
     )
 
-    // ✅ Let Kotlin infer the type from RecipeRepository
+
     fun getRecipesForStack(stackId: Int) =
         if (stackId == ALL_RECIPES_STACK_ID) {
             recipeRepository.getAllRecipes()
@@ -28,7 +28,6 @@ class StackViewModel(
             recipeRepository.getRecipesForStack(stackId)
         }
 
-    // ✅ Same here – no explicit type
     fun searchRecipes(query: String) =
         recipeRepository.searchRecipes(query)
 

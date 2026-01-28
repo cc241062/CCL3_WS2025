@@ -47,6 +47,8 @@ fun QuestScreen(
     var showFryEggScreen by remember { mutableStateOf(false) }
     var showGreenGoddessScreen by remember { mutableStateOf(false) }
     var showBeefTartareScreen by remember { mutableStateOf(false) }
+    var showOnionScreen by remember { mutableStateOf(false) }
+    var showBrownieScreen by remember { mutableStateOf(false) }
     var showFinishScreen by remember { mutableStateOf(false) }
 
     val completedCount = quests.count { it.isDone }
@@ -102,10 +104,10 @@ fun QuestScreen(
                 Card(
                     modifier = Modifier
                         .matchParentSize()
-                        .offset(y = 6.dp), // slight drop shadow effect
+                        .offset(y = 6.dp),
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFF1C393D) // same dark teal as other shadows
+                        containerColor = Color(0xFF1C393D)
                     ),
                     elevation = CardDefaults.cardElevation(0.dp)
                 ) {}
@@ -145,7 +147,7 @@ fun QuestScreen(
                                     modifier = Modifier
                                         .fillMaxHeight()
                                         .fillMaxWidth(completedCount.toFloat() / totalQuests)
-                                        .background(Color(0xFFE37434)) // orange
+                                        .background(Color(0xFFE37434))
                                 )
                             }
 
@@ -186,13 +188,13 @@ fun QuestScreen(
                             if ((index - 1) % 2 == 0) (-50).dp else 50.dp
                         }
 
-                        // draw connector only if there is a previous node
+
                         if (prevOffsetX != null) {
                             OrganicQuestPathConnector(
                                 fromOffsetX = prevOffsetX,
                                 toOffsetX = offsetX,
                                 index = index,
-                                isDone = quests[index - 1].isDone // segment becomes solid when the previous quest is done
+                                isDone = quests[index - 1].isDone
                             )
                         }
 
@@ -201,7 +203,6 @@ fun QuestScreen(
                             isCurrentQuest = !quest.isDone &&
                                     (index == 0 || quests.getOrNull(index - 1)?.isDone == true),
                             onClick = {
-                                // now also opens dialog when quest is already done
                                 selectedQuest = quest
                             },
                             offsetX = offsetX,
@@ -223,9 +224,12 @@ fun QuestScreen(
                     "Fry an Egg" -> showFryEggScreen = true
                     "Green Goddess Salad" -> showGreenGoddessScreen = true
                     "Beef Tartare" -> showBeefTartareScreen = true
+                    "Cut an Onion Like a Pro" -> showOnionScreen = true
+                    "Fudge Brownies" -> showBrownieScreen = true
                     else -> viewModel.completeQuest(quest)
                 }
             },
+
 
             fontFamily = juaFont
         )
@@ -238,14 +242,12 @@ fun QuestScreen(
         FryEggQuestScreen(
             fontFamily = juaFont,
             onClose = {
-                // user pressed X → just close, don't complete
                 showFryEggScreen = false
             },
             onFinished = {
-                // user finished the quest steps
                 showFryEggScreen = false
                 fryQuest?.let { viewModel.completeQuest(it) }
-                showFinishScreen = true            // 👈 trigger finish screen
+                showFinishScreen = true
             }
         )
     }
@@ -257,7 +259,6 @@ fun QuestScreen(
         GreenGoddessQuestScreen(
             fontFamily = juaFont,
             onClose = {
-                // close without completing
                 showGreenGoddessScreen = false
             },
             onFinished = {
@@ -275,7 +276,6 @@ fun QuestScreen(
         BeefTartareQuestScreen(
             fontFamily = juaFont,
             onClose = {
-                // close without completing
                 showBeefTartareScreen = false
             },
             onFinished = {
@@ -286,8 +286,43 @@ fun QuestScreen(
         )
     }
 
+    // Cut an Onion Like a Pro quest steps screen
+    if (showOnionScreen) {
+        val onionQuest = quests.firstOrNull { it.title == "Cut an Onion Like a Pro" }
 
-    // Duolingo-style finish screen overlay
+        OnionCuttingQuestScreen(
+            fontFamily = juaFont,
+            onClose = {
+
+                showOnionScreen = false
+            },
+            onFinished = {
+                showOnionScreen = false
+                onionQuest?.let { viewModel.completeQuest(it) }
+                showFinishScreen = true
+            }
+        )
+    }
+
+// Fudge Brownies quest steps screen
+    if (showBrownieScreen) {
+        val brownieQuest = quests.firstOrNull { it.title == "Fudge Brownies" }
+
+        FudgeBrownieQuestScreen(
+            fontFamily = juaFont,
+            onClose = {
+                showBrownieScreen = false
+            },
+            onFinished = {
+                showBrownieScreen = false
+                brownieQuest?.let { viewModel.completeQuest(it) }
+                showFinishScreen = true
+            }
+        )
+    }
+
+
+
     if (showFinishScreen) {
         QuestFinishScreen(
             fontFamily = juaFont,
@@ -337,8 +372,8 @@ fun OrganicQuestPathConnector(
             cap = StrokeCap.Round,
             pathEffect = if (isDone) null else PathEffect.dashPathEffect(
                 floatArrayOf(
-                    4.dp.toPx(),  // short dash
-                    25.dp.toPx()  // space
+                    4.dp.toPx(),
+                    25.dp.toPx()
                 ),
                 0f
             )
@@ -430,7 +465,7 @@ fun QuestNode(
                 }
             }
 
-            // Triangle marker pointing DOWN at current quest
+            // Triangle marker pointing down at current quest
             if (isCurrentQuest && !quest.isDone) {
                 DownTriangleMarker(
                     modifier = Modifier
@@ -453,9 +488,9 @@ fun DownTriangleMarker(
         val w = size.width
         val h = size.height
         val path = androidx.compose.ui.graphics.Path().apply {
-            moveTo(w / 2f, h)    // bottom point (pointing down)
-            lineTo(0f, 0f)       // top left
-            lineTo(w, 0f)        // top right
+            moveTo(w / 2f, h)
+            lineTo(0f, 0f)
+            lineTo(w, 0f)
             close()
         }
         drawPath(path = path, color = color)

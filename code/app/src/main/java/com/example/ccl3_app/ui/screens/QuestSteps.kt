@@ -27,18 +27,16 @@ import androidx.compose.ui.unit.sp
 import com.example.ccl3_app.R
 import kotlinx.coroutines.launch
 
-// ─────────────────────────────────────────────────────────────
+
 // Generic data class for any quest step
-// ─────────────────────────────────────────────────────────────
 data class QuestStep(
     val title: String,
     val body: String,
     val imageRes: Int
 )
 
-// ─────────────────────────────────────────────────────────────
+
 // Shared pager UI used by all quest screens
-// ─────────────────────────────────────────────────────────────
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun QuestStepsPagerScreen(
@@ -68,7 +66,7 @@ fun QuestStepsPagerScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            // ───────── Top bar: close + progress ─────────
+            // Top bar: close + progress
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -89,24 +87,24 @@ fun QuestStepsPagerScreen(
                         .weight(1f)
                         .height(10.dp)
                         .clip(RoundedCornerShape(50))
-                        .background(Color(0xFF305B63)) // dark teal track
+                        .background(Color(0xFF305B63))
                 ) {
                     Box(
                         modifier = Modifier
                             .fillMaxHeight()
                             .fillMaxWidth(progress)
-                            .background(Color(0xFFD9FFF2)) // mint fill
+                            .background(Color(0xFFD9FFF2))
                     )
                 }
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // ───────── Card area: stretches between top bar and button ─────────
+            // Card area: stretches between top bar and button
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f),        // 👈 use all remaining vertical space
+                    .weight(1f),
                 contentAlignment = Alignment.TopCenter
             ) {
                 // Back shadow card
@@ -116,7 +114,7 @@ fun QuestStepsPagerScreen(
                         .fillMaxHeight()
                         .offset(x = 16.dp, y = 12.dp)
                         .clip(RoundedCornerShape(28.dp))
-                        .background(Color(0xFFAA5423)) // darker orange shadow
+                        .background(Color(0xFFAA5423))
                 )
 
                 // Front card with pager
@@ -126,7 +124,7 @@ fun QuestStepsPagerScreen(
                         .fillMaxHeight(),
                     shape = RoundedCornerShape(28.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFFE37434) // orange front card
+                        containerColor = Color(0xFFE37434)
                     ),
                     elevation = CardDefaults.cardElevation(0.dp)
                 ) {
@@ -136,7 +134,7 @@ fun QuestStepsPagerScreen(
                     ) { pageIndex ->
                         val step = steps[pageIndex]
 
-                        // 👇 Scrollable content INSIDE the card
+                        // Scrollable content inside the card
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -159,7 +157,7 @@ fun QuestStepsPagerScreen(
                                 contentDescription = step.title,
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .aspectRatio(4f / 3f) // works well on most screens
+                                    .aspectRatio(4f / 3f)
                                     .clip(RoundedCornerShape(20.dp))
                                     .background(Color.White.copy(alpha = 0.15f)),
                                 contentScale = ContentScale.Crop
@@ -183,20 +181,20 @@ fun QuestStepsPagerScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // ───────── Bottom button: a bit above nav bar ─────────
+            //Bottom button: a bit above nav bar
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 16.dp) // gap above app bottom bar
-                    .navigationBarsPadding(), // gap above system nav bar
+                    .padding(bottom = 16.dp)
+                    .navigationBarsPadding(),
                 contentAlignment = Alignment.Center
             ) {
-                // ───────── Bottom button: a bit above nav bar ─────────
+                //Bottom button: a bit above nav bar
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 16.dp)      // space above your app's bottom nav bar
-                        .navigationBarsPadding(),     // space above system nav bar
+                        .padding(bottom = 16.dp)
+                        .navigationBarsPadding(),
                     contentAlignment = Alignment.Center
                 ) {
                     BoxWithConstraints(
@@ -205,10 +203,6 @@ fun QuestStepsPagerScreen(
                     ) {
                         val screenWidth = maxWidth
 
-                        // 🔹 Make width responsive:
-                        // - Very small screens  -> 55%
-                        // - Small-ish screens   -> 65%
-                        // - Normal & big screens -> 72%
                         val buttonWidthFraction =
                             when {
                                 screenWidth < 300.dp -> 0.55f
@@ -223,15 +217,15 @@ fun QuestStepsPagerScreen(
                         val isLastPage = page == pageCount - 1
                         val buttonText = if (isLastPage) "Finish" else "Next"
 
-                        // Shadow behind button (same responsive width)
+                        // Shadow behind button
                         Box(
                             modifier = baseModifier
                                 .offset(y = 4.dp)
                                 .clip(RoundedCornerShape(26.dp))
-                                .background(Color(0xFF0A3941)) // dark teal shadow
+                                .background(Color(0xFF0A3941))
                         )
 
-                        // Button itself (same width as shadow)
+                        // Button itself
                         Button(
                             onClick = {
                                 if (isLastPage) {
@@ -266,10 +260,7 @@ fun QuestStepsPagerScreen(
 
 
 
-// ─────────────────────────────────────────────────────────────
 // Specific quest screens
-// ─────────────────────────────────────────────────────────────
-
 @Composable
 fun FryEggQuestScreen(
     fontFamily: FontFamily,
@@ -372,35 +363,35 @@ fun BeefTartareQuestScreen(
             body = "In this quest you’ll learn the basics of making a classic beef tartare: " +
                     "finely chopped raw beef mixed with herbs, pickles, and seasonings. " +
                     "Always use very fresh, high-quality beef from a trusted source.",
-            imageRes = R.drawable.tartare_overview   // TODO: replace with your real drawable
+            imageRes = R.drawable.tartare_overview
         ),
         QuestStep(
             title = "Step 1 – Safety & setup",
             body = "Ask your butcher for beef suitable for tartare (often a lean cut like tenderloin or sirloin). " +
                     "Keep the meat in the fridge until the last moment. " +
                     "Clean your cutting board, knife, and hands well, and have a cold plate ready for serving.",
-            imageRes = R.drawable.tartare_step1      // TODO: replace with your real drawable
+            imageRes = R.drawable.tartare_step1
         ),
         QuestStep(
             title = "Step 2 – Chop the ingredients",
             body = "With a sharp knife, finely dice the chilled beef into very small cubes. " +
                     "Finely chop some shallot, capers, pickles (or cornichons), and fresh parsley. " +
                     "Keep everything cold as you work.",
-            imageRes = R.drawable.tartare_step2      // TODO: replace with your real drawable
+            imageRes = R.drawable.tartare_step2
         ),
         QuestStep(
             title = "Step 3 – Season the tartare",
             body = "In a chilled bowl, gently mix the chopped beef with the shallot, capers, pickles, and parsley. " +
                     "Add a spoon of mustard, a dash of Worcestershire or similar sauce, a drizzle of olive oil, " +
                     "and salt and pepper. Mix just until combined so the meat stays tender.",
-            imageRes = R.drawable.tartare_step3      // TODO: replace with your real drawable
+            imageRes = R.drawable.tartare_step3
         ),
         QuestStep(
             title = "Step 4 – Plate & enjoy",
             body = "Shape the tartare on a cold plate using a ring mold or spoon. " +
                     "You can top it with a raw egg yolk if you like, but remember that both raw meat and raw egg " +
                     "carry a risk of foodborne illness. Serve immediately with toasted bread or fries.",
-            imageRes = R.drawable.tartare_step4      // TODO: replace with your real drawable
+            imageRes = R.drawable.tartare_step4
         )
     )
 
@@ -411,3 +402,91 @@ fun BeefTartareQuestScreen(
         onFinished = onFinished
     )
 }
+
+@Composable
+fun OnionCuttingQuestScreen(
+    fontFamily: FontFamily,
+    onClose: () -> Unit,
+    onFinished: () -> Unit
+) {
+    val steps = listOf(
+        QuestStep(
+            title = "Overview",
+            body = "In this quest you’ll learn how professional chefs quickly and safely cut an onion. " +
+                    "You’ll keep the root intact for stability, use the claw grip to protect your fingers, " +
+                    "and practice the two essential cuts: horizontal and vertical.",
+            imageRes = R.drawable.onion_overview
+        ),
+        QuestStep(
+            title = "Step 1 – Prep & horizontal cuts",
+            body = "Slice off the top of the onion (leave the root). Cut the onion in half through the root " +
+                    "and peel it. Place one half flat-side down. Use the claw grip to hold it steady. " +
+                    "Make 1–2 horizontal cuts toward the root, stopping just before cutting through.",
+            imageRes = R.drawable.onion_step1
+        ),
+        QuestStep(
+            title = "Step 2 – Vertical cuts & final dice",
+            body = "Make vertical cuts from top to root, spaced based on your desired dice size. " +
+                    "Finally, slice crosswise to produce clean, even onion cubes. " +
+                    "Repeat with the second half and discard the root when done.",
+            imageRes = R.drawable.onion_step2
+        )
+    )
+
+    QuestStepsPagerScreen(
+        fontFamily = fontFamily,
+        steps = steps,
+        onClose = onClose,
+        onFinished = onFinished
+    )
+}
+
+
+@Composable
+fun FudgeBrownieQuestScreen(
+    fontFamily: FontFamily,
+    onClose: () -> Unit,
+    onFinished: () -> Unit
+) {
+    val steps = listOf(
+        QuestStep(
+            title = "Overview",
+            body = "In this quest you'll master the art of making rich, fudgy brownies with a shiny crackly top. " +
+                    "We’ll melt chocolate and butter, whisk the sugar mixture properly, and bake them just right.",
+            imageRes = R.drawable.brownie_overview
+        ),
+        QuestStep(
+            title = "Step 1 – Melt chocolate & butter",
+            body = "In a heatproof bowl, melt dark chocolate and butter together over a pot of simmering water " +
+                    "(or microwave in short bursts). Stir until completely smooth and glossy.",
+            imageRes = R.drawable.brownie_step1
+        ),
+        QuestStep(
+            title = "Step 2 – Whisk eggs & sugar",
+            body = "In a separate bowl, whisk eggs and sugar for at least 1–2 minutes until pale and slightly thick. " +
+                    "This step is crucial: it creates the classic shiny brownie top.",
+            imageRes = R.drawable.brownie_step2
+        ),
+        QuestStep(
+            title = "Step 3 – Combine & fold in flour",
+            body = "Slowly pour the warm chocolate mixture into the egg mixture while whisking. " +
+                    "Sift in flour, cocoa powder, and a pinch of salt. Gently fold until just combined — " +
+                    "overmixing leads to cakey brownies.",
+            imageRes = R.drawable.brownie_step3
+        ),
+        QuestStep(
+            title = "Step 4 – Bake perfectly",
+            body = "Pour into a lined baking pan. Bake at 175°C (350°F) for 20–25 minutes. " +
+                    "The edges should be set and the center slightly wobbly. Let cool completely for maximum fudginess.",
+            imageRes = R.drawable.brownie_step4
+        )
+    )
+
+    QuestStepsPagerScreen(
+        fontFamily = fontFamily,
+        steps = steps,
+        onClose = onClose,
+        onFinished = onFinished
+    )
+}
+
