@@ -5,5 +5,5 @@ data class Quest(
     val title: String,
     val description: String,
     val isDone: Boolean = false,
-    val level: Int // order of the quest (1, 2, 3, ...)
+    val level: Int
 )

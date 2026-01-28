@@ -28,7 +28,6 @@ class ProfileRepository(private val profileDao: ProfileDao) {
         }
     }
 
-    // ✅ One-shot fetch for detail screen
     suspend fun getSingleProfile(): Profile? =
         profileDao.getSingleProfile()?.toDomain()
 

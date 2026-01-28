@@ -76,7 +76,7 @@ fun RecipeCard(
     ) {
         Box {
 
-            // ➕ ADD BUTTON
+            // Add Button
             IconButton(
                 onClick = onAddRecipe,
                 modifier = Modifier
@@ -105,13 +105,6 @@ fun RecipeCard(
                         .background(Color.DarkGray),
                     contentAlignment = Alignment.Center
                 ) {
-                    // TODO: Replace with actual image
-                    // Image(
-                    //     painter = painterResource(id = recipe.imageResId),
-                    //     contentDescription = recipe.name,
-                    //     contentScale = ContentScale.Crop,
-                    //     modifier = Modifier.fillMaxSize()
-                    // )
                     Text(
                         text = "🍳",
                         fontSize = 72.sp
@@ -129,7 +122,7 @@ fun RecipeCard(
                 color = Color.Black
             )
 
-            // Ingredient count (since no duration field)
+            // Ingredient count
             Text(
                 text = "${recipe.ingredients.size} ingredients",
                 fontSize = 14.sp,

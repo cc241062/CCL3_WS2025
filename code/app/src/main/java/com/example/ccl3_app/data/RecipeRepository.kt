@@ -82,10 +82,8 @@ class RecipeRepository(private val recipeDao: RecipeDao) {
     ) {
         recipeDao.addRecipe(
             RecipeEntity(
-                //id = 0,
                 stackId = stackId,
                 title = title,
-                //image = image,
                 description = description,
                 ingredients = ingredients,
                 instructions = instructions,
@@ -100,7 +98,6 @@ class RecipeRepository(private val recipeDao: RecipeDao) {
                 id = recipe.id,
                 stackId = recipe.stackId,
                 title = recipe.title,
-                //image = recipe.image,
                 description = recipe.description,
                 ingredients = recipe.ingredients,
                 instructions = recipe.instructions
@@ -115,7 +112,6 @@ class RecipeRepository(private val recipeDao: RecipeDao) {
             id = entity.id,
             stackId = entity.stackId,
             title = entity.title,
-            //image = entity.image,
             description = entity.description,
             ingredients = entity.ingredients,
             instructions = entity.instructions
@@ -129,7 +125,6 @@ class RecipeRepository(private val recipeDao: RecipeDao) {
                 id = recipe.id,
                 stackId = recipe.stackId,
                 title = recipe.title,
-                //image = recipe.image,
                 description = recipe.description,
                 ingredients = recipe.ingredients,
                 instructions = recipe.instructions

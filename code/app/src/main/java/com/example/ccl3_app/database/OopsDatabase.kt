@@ -91,41 +91,8 @@ abstract class OopsDatabase : RoomDatabase() {
                     false,
                     5
                 ),
-                QuestEntity(
-                    0,
-                    "Cook Pasta",
-                    "Boil pasta al dente",
-                    false,
-                    6
-                ),
-                QuestEntity(
-                    0,
-                    "Make a Sandwich",
-                    "Create a delicious sandwich",
-                    false,
-                    7
-                ),
-                QuestEntity(
-                    0,
-                    "Dice Vegetables",
-                    "Learn proper knife skills for dicing",
-                    false,
-                    8
-                ),
-                QuestEntity(
-                    0,
-                    "Make a Salad",
-                    "Prepare a fresh and healthy salad",
-                    false,
-                    9
-                ),
-                QuestEntity(
-                    0,
-                    "Bake Cookies",
-                    "Bake your first batch of cookies",
-                    false,
-                    10
-                )
+
+
             )
 
             quests.forEach { quest ->

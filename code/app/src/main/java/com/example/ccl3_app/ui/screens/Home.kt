@@ -1,5 +1,6 @@
 package com.example.ccl3_app.ui.screens
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
@@ -33,6 +34,13 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.IntOffset
+import kotlin.math.roundToInt
+import kotlin.math.abs
 
 val JuaFont = FontFamily(Font(R.font.jua_regular, FontWeight.Normal))
 
@@ -167,47 +175,42 @@ fun HomeScreen(
 
                             DropdownMenu(
                                 expanded = stackMenuExpanded,
-                                onDismissRequest = { stackMenuExpanded = false }
+                                onDismissRequest = { stackMenuExpanded = false },
+                                modifier = Modifier
+                                    .background(Color(0xFFFFE4C7))
                             ) {
-                                DropdownMenu(
-                                    expanded = stackMenuExpanded,
-                                    onDismissRequest = { stackMenuExpanded = false },
-                                    modifier = Modifier
-                                        .background(Color(0xFFFFE4C7))
-                                ) {
+                                DropdownMenuItem(
+                                    text = {
+                                        Text(
+                                            text = "All recipes",
+                                            fontFamily = JuaFont,
+                                            color = Color(0xFFAA5423)
+                                        )
+                                    },
+                                    onClick = {
+                                        viewModel.selectStack(null)
+                                        stackMenuExpanded = false
+                                    },
+                                    modifier = Modifier.background(Color.Transparent)
+                                )
+
+                                Divider(color = Color(0xFFE0A36E))
+
+                                stacks.forEach { stack ->
                                     DropdownMenuItem(
                                         text = {
                                             Text(
-                                                text = "All recipes",
+                                                text = stack.name,
                                                 fontFamily = JuaFont,
                                                 color = Color(0xFFAA5423)
                                             )
                                         },
                                         onClick = {
-                                            viewModel.selectStack(null)
+                                            viewModel.selectStack(stack.id)
                                             stackMenuExpanded = false
                                         },
                                         modifier = Modifier.background(Color.Transparent)
                                     )
-
-                                    Divider(color = Color(0xFFE0A36E))
-
-                                    stacks.forEach { stack ->
-                                        DropdownMenuItem(
-                                            text = {
-                                                Text(
-                                                    text = stack.name,
-                                                    fontFamily = JuaFont,
-                                                    color = Color(0xFFAA5423)
-                                                )
-                                            },
-                                            onClick = {
-                                                viewModel.selectStack(stack.id)
-                                                stackMenuExpanded = false
-                                            },
-                                            modifier = Modifier.background(Color.Transparent)
-                                        )
-                                    }
                                 }
                             }
                         }
@@ -230,6 +233,8 @@ fun HomeScreen(
                             recipesCount = recipesInStack.size,
                             currentIndex = currentRecipeIndex,
                             onRecipeClick = { onRecipeClick(currentRecipe.id) },
+                            onSwipeLeft = { viewModel.nextRecipe() },      // swipe left -> next
+                            onSwipeRight = { viewModel.previousRecipe() }, // swipe right -> previous
                             cardHeight = screenHeight * 0.8f,
                             modifier = Modifier
                                 .align(Alignment.Center)
@@ -257,7 +262,7 @@ fun HomeScreen(
 }
 
 
-// ------------------ other composables unchanged --------------------
+// ------------------ other composables --------------------
 
 @Composable
 fun WelcomeQuestCard(onClick: () -> Unit = {}) {
@@ -346,9 +351,30 @@ fun RecipeCardStack(
     recipesCount: Int = 1,
     currentIndex: Int = 0,
     onRecipeClick: () -> Unit = {},
+    onSwipeLeft: () -> Unit = {},
+    onSwipeRight: () -> Unit = {},
     cardHeight: Dp,
     modifier: Modifier = Modifier
 ) {
+    val density = LocalDensity.current
+    val swipeThresholdPx = with(density) { 80.dp.toPx() }
+
+    // raw drag offset controlled by gestures
+    var rawOffsetX by remember { mutableStateOf(0f) }
+    // smooth animated offset used for the UI
+    val animatedOffsetX by animateFloatAsState(
+        targetValue = rawOffsetX,
+        label = "cardSwipeOffset"
+    )
+
+    // 👉 how far we are swiping, 0..1
+    val swipeProgress = (abs(animatedOffsetX) / swipeThresholdPx).coerceIn(0f, 1f)
+
+    // front card base + darker color
+    val baseFrontColor = Color(0xFFC8F4EC)
+    val darkerFrontColor = Color(0xFFADDCD3) // just a bit darker
+    val frontCardColor = lerp(baseFrontColor, darkerFrontColor, swipeProgress)
+
     Box(
         modifier = modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center
@@ -385,10 +411,40 @@ fun RecipeCardStack(
                 onClick = onRecipeClick,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(cardHeight),
+                    .height(cardHeight)
+                    // use the *animated* offset for smoothness
+                    .offset { IntOffset(animatedOffsetX.roundToInt(), 0) }
+                    .pointerInput(Unit) {
+                        detectHorizontalDragGestures(
+                            onHorizontalDrag = { _, dragAmount ->
+                                rawOffsetX += dragAmount
+                            },
+                            onDragEnd = {
+                                when {
+                                    rawOffsetX <= -swipeThresholdPx -> {
+                                        // swipe left
+                                        rawOffsetX = 0f
+                                        onSwipeLeft()
+                                    }
+                                    rawOffsetX >= swipeThresholdPx -> {
+                                        // swipe right
+                                        rawOffsetX = 0f
+                                        onSwipeRight()
+                                    }
+                                    else -> {
+                                        // not far enough -> snap back
+                                        rawOffsetX = 0f
+                                    }
+                                }
+                            },
+                            onDragCancel = {
+                                rawOffsetX = 0f
+                            }
+                        )
+                    },
                 shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFFC8F4EC)
+                    containerColor = frontCardColor
                 ),
                 elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {
@@ -473,6 +529,8 @@ fun RecipeCardStack(
         }
     }
 }
+
+
 
 @Composable
 fun RecipeStackArrows(

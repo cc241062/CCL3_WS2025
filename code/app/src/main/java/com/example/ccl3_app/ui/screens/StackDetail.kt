@@ -10,13 +10,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -29,7 +29,6 @@ import com.example.ccl3_app.data.StackRepository
 import com.example.ccl3_app.database.OopsDatabase
 import com.example.ccl3_app.ui.theme.Jua
 import com.example.ccl3_app.ui.theme.Orange
-import com.example.ccl3_app.ui.theme.PostItYellow
 import com.example.ccl3_app.ui.theme.Teal
 import com.example.ccl3_app.ui.viewmodels.StackDetailViewModel
 import com.example.ccl3_app.R
@@ -68,10 +67,12 @@ fun StackDetailScreen(
             ?: Teal
     }
 
+
+    val isYellowStack = stack?.color?.equals("FFF9C4", ignoreCase = true) == true
+
     val isAllRecipes = stackId == StackDetailViewModel.ALL_RECIPES_STACK_ID
 
 
-    // ✅ Apply Jua to all Text in this screen
     CompositionLocalProvider(
         LocalTextStyle provides LocalTextStyle.current.copy(fontFamily = Jua)
     ) {
@@ -101,7 +102,13 @@ fun StackDetailScreen(
                                     painter = painterResource(id = R.drawable.edit),
                                     contentDescription = "Edit Stack",
                                     modifier = Modifier.size(32.dp),
-                                    contentScale = ContentScale.Fit
+                                    contentScale = ContentScale.Fit,
+                                    colorFilter = if (isYellowStack)
+                                        ColorFilter.tint(
+                                            Color.White,
+                                            blendMode = BlendMode.SrcIn
+                                        )
+                                    else null
                                 )
                             }
 
@@ -115,7 +122,13 @@ fun StackDetailScreen(
                                     painter = painterResource(id = R.drawable.delete),
                                     contentDescription = "Delete Stack",
                                     modifier = Modifier.size(28.dp),
-                                    contentScale = ContentScale.Fit
+                                    contentScale = ContentScale.Fit,
+                                    colorFilter = if (isYellowStack)
+                                        ColorFilter.tint(
+                                            Color.White,
+                                            blendMode = BlendMode.SrcIn
+                                        )
+                                    else null
                                 )
                             }
                         }
@@ -126,7 +139,6 @@ fun StackDetailScreen(
                         navigationIconContentColor = Color.White,
                         actionIconContentColor = Color.White
                     )
-
                 )
             },
             floatingActionButton = {
@@ -147,8 +159,6 @@ fun StackDetailScreen(
                     }
                 }
             }
-
-
         ) { paddingValues ->
             Column(
                 modifier = Modifier
@@ -203,16 +213,12 @@ fun StackDetailScreen(
                     ) {
                         items(recipes) { recipe ->
                             RecipeListItem(
-
                                 title = recipe.title,
                                 description = recipe.description,
                                 onClick = { onRecipeClick(recipe.id) }
-
                             )
                         }
-
                     }
-
                 }
             }
         }
@@ -233,7 +239,6 @@ private fun RecipeListItem(
         colors = CardDefaults.cardColors(
             containerColor = RecipeCardColor
         ),
-
     ) {
         Column(
             modifier = Modifier
